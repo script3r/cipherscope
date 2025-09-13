@@ -155,7 +155,7 @@ fn main() -> Result<()> {
                 .progress_chars("#>-"),
         );
         pb.set_message("Scanning files...");
-        
+
         cfg.progress_callback = Some(Arc::new(move |processed, total, findings| {
             pb.set_length(total as u64);
             pb.set_position(processed as u64);

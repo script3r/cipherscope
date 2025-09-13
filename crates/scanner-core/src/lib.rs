@@ -834,14 +834,14 @@ impl<'a> Scanner<'a> {
 
         let (tx, rx) = bounded::<Finding>(8192);
         let (progress_tx, progress_rx) = bounded::<usize>(1000);
-        
+
         // Spawn a thread to collect progress updates
         let progress_handle = if let Some(ref callback) = self.config.progress_callback {
             let callback = callback.clone();
             Some(std::thread::spawn(move || {
                 let mut processed = 0;
                 let mut findings_count = 0;
-                
+
                 while let Ok(_) = progress_rx.recv() {
                     processed += 1;
                     callback(processed, total_files, findings_count);
@@ -851,41 +851,44 @@ impl<'a> Scanner<'a> {
             None
         };
 
-        files.par_iter().for_each_with((tx.clone(), progress_tx.clone()), |(tx, progress_tx), path| {
-            if let Some(lang) = Self::detect_language(path) {
-                if let Ok(bytes) = Self::load_file(path) {
-                    let unit = ScanUnit {
-                        path: path.clone(),
-                        lang,
-                        bytes: bytes.clone(),
-                    };
-                    // Strip comments once and reuse
-                    let stripped = strip_comments(lang, &bytes);
-                    let stripped_s = String::from_utf8_lossy(&stripped);
-                    let index = LineIndex::new(stripped_s.as_bytes());
+        files.par_iter().for_each_with(
+            (tx.clone(), progress_tx.clone()),
+            |(tx, progress_tx), path| {
+                if let Some(lang) = Self::detect_language(path) {
+                    if let Ok(bytes) = Self::load_file(path) {
+                        let unit = ScanUnit {
+                            path: path.clone(),
+                            lang,
+                            bytes: bytes.clone(),
+                        };
+                        // Strip comments once and reuse
+                        let stripped = strip_comments(lang, &bytes);
+                        let stripped_s = String::from_utf8_lossy(&stripped);
+                        let index = LineIndex::new(stripped_s.as_bytes());
 
-                    let mut em = Emitter {
-                        tx: tx.clone(),
-                        rx: rx.clone(),
-                    };
-                    for det in &self.detectors {
-                        if !det.languages().contains(&lang) {
-                            continue;
+                        let mut em = Emitter {
+                            tx: tx.clone(),
+                            rx: rx.clone(),
+                        };
+                        for det in &self.detectors {
+                            if !det.languages().contains(&lang) {
+                                continue;
+                            }
+                            if !prefilter_hit(det, &stripped) {
+                                continue;
+                            }
+                            let _ = det.scan_optimized(&unit, &stripped_s, &index, &mut em);
                         }
-                        if !prefilter_hit(det, &stripped) {
-                            continue;
-                        }
-                        let _ = det.scan_optimized(&unit, &stripped_s, &index, &mut em);
                     }
                 }
-            }
-            // Signal that this file has been processed
-            let _ = progress_tx.send(1);
-        });
+                // Signal that this file has been processed
+                let _ = progress_tx.send(1);
+            },
+        );
 
         drop(tx);
         drop(progress_tx);
-        
+
         for f in rx.iter() {
             findings.push(f);
         }
