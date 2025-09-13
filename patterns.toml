@@ -13,21 +13,38 @@ apis = [
   "\\bHMAC_Init_ex\\(",
   "\\bEVP_DigestSignInit\\(",
   "\\bEVP_DigestVerifyInit\\(",
+  "\\bEVP_\\w+\\(",
+  "\\bRSA_\\w+\\(",
+  "\\bSSL_\\w+\\(",
+  "\\bHMAC_\\w+\\(",
+  "\\bMD5_\\w+\\(",
+  "\\bSHA1_\\w+\\(",
+  "\\bSHA256_\\w+\\(",
 ]
 
 [[library]]
 name = "LibreSSL"
 languages = ["C", "C++"]
 [library.patterns]
-include = ["^\\s*#\\s*include\\s*<openssl/[^>]+>"]
-apis = ["\\bEVP_\\w+\\(", "\\bRSA_\\w+\\(", "\\bSSL_\\w+\\("]
+include = [
+  "^\\s*#\\s*include\\s*<libressl/[^>]+>",
+]
+apis = [
+  "LIBRESSL_VERSION_NUMBER",
+  "LIBRESSL_",
+]
 
 [[library]]
 name = "BoringSSL"
 languages = ["C", "C++"]
 [library.patterns]
-include = ["^\\s*#\\s*include\\s*<openssl/[^>]+>"]
-apis = ["\\bEVP_\\w+\\(", "\\bRSA_\\w+\\(", "\\bSSL_\\w+\\("]
+include = [
+  "^\\s*#\\s*include\\s*<boringssl/[^>]+>",
+]
+apis = [
+  "BORINGSSL_",
+  "OPENSSL_IS_BORINGSSL",
+]
 
 [[library]]
 name = "libsodium"
@@ -142,15 +159,20 @@ apis = [
   "Cipher\\.getInstance\\(.*,?\"BC\"?\\)",
   "Mac\\.getInstance\\(",
   "Signature\\.getInstance\\(",
+  "BouncyCastleProvider",
   "\\.sign\\(",
   "\\.verify\\(",
 ]
 
 [[library]]
 name = "Google Tink"
-languages = ["Java"]
+languages = ["Java", "Python"]
 [library.patterns]
-import = ["^\\s*import\\s+com\\.google\\.crypto\\.tink\\."]
+import = [
+  "^\\s*import\\s+com\\.google\\.crypto\\.tink\\.",
+  "^\\s*from\\s+tink\\b",
+  "^\\s*import\\s+tink\\b",
+]
 apis = [
   "TinkConfig\\.register\\(",
   "\\.encrypt\\(",
@@ -183,6 +205,37 @@ apis = [
   "\\bbcrypt\\.GenerateFromPassword\\(",
   "chacha20poly1305\\.New",
   "scrypt\\.",
+]
+
+[[library]]
+name = "age"
+languages = ["Go"]
+[library.patterns]
+import = [
+  "^\\s*import\\s+\"filippo\\.io/age\"",
+  "^\\s*\"filippo\\.io/age\"",
+  "^\\s*import\\s+\"filippo\\.io/age/cmd/\"",
+  "^\\s*\"filippo\\.io/age/cmd/\"",
+]
+apis = [
+  "age\\.Encrypt\\(",
+  "age\\.Decrypt\\(",
+  "age\\.ParseRecipients\\(",
+  "age\\.ParseIdentities\\(",
+  "age\\.GenerateX25519Identity\\(",
+  "age\\.ScryptRecipient\\(",
+  "age\\.ScryptIdentity\\(",
+  "age\\.SSHRecipient\\(",
+  "age\\.SSHIdentity\\(",
+  "age\\.NewFile\\(",
+  "age\\.NewReader\\(",
+  "age\\.NewWriter\\(",
+  "age\\.NewX25519Recipient\\(",
+  "age\\.NewX25519Identity\\(",
+  "age\\.NewScryptRecipient\\(",
+  "age\\.NewScryptIdentity\\(",
+  "age\\.NewSSHRecipient\\(",
+  "age\\.NewSSHIdentity\\(",
 ]
 
 [[library]]
@@ -255,13 +308,33 @@ apis = [
 name = "PyNaCl"
 languages = ["Python"]
 [library.patterns]
-import = ["^\\s*from\\s+nacl\\b", "^\\s*import\\s+nacl\\b"]
+import = [
+  "^\\s*from\\s+nacl\\b",
+  "^\\s*import\\s+nacl\\b",
+  "^\\s*from\\s+nacl\\.signing\\b",
+  "^\\s*from\\s+nacl\\.secret\\b",
+  "^\\s*from\\s+nacl\\.encoding\\b",
+  "^\\s*from\\s+nacl\\.hash\\b",
+  "^\\s*from\\s+nacl\\.pwhash\\b",
+]
 apis = [
   "nacl\\.secret\\.SecretBox",
-  "\\.encrypt\\(",
-  "\\.decrypt\\(",
+  "nacl\\.signing\\.SigningKey",
+  "nacl\\.signing\\.VerifyKey",
+  "nacl\\.encoding\\.",
+  "nacl\\.hash\\.",
+  "nacl\\.pwhash\\.",
+  "nacl\\.hashlib\\.",
+  "SigningKey\\.generate\\(",
   "SigningKey\\.sign\\(",
   "VerifyKey\\.verify\\(",
+  "SignedMessage\\.",
+  "\\.encrypt\\(",
+  "\\.decrypt\\(",
+  "\\.sign\\(",
+  "\\.verify\\(",
+  "HexEncoder",
+  "Base64Encoder",
 ]
 
 [[library]]
@@ -318,6 +391,7 @@ languages = ["PHP"]
 apis = [
   "\\bsodium_crypto_secretbox\\(",
   "\\bsodium_crypto_secretbox_open\\(",
+  "\\bsodium_crypto_secretbox_keygen\\(",
   "\\bsodium_crypto_aead_.*_encrypt\\(",
   "\\bsodium_crypto_aead_.*_decrypt\\(",
   "\\bsodium_crypto_auth\\(",

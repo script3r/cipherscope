@@ -64,6 +64,10 @@ struct Args {
     /// Dry-run: list files that would be scanned
     #[arg(long, action = ArgAction::SetTrue)]
     dry_run: bool,
+
+    /// Path to patterns file
+    #[arg(long, value_name = "FILE", default_value = "patterns.toml")]
+    patterns: PathBuf,
 }
 
 fn main() -> Result<()> {
@@ -75,8 +79,8 @@ fn main() -> Result<()> {
             .ok();
     }
 
-    // Load patterns: patterns.toml + optional patterns.local.toml
-    let base = fs::read_to_string("patterns.toml").context("read patterns.toml")?;
+    // Load patterns from specified file
+    let base = fs::read_to_string(&args.patterns).with_context(|| format!("read patterns file: {}", args.patterns.display()))?;
     let reg = PatternRegistry::load(&base)?;
     let reg = Arc::new(reg);
 

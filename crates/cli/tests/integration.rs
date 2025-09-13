@@ -50,6 +50,12 @@ fn scan_fixtures() {
     let fixtures = workspace.join("fixtures");
     let findings = scanner.run(&[fixtures.clone()]).unwrap();
 
+    // Debug: print all findings
+    println!("Found {} findings:", findings.len());
+    for f in &findings {
+        println!("  {:?} | {} | {}:{}", f.language, f.library, f.file.display(), f.span.line);
+    }
+
     // Expect at least one hit per language category in positive fixtures
     let has_rust = findings
         .iter()

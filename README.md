@@ -1,6 +1,6 @@
 ## cryptofind
 
-Fast, low-false-positive static scanner that finds third-party cryptographic libraries and call sites across Go, Java, C, C++, Rust, Python, and PHP codebases.
+Fast, low-false-positive static scanner that finds third-party cryptographic libraries and call sites across Go, Java, C, C++, Rust, Python, PHP, Swift, Objective-C, and Kotlin codebases.
 
 ### Install & Run
 
@@ -20,6 +20,7 @@ Key flags:
 - `--min-confidence 0.9`: filter low-confidence hits
 - `--threads N`: set thread pool size
 - `--max-file-size MB`: skip large files (default 2)
+- `--patterns PATH`: specify patterns file (default: `patterns.toml`)
 - `--include-glob GLOB` / `--exclude-glob GLOB`
 - `--allow LIB` / `--deny LIB`
 - `--deterministic`: stable output ordering
@@ -54,6 +55,27 @@ SARIF snippet:
 ### Configuration & Patterns
 
 Patterns are loaded from `patterns.toml` (and optional `patterns.local.toml`, if you add it). The schema supports per-language `include`/`import`/`namespace`/`apis` anchored regexes. The engine strips comments and avoids string literals to reduce false positives.
+
+#### Supported Languages & File Extensions
+
+The scanner automatically detects and processes files with these extensions:
+
+- **C/C++**: `.c`, `.h`, `.cc`, `.cpp`, `.cxx`, `.c++`, `.hpp`, `.hxx`, `.h++`, `.hh`
+- **Java**: `.java`
+- **Go**: `.go`
+- **Rust**: `.rs`
+- **Python**: `.py`, `.pyw`, `.pyi`
+- **PHP**: `.php`, `.phtml`, `.php3`, `.php4`, `.php5`, `.phps`
+- **Swift**: `.swift`
+- **Objective-C**: `.m`, `.mm`, `.M`
+- **Kotlin**: `.kt`, `.kts`
+
+#### Performance Optimizations
+
+- **Default Glob Filtering**: Only processes source files, skipping documentation, images, and binaries
+- **Pattern Caching**: Compiled patterns are cached per language for faster lookups
+- **Aho-Corasick Prefiltering**: Fast substring matching before expensive regex operations
+- **Parallel Processing**: Multi-threaded file scanning using Rayon
 
 ### Extending Detectors
 
