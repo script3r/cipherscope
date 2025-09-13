@@ -1,17 +1,15 @@
 use anyhow::{anyhow, Context, Result};
-use aho_corasick::{AhoCorasick, AhoCorasickBuilder};
+use aho_corasick::AhoCorasickBuilder;
 use crossbeam_channel::{bounded, Receiver, Sender};
 use ignore::WalkBuilder;
-use once_cell::sync::OnceCell;
 use rayon::prelude::*;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeSet;
 use std::fs;
-use std::io::{self, Read};
+use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-use std::time::{Duration, SystemTime};
 
 // ---------------- Types ----------------
 
@@ -92,13 +90,12 @@ pub trait Detector: Send + Sync {
 pub struct Emitter {
     tx: Sender<Finding>,
     rx: Receiver<Finding>,
-    buffer: Vec<Finding>,
 }
 
 impl Emitter {
     pub fn new(bound: usize) -> Self {
         let (tx, rx) = bounded(bound);
-        Self { tx, rx, buffer: Vec::new() }
+        Self { tx, rx }
     }
 
     pub fn send(&mut self, finding: Finding) -> Result<()> {
@@ -497,7 +494,7 @@ impl<'a> Scanner<'a> {
         for root in roots {
             let mut builder = WalkBuilder::new(root);
             builder.hidden(false).git_ignore(true).git_exclude(true).ignore(true);
-            for ig in &self.config.include_globs { builder.add("."); builder.filter_entry(|_| true); }
+            for _ig in &self.config.include_globs { builder.add("."); builder.filter_entry(|_| true); }
             // exclude_globs are handled later using globset for simplicity
             for result in builder.build() {
                 if let Ok(entry) = result {
@@ -545,7 +542,7 @@ impl<'a> Scanner<'a> {
                 if let Ok(bytes) = Self::load_file(path) {
                     let unit = ScanUnit { path: path.clone(), lang, bytes: bytes.clone() };
                     let stripped = strip_comments(lang, &bytes);
-                    let mut em = Emitter { tx: tx.clone(), rx: rx.clone(), buffer: Vec::new() };
+                    let mut em = Emitter { tx: tx.clone(), rx: rx.clone() };
                     for det in &self.detectors {
                         if !det.languages().contains(&lang) { continue; }
                         if !prefilter_hit(det, &stripped) { continue; }
@@ -594,25 +591,13 @@ pub struct PatternDetector {
     id: &'static str,
     languages: &'static [Language],
     registry: Arc<PatternRegistry>,
-    ac: OnceCell<AhoCorasick>,
 }
 
 impl PatternDetector {
     pub fn new(id: &'static str, languages: &'static [Language], registry: Arc<PatternRegistry>) -> Self {
-        Self { id, languages, registry, ac: OnceCell::new() }
+        Self { id, languages, registry }
     }
 
-    fn build_ac(&self) -> AhoCorasick {
-        // Merge all substrings for relevant libs
-        let mut subs = BTreeSet::new();
-        for lib in self.registry.for_language(self.languages[0]) { // languages are same category per detector
-            for s in &lib.prefilter_substrings { subs.insert(s.clone()); }
-        }
-        AhoCorasickBuilder::new()
-            .ascii_case_insensitive(true)
-            .build(subs.into_iter().collect::<Vec<_>>())
-            .expect("failed to build aho-corasick for detector")
-    }
 }
 
 impl Detector for PatternDetector {

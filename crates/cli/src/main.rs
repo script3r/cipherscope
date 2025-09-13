@@ -152,7 +152,7 @@ struct SarifTool { driver: SarifDriver }
 struct SarifDriver { name: String, version: String }
 #[derive(serde::Serialize)]
 struct SarifResult {
-    ruleId: String,
+    rule_id: String,
     level: String,
     message: SarifMessage,
     locations: Vec<SarifLocation>,
@@ -160,13 +160,13 @@ struct SarifResult {
 #[derive(serde::Serialize)]
 struct SarifMessage { text: String }
 #[derive(serde::Serialize)]
-struct SarifLocation { physicalLocation: SarifPhysicalLocation }
+struct SarifLocation { physical_location: SarifPhysicalLocation }
 #[derive(serde::Serialize)]
-struct SarifPhysicalLocation { artifactLocation: SarifArtifactLocation, region: SarifRegion }
+struct SarifPhysicalLocation { artifact_location: SarifArtifactLocation, region: SarifRegion }
 #[derive(serde::Serialize)]
 struct SarifArtifactLocation { uri: String }
 #[derive(serde::Serialize)]
-struct SarifRegion { startLine: usize, startColumn: usize }
+struct SarifRegion { start_line: usize, start_column: usize }
 
 fn to_sarif(findings: &[Finding]) -> SarifLog {
     SarifLog {
@@ -175,12 +175,12 @@ fn to_sarif(findings: &[Finding]) -> SarifLog {
         runs: vec![SarifRun {
             tool: SarifTool { driver: SarifDriver { name: "cryptofind".into(), version: env!("CARGO_PKG_VERSION").into() } },
             results: findings.iter().map(|f| SarifResult {
-                ruleId: f.detector_id.clone(),
+                rule_id: f.detector_id.clone(),
                 level: "note".into(),
                 message: SarifMessage { text: format!("{} in {:?}", f.library, f.language) },
-                locations: vec![SarifLocation { physicalLocation: SarifPhysicalLocation {
-                    artifactLocation: SarifArtifactLocation { uri: f.file.display().to_string() },
-                    region: SarifRegion { startLine: f.span.line, startColumn: f.span.column },
+                locations: vec![SarifLocation { physical_location: SarifPhysicalLocation {
+                    artifact_location: SarifArtifactLocation { uri: f.file.display().to_string() },
+                    region: SarifRegion { start_line: f.span.line, start_column: f.span.column },
                 }}],
             }).collect(),
         }],
