@@ -53,7 +53,13 @@ fn scan_fixtures() {
     // Debug: print all findings
     println!("Found {} findings:", findings.len());
     for f in &findings {
-        println!("  {:?} | {} | {}:{}", f.language, f.library, f.file.display(), f.span.line);
+        println!(
+            "  {:?} | {} | {}:{}",
+            f.language,
+            f.library,
+            f.file.display(),
+            f.span.line
+        );
     }
 
     // Expect at least one hit per language category in positive fixtures

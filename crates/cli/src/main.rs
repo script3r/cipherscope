@@ -80,7 +80,8 @@ fn main() -> Result<()> {
     }
 
     // Load patterns from specified file
-    let base = fs::read_to_string(&args.patterns).with_context(|| format!("read patterns file: {}", args.patterns.display()))?;
+    let base = fs::read_to_string(&args.patterns)
+        .with_context(|| format!("read patterns file: {}", args.patterns.display()))?;
     let reg = PatternRegistry::load(&base)?;
     let reg = Arc::new(reg);
 

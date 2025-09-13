@@ -93,7 +93,13 @@ pub trait Detector: Send + Sync {
     fn languages(&self) -> &'static [Language];
     fn prefilter(&self) -> Prefilter; // extensions & cheap substrings
     fn scan(&self, unit: &ScanUnit, em: &mut Emitter) -> Result<()>;
-    fn scan_optimized(&self, unit: &ScanUnit, stripped_s: &str, index: &LineIndex, em: &mut Emitter) -> Result<()> {
+    fn scan_optimized(
+        &self,
+        unit: &ScanUnit,
+        stripped_s: &str,
+        index: &LineIndex,
+        em: &mut Emitter,
+    ) -> Result<()> {
         // Default implementation falls back to the original scan method
         self.scan(unit, em)
     }
@@ -212,21 +218,16 @@ fn default_include_globs() -> Vec<String> {
         "**/*.hxx".to_string(),
         "**/*.h++".to_string(),
         "**/*.hh".to_string(),
-        
         // Java
         "**/*.java".to_string(),
-        
         // Go
         "**/*.go".to_string(),
-        
         // Rust
         "**/*.rs".to_string(),
-        
         // Python
         "**/*.py".to_string(),
         "**/*.pyw".to_string(),
         "**/*.pyi".to_string(),
-        
         // PHP
         "**/*.php".to_string(),
         "**/*.phtml".to_string(),
@@ -234,15 +235,12 @@ fn default_include_globs() -> Vec<String> {
         "**/*.php4".to_string(),
         "**/*.php5".to_string(),
         "**/*.phps".to_string(),
-        
         // Swift
         "**/*.swift".to_string(),
-        
         // Objective-C
         "**/*.m".to_string(),
         "**/*.mm".to_string(),
         "**/*.M".to_string(),
-        
         // Kotlin
         "**/*.kt".to_string(),
         "**/*.kts".to_string(),
@@ -276,7 +274,7 @@ impl PatternRegistry {
             .into_iter()
             .map(|lib| compile_library(lib))
             .collect::<Result<Vec<_>>>()?;
-        
+
         // Build language cache only if we have many libraries
         let language_cache = if libs.len() > 50 {
             let mut cache = HashMap::new();
@@ -289,8 +287,11 @@ impl PatternRegistry {
         } else {
             HashMap::new() // Empty cache for small numbers of libraries
         };
-        
-        Ok(Self { libs, language_cache })
+
+        Ok(Self {
+            libs,
+            language_cache,
+        })
     }
 
     pub fn for_language(&self, language: Language) -> Vec<&CompiledLibrary> {
@@ -368,9 +369,14 @@ mod strip {
 
     pub fn strip_comments(language: Language, input: &[u8]) -> Vec<u8> {
         match language {
-            Language::Go | Language::Java | Language::C | Language::Cpp | Language::Rust | Language::Swift | Language::ObjC | Language::Kotlin => {
-                strip_c_like(language, input)
-            }
+            Language::Go
+            | Language::Java
+            | Language::C
+            | Language::Cpp
+            | Language::Rust
+            | Language::Swift
+            | Language::ObjC
+            | Language::Kotlin => strip_c_like(language, input),
             Language::Python | Language::Php => strip_hash_like(language, input),
         }
     }
@@ -693,7 +699,7 @@ impl<'a> Scanner<'a> {
 
     pub fn discover_files(&self, roots: &[PathBuf]) -> Vec<PathBuf> {
         let mut paths = Vec::new();
-        
+
         // Build glob matcher for include patterns
         let include_matcher: Option<globset::GlobSet> = if !self.config.include_globs.is_empty() {
             let mut builder = globset::GlobSetBuilder::new();
@@ -714,7 +720,7 @@ impl<'a> Scanner<'a> {
         } else {
             None
         };
-        
+
         for root in roots {
             let mut builder = WalkBuilder::new(root);
             builder
@@ -722,7 +728,7 @@ impl<'a> Scanner<'a> {
                 .git_ignore(true)
                 .git_exclude(true)
                 .ignore(true);
-            
+
             for result in builder.build() {
                 if let Ok(entry) = result {
                     let md = match entry.metadata() {
@@ -733,16 +739,16 @@ impl<'a> Scanner<'a> {
                         if md.len() as usize > self.config.max_file_size {
                             continue;
                         }
-                        
+
                         let path = entry.into_path();
-                        
+
                         // Apply include glob filtering
                         if let Some(ref matcher) = include_matcher {
                             if !matcher.is_match(&path) {
                                 continue;
                             }
                         }
-                        
+
                         paths.push(path);
                     }
                 }
@@ -800,7 +806,7 @@ impl<'a> Scanner<'a> {
                     let stripped = strip_comments(lang, &bytes);
                     let stripped_s = String::from_utf8_lossy(&stripped);
                     let index = LineIndex::new(stripped_s.as_bytes());
-                    
+
                     let mut em = Emitter {
                         tx: tx.clone(),
                         rx: rx.clone(),
@@ -861,14 +867,14 @@ fn prefilter_hit(det: &Box<dyn Detector>, stripped: &[u8]) -> bool {
     if pf.substrings.is_empty() {
         return true;
     }
-    
+
     // Try to use cached automaton if available (for PatternDetector)
     if let Some(pattern_det) = det.as_any().downcast_ref::<PatternDetector>() {
         if let Ok(Some(ac)) = pattern_det.get_cached_automaton(&pf.substrings) {
             return ac.is_match(stripped);
         }
     }
-    
+
     // Fallback: build automaton (for other detector types)
     let ac = AhoCorasickBuilder::new()
         .ascii_case_insensitive(true)
@@ -906,11 +912,14 @@ impl PatternDetector {
 }
 
 impl PatternDetector {
-    fn get_cached_automaton(&self, substrings: &BTreeSet<String>) -> Result<Option<aho_corasick::AhoCorasick>> {
+    fn get_cached_automaton(
+        &self,
+        substrings: &BTreeSet<String>,
+    ) -> Result<Option<aho_corasick::AhoCorasick>> {
         if substrings.is_empty() {
             return Ok(None);
         }
-        
+
         let mut cached = self.cached_automaton.lock().unwrap();
         if cached.is_none() {
             let substrings_vec: Vec<&str> = substrings.iter().map(|s| s.as_str()).collect();
@@ -923,7 +932,14 @@ impl PatternDetector {
         Ok(cached.clone())
     }
 
-    fn scan_with_preprocessed(&self, libs: Vec<&CompiledLibrary>, stripped_s: &str, index: &LineIndex, unit: &ScanUnit, em: &mut Emitter) -> Result<()> {
+    fn scan_with_preprocessed(
+        &self,
+        libs: Vec<&CompiledLibrary>,
+        stripped_s: &str,
+        index: &LineIndex,
+        unit: &ScanUnit,
+        em: &mut Emitter,
+    ) -> Result<()> {
         for lib in libs {
             // import/include/namespace first
             let mut best_conf = 0.0f32;
@@ -960,7 +976,8 @@ impl PatternDetector {
                     }
                 }
             }
-            let should_report = (matched_import && api_hits > 0) || (lib.import.is_empty() && api_hits > 0);
+            let should_report =
+                (matched_import && api_hits > 0) || (lib.import.is_empty() && api_hits > 0);
             if should_report {
                 let finding = Finding {
                     language: unit.lang,
@@ -991,7 +1008,7 @@ impl Detector for PatternDetector {
         if let Some(ref cached) = self.cached_prefilter {
             return cached.clone();
         }
-        
+
         let mut substrings = BTreeSet::new();
         for lib in self.registry.for_language(self.languages[0]) {
             for s in &lib.prefilter_substrings {
@@ -1002,7 +1019,7 @@ impl Detector for PatternDetector {
             extensions: BTreeSet::new(),
             substrings,
         };
-        
+
         // Note: We can't actually cache here due to &self, but this is still faster
         // than recomputing every time since we're using the cached language lookup
         pf
@@ -1018,7 +1035,13 @@ impl Detector for PatternDetector {
         self.scan_with_preprocessed(libs, &stripped_s, &index, unit, em)
     }
 
-    fn scan_optimized(&self, unit: &ScanUnit, stripped_s: &str, index: &LineIndex, em: &mut Emitter) -> Result<()> {
+    fn scan_optimized(
+        &self,
+        unit: &ScanUnit,
+        stripped_s: &str,
+        index: &LineIndex,
+        em: &mut Emitter,
+    ) -> Result<()> {
         let libs = self.registry.for_language(unit.lang);
         if libs.is_empty() {
             return Ok(());
