@@ -1,0 +1,413 @@
+[version]
+schema = "1"
+updated = "2025-09-12"
+
+[[library]]
+name = "OpenSSL"
+languages = ["C", "C++"]
+[library.patterns]
+include = ["^\\s*#\\s*include\\s*<openssl/[^>]+>"]
+apis = [
+  "\\bEVP_EncryptInit_ex\\(",
+  "\\bEVP_DecryptInit_ex\\(",
+  "\\bHMAC_Init_ex\\(",
+  "\\bEVP_DigestSignInit\\(",
+  "\\bEVP_DigestVerifyInit\\(",
+  "\\bEVP_\\w+\\(",
+  "\\bRSA_\\w+\\(",
+  "\\bSSL_\\w+\\(",
+  "\\bHMAC_\\w+\\(",
+  "\\bMD5_\\w+\\(",
+  "\\bSHA1_\\w+\\(",
+  "\\bSHA256_\\w+\\(",
+]
+
+[[library]]
+name = "LibreSSL"
+languages = ["C", "C++"]
+[library.patterns]
+include = [
+  "^\\s*#\\s*include\\s*<libressl/[^>]+>",
+]
+apis = [
+  "LIBRESSL_VERSION_NUMBER",
+  "LIBRESSL_",
+]
+
+[[library]]
+name = "BoringSSL"
+languages = ["C", "C++"]
+[library.patterns]
+include = [
+  "^\\s*#\\s*include\\s*<boringssl/[^>]+>",
+]
+apis = [
+  "BORINGSSL_",
+  "OPENSSL_IS_BORINGSSL",
+]
+
+[[library]]
+name = "libsodium"
+languages = ["C", "C++"]
+[library.patterns]
+include = ["^\\s*#\\s*include\\s*<sodium(?:/[^>]+)?>"]
+apis = [
+  "\\bcrypto_secretbox_easy\\(",
+  "\\bcrypto_secretbox_open_easy\\(",
+  "\\bcrypto_aead_chacha20poly1305_ietf_encrypt\\(",
+  "\\bcrypto_aead_chacha20poly1305_ietf_decrypt\\(",
+  "\\bcrypto_auth\\(",
+  "\\bcrypto_auth_verify\\(",
+  "\\bcrypto_sign_detached\\(",
+  "\\bcrypto_sign_verify_detached\\(",
+]
+
+[[library]]
+name = "GnuTLS"
+languages = ["C", "C++"]
+[library.patterns]
+include = ["^\\s*#\\s*include\\s*<gnutls/gnutls\\.h>"]
+apis = [
+  "\\bgnutls_cipher_encrypt2\\(",
+  "\\bgnutls_cipher_decrypt2\\(",
+  "\\bgnutls_hmac_init\\(",
+  "\\bgnutls_hmac\\(",
+  "\\bgnutls_privkey_sign_data\\(",
+  "\\bgnutls_pubkey_verify_data2\\(",
+]
+
+[[library]]
+name = "libgcrypt"
+languages = ["C", "C++"]
+[library.patterns]
+include = ["^\\s*#\\s*include\\s*<gcrypt\\.h>"]
+apis = [
+  "\\bgcry_cipher_encrypt\\(",
+  "\\bgcry_cipher_decrypt\\(",
+  "\\bgcry_md_setkey\\(",
+  "\\bgcry_pk_sign\\(",
+  "\\bgcry_pk_verify\\(",
+]
+
+[[library]]
+name = "Crypto++"
+languages = ["C", "C++"]
+[library.patterns]
+include = ["^\\s*#\\s*include\\s*<cryptopp/[^>]+>"]
+namespace = ["CryptoPP::"]
+apis = [
+  "CryptoPP::CBC_Mode<.*>::Encryption",
+  "CryptoPP::CBC_Mode<.*>::Decryption",
+  "CryptoPP::HMAC<",
+  "CryptoPP::RSASS<.*>::Signer",
+  "CryptoPP::RSASS<.*>::Verifier",
+  "CryptoPP::ECDSA<.*>::Signer",
+  "CryptoPP::ECDSA<.*>::Verifier",
+]
+
+[[library]]
+name = "Botan"
+languages = ["C", "C++"]
+[library.patterns]
+include = ["^\\s*#\\s*include\\s*<botan/[^>]+>"]
+namespace = ["Botan::"]
+apis = [
+  "Botan::Cipher_Mode::create",
+  "Botan::AEAD_Mode::create",
+  "Botan::MessageAuthenticationCode::create",
+  "Botan::PK_Signer",
+  "Botan::PK_Verifier",
+]
+
+[[library]]
+name = "wolfSSL"
+languages = ["C", "C++"]
+[library.patterns]
+include = ["^\\s*#\\s*include\\s*<wolfssl/[^>]+>"]
+apis = [
+  "\\bwc_AesGcmEncrypt\\(",
+  "\\bwc_AesGcmDecrypt\\(",
+  "\\bwc_HmacSetKey\\(",
+  "\\bwc_HmacUpdate\\(",
+  "\\bwc_HmacFinal\\(",
+  "\\bwc_SignatureGenerate\\(",
+  "\\bwc_SignatureVerify\\(",
+]
+
+[[library]]
+name = "mbedTLS"
+languages = ["C", "C++"]
+[library.patterns]
+include = ["^\\s*#\\s*include\\s*<mbedtls/[^>]+>"]
+apis = [
+  "\\bmbedtls_gcm_crypt_and_tag\\(",
+  "\\bmbedtls_gcm_auth_decrypt\\(",
+  "\\bmbedtls_md_hmac\\(",
+  "\\bmbedtls_pk_sign\\(",
+  "\\bmbedtls_pk_verify\\(",
+]
+
+[[library]]
+name = "BouncyCastle"
+languages = ["Java"]
+[library.patterns]
+import = [
+  "^\\s*import\\s+org\\.bouncycastle\\.",
+  "^\\s*import\\s+org\\.bouncycastle\\.jce\\.provider\\.BouncyCastleProvider",
+]
+apis = [
+  "Cipher\\.getInstance\\(.*,?\"BC\"?\\)",
+  "Mac\\.getInstance\\(",
+  "Signature\\.getInstance\\(",
+  "BouncyCastleProvider",
+  "\\.sign\\(",
+  "\\.verify\\(",
+]
+
+[[library]]
+name = "Google Tink"
+languages = ["Java", "Python"]
+[library.patterns]
+import = [
+  "^\\s*import\\s+com\\.google\\.crypto\\.tink\\.",
+  "^\\s*from\\s+tink\\b",
+  "^\\s*import\\s+tink\\b",
+]
+apis = [
+  "TinkConfig\\.register\\(",
+  "\\.encrypt\\(",
+  "\\.decrypt\\(",
+  "computeMac\\(",
+  "verifyMac\\(",
+  "\\bsign\\(",
+  "\\bverify\\(",
+]
+
+[[library]]
+name = "Conscrypt"
+languages = ["Java"]
+[library.patterns]
+import = ["^\\s*import\\s+org\\.conscrypt\\."]
+apis = [
+  "Cipher\\.getInstance\\(",
+  "Signature\\.getInstance\\(",
+]
+
+[[library]]
+name = "Go x/crypto"
+languages = ["Go"]
+[library.patterns]
+import = [
+  "^\\s*import\\s+\"golang\\.org/x/crypto(/[^\"]*)?\"",
+  "^\\s*\"golang\\.org/x/crypto(/[^\"]*)?\"",
+]
+apis = [
+  "\\bbcrypt\\.GenerateFromPassword\\(",
+  "chacha20poly1305\\.New",
+  "scrypt\\.",
+]
+
+[[library]]
+name = "age"
+languages = ["Go"]
+[library.patterns]
+import = [
+  "^\\s*import\\s+\"filippo\\.io/age\"",
+  "^\\s*\"filippo\\.io/age\"",
+  "^\\s*import\\s+\"filippo\\.io/age/cmd/\"",
+  "^\\s*\"filippo\\.io/age/cmd/\"",
+]
+apis = [
+  "age\\.Encrypt\\(",
+  "age\\.Decrypt\\(",
+  "age\\.ParseRecipients\\(",
+  "age\\.ParseIdentities\\(",
+  "age\\.GenerateX25519Identity\\(",
+  "age\\.ScryptRecipient\\(",
+  "age\\.ScryptIdentity\\(",
+  "age\\.SSHRecipient\\(",
+  "age\\.SSHIdentity\\(",
+  "age\\.NewFile\\(",
+  "age\\.NewReader\\(",
+  "age\\.NewWriter\\(",
+  "age\\.NewX25519Recipient\\(",
+  "age\\.NewX25519Identity\\(",
+  "age\\.NewScryptRecipient\\(",
+  "age\\.NewScryptIdentity\\(",
+  "age\\.NewSSHRecipient\\(",
+  "age\\.NewSSHIdentity\\(",
+]
+
+[[library]]
+name = "RustCrypto"
+languages = ["Rust"]
+[library.patterns]
+import = [
+  "^\\s*use\\s+(aes|aes_gcm|chacha20poly1305|sha2|blake3)::",
+  "^\\s*use\\s+ring::",
+  "^\\s*use\\s+rustls::",
+  "^\\s*use\\s+sodiumoxide::",
+  "^\\s*use\\s+openssl::",
+]
+apis = [
+  "openssl::ssl::",
+  "ring::aead::",
+  "rustls::ClientConfig",
+  "sodiumoxide::crypto::",
+  "aes_gcm::Aes256Gcm",
+  "\\bAes256Gcm::new\\(",
+  "\\baead::Aead\\b",
+  "\\bencrypt\\(",
+  "\\bdecrypt\\(",
+  "\\bhmac::Hmac\\b",
+  "\\bMac::verify_slice\\(",
+  "ring::aead::seal_in_place",
+  "ring::aead::open_in_place",
+  "ring::hmac::sign",
+  "ring::signature::.*::sign",
+  "ring::signature::.*::verify",
+]
+
+[[library]]
+name = "PyCA cryptography"
+languages = ["Python"]
+[library.patterns]
+import = [
+  "^\\s*from\\s+cryptography\\b",
+  "^\\s*import\\s+cryptography\\b",
+]
+apis = [
+  "Fernet\\(",
+  "\\.encrypt\\(",
+  "\\.decrypt\\(",
+  "AESGCM\\(",
+  "hmac\\.HMAC\\(",
+  "\\.finalize\\(",
+  "\\.verify\\(",
+  "\\.sign\\(",
+]
+
+[[library]]
+name = "PyCryptodome"
+languages = ["Python"]
+[library.patterns]
+import = [
+  "^\\s*from\\s+Crypto\\b",
+  "^\\s*import\\s+Crypto\\b",
+]
+apis = [
+  "Crypto\\.Cipher\\.AES\\.new\\(",
+  "\\.encrypt\\(",
+  "\\.decrypt\\(",
+  "Crypto\\.Hash\\.HMAC\\.new\\(",
+  "Crypto\\.Signature\\.pkcs1_15\\.new\\(.*\\)\\.sign\\(",
+  "Crypto\\.Signature\\.pkcs1_15\\.new\\(.*\\)\\.verify\\(",
+]
+
+[[library]]
+name = "PyNaCl"
+languages = ["Python"]
+[library.patterns]
+import = [
+  "^\\s*from\\s+nacl\\b",
+  "^\\s*import\\s+nacl\\b",
+  "^\\s*from\\s+nacl\\.signing\\b",
+  "^\\s*from\\s+nacl\\.secret\\b",
+  "^\\s*from\\s+nacl\\.encoding\\b",
+  "^\\s*from\\s+nacl\\.hash\\b",
+  "^\\s*from\\s+nacl\\.pwhash\\b",
+]
+apis = [
+  "nacl\\.secret\\.SecretBox",
+  "nacl\\.signing\\.SigningKey",
+  "nacl\\.signing\\.VerifyKey",
+  "nacl\\.encoding\\.",
+  "nacl\\.hash\\.",
+  "nacl\\.pwhash\\.",
+  "nacl\\.hashlib\\.",
+  "SigningKey\\.generate\\(",
+  "SigningKey\\.sign\\(",
+  "VerifyKey\\.verify\\(",
+  "SignedMessage\\.",
+  "\\.encrypt\\(",
+  "\\.decrypt\\(",
+  "\\.sign\\(",
+  "\\.verify\\(",
+  "HexEncoder",
+  "Base64Encoder",
+]
+
+[[library]]
+name = "pyOpenSSL"
+languages = ["Python"]
+[library.patterns]
+import = ["^\\s*import\\s+OpenSSL\\b"]
+apis = [
+  "OpenSSL\\.crypto\\.sign\\(",
+  "OpenSSL\\.crypto\\.verify\\(",
+]
+
+[[library]]
+name = "M2Crypto"
+languages = ["Python"]
+[library.patterns]
+import = ["^\\s*import\\s+M2Crypto\\b"]
+apis = [
+  "EVP\\.Cipher\\(",
+  "EVP\\.HMAC\\(",
+  "RSA\\.sign\\(",
+  "RSA\\.verify\\(",
+]
+
+[[library]]
+name = "phpseclib"
+languages = ["PHP"]
+[library.patterns]
+import = [
+  "^\\s*use\\s+phpseclib",
+  "^\\s*use\\s+phpseclib\\\\Crypt\\\\",
+]
+apis = [
+  "->encrypt\\(",
+  "->decrypt\\(",
+  "->sign\\(",
+  "->verify\\(",
+]
+
+[[library]]
+name = "Defuse PHP Crypto"
+languages = ["PHP"]
+[library.patterns]
+import = ["^\\s*use\\s+Defuse\\\\Crypto\\\\"]
+apis = [
+  "Defuse\\\\Crypto\\\\Crypto::encrypt\\(",
+  "Defuse\\\\Crypto\\\\Crypto::decrypt\\(",
+]
+
+[[library]]
+name = "PHP sodium"
+languages = ["PHP"]
+[library.patterns]
+apis = [
+  "\\bsodium_crypto_secretbox\\(",
+  "\\bsodium_crypto_secretbox_open\\(",
+  "\\bsodium_crypto_secretbox_keygen\\(",
+  "\\bsodium_crypto_aead_.*_encrypt\\(",
+  "\\bsodium_crypto_aead_.*_decrypt\\(",
+  "\\bsodium_crypto_auth\\(",
+  "\\bsodium_crypto_auth_verify\\(",
+  "\\bsodium_crypto_sign_detached\\(",
+  "\\bsodium_crypto_sign_verify_detached\\(",
+]
+
+[[library]]
+name = "PHP OpenSSL"
+languages = ["PHP"]
+[library.patterns]
+apis = [
+  "\\bopenssl_encrypt\\(",
+  "\\bopenssl_decrypt\\(",
+  "\\bopenssl_sign\\(",
+  "\\bopenssl_verify\\(",
+]
+
