@@ -1,0 +1,24 @@
+[package]
+name = "cryptofind"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+toml = { workspace = true }
+ignore = { workspace = true }
+rayon = { workspace = true }
+once_cell = { workspace = true }
+regex = { workspace = true }
+aho-corasick = { workspace = true }
+crossbeam-channel = { workspace = true }
+scanner-core = { path = "../scanner-core" }
+
+[[bin]]
+name = "cryptofind"
+path = "src/main.rs"
+

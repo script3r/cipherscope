@@ -1,0 +1,195 @@
+[version]
+schema = "1"
+updated = "2025-09-12"
+
+[[library]]
+name = "OpenSSL"
+languages = ["C", "C++"]
+[library.patterns]
+include = ["^\\s*#\\s*include\\s*<openssl/[^>]+>"]
+apis = ["\\bEVP_\\w+\\(", "\\bRSA_\\w+\\(", "\\bSSL_\\w+\\("]
+
+[[library]]
+name = "LibreSSL"
+languages = ["C", "C++"]
+[library.patterns]
+include = ["^\\s*#\\s*include\\s*<openssl/[^>]+>"]
+apis = ["\\bEVP_\\w+\\(", "\\bRSA_\\w+\\(", "\\bSSL_\\w+\\("]
+
+[[library]]
+name = "BoringSSL"
+languages = ["C", "C++"]
+[library.patterns]
+include = ["^\\s*#\\s*include\\s*<openssl/[^>]+>"]
+apis = ["\\bEVP_\\w+\\(", "\\bRSA_\\w+\\(", "\\bSSL_\\w+\\("]
+
+[[library]]
+name = "libsodium"
+languages = ["C", "C++"]
+[library.patterns]
+include = ["^\\s*#\\s*include\\s*<sodium(?:/[^>]+)?>"]
+apis = ["\\bcrypto_[a-z0-9_]+\\("]
+
+[[library]]
+name = "GnuTLS"
+languages = ["C", "C++"]
+[library.patterns]
+include = ["^\\s*#\\s*include\\s*<gnutls/gnutls\\.h>"]
+apis = ["\\bgnutls_\\w+\\("]
+
+[[library]]
+name = "libgcrypt"
+languages = ["C", "C++"]
+[library.patterns]
+include = ["^\\s*#\\s*include\\s*<gcrypt\\.h>"]
+apis = ["\\bgcry_\\w+\\("]
+
+[[library]]
+name = "Crypto++"
+languages = ["C", "C++"]
+[library.patterns]
+include = ["^\\s*#\\s*include\\s*<cryptopp/[^>]+>"]
+namespace = ["CryptoPP::"]
+
+[[library]]
+name = "Botan"
+languages = ["C", "C++"]
+[library.patterns]
+include = ["^\\s*#\\s*include\\s*<botan/[^>]+>"]
+namespace = ["Botan::"]
+
+[[library]]
+name = "wolfSSL"
+languages = ["C", "C++"]
+[library.patterns]
+include = ["^\\s*#\\s*include\\s*<wolfssl/[^>]+>"]
+
+[[library]]
+name = "mbedTLS"
+languages = ["C", "C++"]
+[library.patterns]
+include = ["^\\s*#\\s*include\\s*<mbedtls/[^>]+>"]
+
+[[library]]
+name = "BouncyCastle"
+languages = ["Java"]
+[library.patterns]
+import = [
+  "^\\s*import\\s+org\\.bouncycastle\\.",
+  "^\\s*import\\s+org\\.bouncycastle\\.jce\\.provider\\.BouncyCastleProvider",
+]
+apis = ["Cipher\\.getInstance\\(.*,\"BC\"\\)", "new\\s+BouncyCastleProvider\\("]
+
+[[library]]
+name = "Google Tink"
+languages = ["Java"]
+[library.patterns]
+import = ["^\\s*import\\s+com\\.google\\.crypto\\.tink\\."]
+apis = ["TinkConfig\\.register\\("]
+
+[[library]]
+name = "Conscrypt"
+languages = ["Java"]
+[library.patterns]
+import = ["^\\s*import\\s+org\\.conscrypt\\."]
+
+[[library]]
+name = "Go x/crypto"
+languages = ["Go"]
+[library.patterns]
+import = [
+  "^\\s*import\\s+\"golang\\.org/x/crypto(/[^\"]*)?\"",
+  "^\\s*\"golang\\.org/x/crypto(/[^\"]*)?\"",
+]
+apis = [
+  "\\bbcrypt\\.GenerateFromPassword\\(",
+  "chacha20poly1305\\.New",
+  "scrypt\\.",
+]
+
+[[library]]
+name = "RustCrypto"
+languages = ["Rust"]
+[library.patterns]
+import = [
+  "^\\s*use\\s+(aes|aes_gcm|chacha20poly1305|sha2|blake3)::",
+  "^\\s*use\\s+ring::",
+  "^\\s*use\\s+rustls::",
+  "^\\s*use\\s+sodiumoxide::",
+  "^\\s*use\\s+openssl::",
+]
+apis = [
+  "openssl::ssl::",
+  "ring::aead::",
+  "rustls::ClientConfig",
+  "sodiumoxide::crypto::",
+  "aes_gcm::Aes256Gcm",
+]
+
+[[library]]
+name = "PyCA cryptography"
+languages = ["Python"]
+[library.patterns]
+import = [
+  "^\\s*from\\s+cryptography\\b",
+  "^\\s*import\\s+cryptography\\b",
+]
+apis = ["Fernet\\(", "AESGCM\\("]
+
+[[library]]
+name = "PyCryptodome"
+languages = ["Python"]
+[library.patterns]
+import = [
+  "^\\s*from\\s+Crypto\\b",
+  "^\\s*import\\s+Crypto\\b",
+]
+apis = ["Crypto\\.Cipher\\.AES"]
+
+[[library]]
+name = "PyNaCl"
+languages = ["Python"]
+[library.patterns]
+import = ["^\\s*from\\s+nacl\\b", "^\\s*import\\s+nacl\\b"]
+apis = ["nacl\\.secret"]
+
+[[library]]
+name = "pyOpenSSL"
+languages = ["Python"]
+[library.patterns]
+import = ["^\\s*import\\s+OpenSSL\\b"]
+apis = ["OpenSSL\\.crypto"]
+
+[[library]]
+name = "M2Crypto"
+languages = ["Python"]
+[library.patterns]
+import = ["^\\s*import\\s+M2Crypto\\b"]
+
+[[library]]
+name = "phpseclib"
+languages = ["PHP"]
+[library.patterns]
+import = [
+  "^\\s*use\\s+phpseclib",
+  "^\\s*use\\s+phpseclib\\\\Crypt\\\\",
+]
+
+[[library]]
+name = "Defuse PHP Crypto"
+languages = ["PHP"]
+[library.patterns]
+import = ["^\\s*use\\s+Defuse\\\\Crypto\\\\"]
+
+[[library]]
+name = "PHP sodium"
+languages = ["PHP"]
+[library.patterns]
+apis = ["\\bsodium_[a-z0-9_]+\\("]
+
+[[library]]
+name = "PHP OpenSSL"
+languages = ["PHP"]
+[library.patterns]
+apis = ["\\bopenssl_(encrypt|decrypt|sign|verify)\\("]
+

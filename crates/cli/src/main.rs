@@ -1,0 +1,189 @@
+use anyhow::{Context, Result};
+use clap::{ArgAction, Parser};
+use scanner_core::*;
+use std::fs;
+use std::path::PathBuf;
+use std::sync::Arc;
+
+#[derive(Parser, Debug)]
+#[command(name = "cryptofind")] 
+#[command(version, about = "Fast static scanner for third-party crypto libraries", long_about = None)]
+struct Args {
+    /// Paths to scan
+    #[arg(value_name = "PATH", default_value = ".")]
+    paths: Vec<PathBuf>,
+
+    /// Emit JSONL to stdout
+    #[arg(long, action = ArgAction::SetTrue)]
+    json: bool,
+
+    /// Write SARIF to file
+    #[arg(long, value_name = "FILE")]
+    sarif: Option<PathBuf>,
+
+    /// Minimum confidence required
+    #[arg(long, value_name = "FLOAT")] 
+    min_confidence: Option<f32>,
+
+    /// Number of threads
+    #[arg(long, value_name = "N")] 
+    threads: Option<usize>,
+
+    /// Maximum file size in MB
+    #[arg(long, value_name = "MB")] 
+    max_file_size: Option<usize>,
+
+    /// Include glob(s)
+    #[arg(long, value_name = "GLOB")] 
+    include_glob: Vec<String>,
+
+    /// Exclude glob(s)
+    #[arg(long, value_name = "GLOB")] 
+    exclude_glob: Vec<String>,
+
+    /// Allow only these libraries
+    #[arg(long, value_name = "LIB")] 
+    allow: Vec<String>,
+
+    /// Deny these libraries
+    #[arg(long, value_name = "LIB")] 
+    deny: Vec<String>,
+
+    /// Deterministic output ordering
+    #[arg(long, action = ArgAction::SetTrue)]
+    deterministic: bool,
+
+    /// Fail with code 2 if findings are present
+    #[arg(long, action = ArgAction::SetTrue)]
+    fail_on_find: bool,
+
+    /// Print merged patterns/config and exit
+    #[arg(long, action = ArgAction::SetTrue)]
+    print_config: bool,
+
+    /// Dry-run: list files that would be scanned
+    #[arg(long, action = ArgAction::SetTrue)]
+    dry_run: bool,
+}
+
+fn main() -> Result<()> {
+    let args = Args::parse();
+    if let Some(n) = args.threads { rayon::ThreadPoolBuilder::new().num_threads(n).build_global().ok(); }
+
+    // Load patterns: patterns.toml + optional patterns.local.toml
+    let base = fs::read_to_string("patterns.toml").context("read patterns.toml")?;
+    let reg = PatternRegistry::load(&base)?;
+    let reg = Arc::new(reg);
+
+    if args.print_config {
+        println!("{}", base);
+        return Ok(());
+    }
+
+    // Prepare detectors
+    let dets: Vec<Box<dyn Detector>> = vec![
+        Box::new(PatternDetector::new("detector-go", &[Language::Go], reg.clone())),
+        Box::new(PatternDetector::new("detector-java", &[Language::Java], reg.clone())),
+        Box::new(PatternDetector::new("detector-c", &[Language::C], reg.clone())),
+        Box::new(PatternDetector::new("detector-cpp", &[Language::Cpp], reg.clone())),
+        Box::new(PatternDetector::new("detector-rust", &[Language::Rust], reg.clone())),
+        Box::new(PatternDetector::new("detector-python", &[Language::Python], reg.clone())),
+        Box::new(PatternDetector::new("detector-php", &[Language::Php], reg.clone())),
+    ];
+
+    let mut cfg = Config::default();
+    cfg.min_confidence = args.min_confidence;
+    if let Some(mb) = args.max_file_size { cfg.max_file_size = mb * 1024 * 1024; }
+    cfg.include_globs = args.include_glob.clone();
+    cfg.exclude_globs = args.exclude_glob.clone();
+    cfg.allow_libs = args.allow.clone();
+    cfg.deny_libs = args.deny.clone();
+    cfg.deterministic = args.deterministic;
+
+    let scanner = Scanner::new(&reg, dets, cfg);
+    if args.dry_run {
+        let files = scanner.discover_files(&args.paths);
+        for p in files { println!("{}", p.display()); }
+        return Ok(());
+    }
+
+    let findings = scanner.run(&args.paths)?;
+
+    if args.json {
+        for f in &findings {
+            println!("{}", serde_json::to_string(f)?);
+        }
+    } else {
+        print_table(&findings);
+    }
+
+    if let Some(sarif_path) = args.sarif.as_ref() {
+        let sarif = to_sarif(&findings);
+        fs::write(sarif_path, serde_json::to_vec_pretty(&sarif)?)?;
+    }
+
+    if args.fail_on_find && !findings.is_empty() { std::process::exit(2); }
+    Ok(())
+}
+
+fn print_table(findings: &[Finding]) {
+    use std::collections::BTreeMap;
+    let mut map: BTreeMap<(Language, String), Vec<&Finding>> = BTreeMap::new();
+    for f in findings { map.entry((f.language, f.library.clone())).or_default().push(f); }
+    println!("Language | Library | Count | Example");
+    println!("---------|---------|-------|--------");
+    for ((lang, lib), list) in map {
+        let ex = list.first().map(|f| format!("{}:{} {}", f.file.display(), f.span.line, f.symbol)).unwrap_or_default();
+        println!("{:?} | {} | {} | {}", lang, lib, list.len(), ex);
+    }
+}
+
+#[derive(serde::Serialize)]
+struct SarifLog {
+    version: String,
+    #[serde(rename = "$schema")] schema: String,
+    runs: Vec<SarifRun>,
+}
+#[derive(serde::Serialize)]
+struct SarifRun { tool: SarifTool, results: Vec<SarifResult> }
+#[derive(serde::Serialize)]
+struct SarifTool { driver: SarifDriver }
+#[derive(serde::Serialize)]
+struct SarifDriver { name: String, version: String }
+#[derive(serde::Serialize)]
+struct SarifResult {
+    ruleId: String,
+    level: String,
+    message: SarifMessage,
+    locations: Vec<SarifLocation>,
+}
+#[derive(serde::Serialize)]
+struct SarifMessage { text: String }
+#[derive(serde::Serialize)]
+struct SarifLocation { physicalLocation: SarifPhysicalLocation }
+#[derive(serde::Serialize)]
+struct SarifPhysicalLocation { artifactLocation: SarifArtifactLocation, region: SarifRegion }
+#[derive(serde::Serialize)]
+struct SarifArtifactLocation { uri: String }
+#[derive(serde::Serialize)]
+struct SarifRegion { startLine: usize, startColumn: usize }
+
+fn to_sarif(findings: &[Finding]) -> SarifLog {
+    SarifLog {
+        version: "2.1.0".into(),
+        schema: "https://json.schemastore.org/sarif-2.1.0.json".into(),
+        runs: vec![SarifRun {
+            tool: SarifTool { driver: SarifDriver { name: "cryptofind".into(), version: env!("CARGO_PKG_VERSION").into() } },
+            results: findings.iter().map(|f| SarifResult {
+                ruleId: f.detector_id.clone(),
+                level: "note".into(),
+                message: SarifMessage { text: format!("{} in {:?}", f.library, f.language) },
+                locations: vec![SarifLocation { physicalLocation: SarifPhysicalLocation {
+                    artifactLocation: SarifArtifactLocation { uri: f.file.display().to_string() },
+                    region: SarifRegion { startLine: f.span.line, startColumn: f.span.column },
+                }}],
+            }).collect(),
+        }],
+    }
+}
+

@@ -1,0 +1,33 @@
+[package]
+name = "scanner-core"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+
+[dependencies]
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+toml = { workspace = true }
+regex = { workspace = true }
+aho-corasick = { workspace = true }
+once_cell = { workspace = true }
+rayon = { workspace = true }
+ignore = { workspace = true }
+memmap2 = { workspace = true }
+globset = { workspace = true }
+crossbeam-channel = { workspace = true }
+
+[dev-dependencies]
+criterion = "0.5"
+tempfile = "3"
+
+[lib]
+name = "scanner_core"
+path = "src/lib.rs"
+
+[[bench]]
+name = "throughput"
+harness = false
+
