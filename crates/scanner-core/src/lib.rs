@@ -1,5 +1,5 @@
-use anyhow::{anyhow, Context, Result};
 use aho_corasick::AhoCorasickBuilder;
+use anyhow::{anyhow, Context, Result};
 use crossbeam_channel::{bounded, Receiver, Sender};
 use ignore::WalkBuilder;
 use rayon::prelude::*;
@@ -40,7 +40,10 @@ impl<'de> Deserialize<'de> for Language {
             "rust" | "rs" => Ok(Language::Rust),
             "python" | "py" => Ok(Language::Python),
             "php" => Ok(Language::Php),
-            other => Err(D::Error::invalid_value(Unexpected::Str(other), &"valid language")),
+            other => Err(D::Error::invalid_value(
+                Unexpected::Str(other),
+                &"valid language",
+            )),
         }
     }
 }
@@ -150,7 +153,7 @@ pub struct LibraryPatterns {
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct Config {
-    #[serde(default = "default_max_file_size")] 
+    #[serde(default = "default_max_file_size")]
     pub max_file_size: usize, // bytes
     #[serde(default)]
     pub include_globs: Vec<String>,
@@ -166,7 +169,9 @@ pub struct Config {
     pub deterministic: bool,
 }
 
-fn default_max_file_size() -> usize { 2 * 1024 * 1024 }
+fn default_max_file_size() -> usize {
+    2 * 1024 * 1024
+}
 
 impl Default for Config {
     fn default() -> Self {
@@ -236,8 +241,7 @@ fn compile_library(lib: LibrarySpec) -> Result<CompiledLibrary> {
 }
 
 fn compile_regexes(srcs: &[String]) -> Result<Vec<Regex>> {
-    srcs
-        .iter()
+    srcs.iter()
         .map(|s| {
             let pat = format!("(?m){}", s);
             Regex::new(&pat).with_context(|| format!("bad pattern: {s}"))
@@ -255,7 +259,13 @@ fn derive_prefilter_substrings(p: &LibraryPatterns) -> Vec<String> {
             }
         }
     };
-    for s in p.include.iter().chain(&p.import).chain(&p.namespace).chain(&p.apis) {
+    for s in p
+        .include
+        .iter()
+        .chain(&p.import)
+        .chain(&p.namespace)
+        .chain(&p.apis)
+    {
         push_tokens(s);
     }
     set.into_iter().collect()
@@ -268,8 +278,9 @@ mod strip {
 
     pub fn strip_comments(language: Language, input: &[u8]) -> Vec<u8> {
         match language {
-            Language::Go | Language::Java | Language::C | Language::Cpp | Language::Rust =>
-                strip_c_like(language, input),
+            Language::Go | Language::Java | Language::C | Language::Cpp | Language::Rust => {
+                strip_c_like(language, input)
+            }
             Language::Python | Language::Php => strip_hash_like(language, input),
         }
     }
@@ -291,13 +302,22 @@ mod strip {
             let next = if i + 1 < input.len() { input[i + 1] } else { 0 };
 
             if in_sl_comment {
-                if b == b'\n' { in_sl_comment = false; out.push(b); }
+                if b == b'\n' {
+                    in_sl_comment = false;
+                    out.push(b);
+                }
                 i += 1;
                 continue;
             }
             if in_ml_comment {
-                if b == b'*' && next == b'/' { in_ml_comment = false; i += 2; continue; }
-                if b == b'\n' { out.push(b); }
+                if b == b'*' && next == b'/' {
+                    in_ml_comment = false;
+                    i += 2;
+                    continue;
+                }
+                if b == b'\n' {
+                    out.push(b);
+                }
                 i += 1;
                 continue;
             }
@@ -306,8 +326,14 @@ mod strip {
                 if language == Language::Rust && str_delim == b'"' && b == b'"' {
                     // handle raw string terminator with hashes
                     let mut k = 0usize;
-                    while k < raw_hashes && i + 1 + k < input.len() && input[i + 1 + k] == b'#' { k += 1; }
-                    if k == raw_hashes { in_str = false; i += 1 + raw_hashes; continue; }
+                    while k < raw_hashes && i + 1 + k < input.len() && input[i + 1 + k] == b'#' {
+                        k += 1;
+                    }
+                    if k == raw_hashes {
+                        in_str = false;
+                        i += 1 + raw_hashes;
+                        continue;
+                    }
                 } else if b == str_delim && (language == Language::Rust || prev_not_escape(&out)) {
                     in_str = false;
                 }
@@ -316,15 +342,30 @@ mod strip {
             }
             if in_char {
                 out.push(b);
-                if b == b'\'' && prev_not_escape(&out) { in_char = false; }
+                if b == b'\'' && prev_not_escape(&out) {
+                    in_char = false;
+                }
                 i += 1;
                 continue;
             }
 
             // start of comments or strings
-            if b == b'/' && next == b'/' { in_sl_comment = true; i += 2; continue; }
-            if b == b'/' && next == b'*' { in_ml_comment = true; i += 2; continue; }
-            if b == b'\'' { in_char = true; out.push(b); i += 1; continue; }
+            if b == b'/' && next == b'/' {
+                in_sl_comment = true;
+                i += 2;
+                continue;
+            }
+            if b == b'/' && next == b'*' {
+                in_ml_comment = true;
+                i += 2;
+                continue;
+            }
+            if b == b'\'' {
+                in_char = true;
+                out.push(b);
+                i += 1;
+                continue;
+            }
             if b == b'"' {
                 in_str = true;
                 str_delim = b'"';
@@ -336,12 +377,16 @@ mod strip {
                         // count preceding hashes
                         let mut h = 0usize;
                         let mut j = i - 1;
-                        while j > 0 && input[j - 1] == b'#' { h += 1; j -= 1; }
+                        while j > 0 && input[j - 1] == b'#' {
+                            h += 1;
+                            j -= 1;
+                        }
                         raw_hashes = h;
                     }
                 }
                 out.push(b);
-                i += 1; continue;
+                i += 1;
+                continue;
             }
 
             out.push(b);
@@ -356,54 +401,95 @@ mod strip {
         let mut in_sl_comment = false;
         let mut in_ml_comment = false; // for PHP
         let mut in_str = false;
-        let mut triple: Option<[u8;3]> = None;
+        let mut triple: Option<[u8; 3]> = None;
         let mut delim = b'"';
         while i < input.len() {
             let b = input[i];
             let next = if i + 1 < input.len() { input[i + 1] } else { 0 };
 
             if in_sl_comment {
-                if b == b'\n' { in_sl_comment = false; out.push(b); }
-                i += 1; continue;
+                if b == b'\n' {
+                    in_sl_comment = false;
+                    out.push(b);
+                }
+                i += 1;
+                continue;
             }
             if in_ml_comment {
-                if b == b'*' && next == b'/' { in_ml_comment = false; i += 2; continue; }
-                if b == b'\n' { out.push(b); }
-                i += 1; continue;
+                if b == b'*' && next == b'/' {
+                    in_ml_comment = false;
+                    i += 2;
+                    continue;
+                }
+                if b == b'\n' {
+                    out.push(b);
+                }
+                i += 1;
+                continue;
             }
             if in_str {
                 out.push(b);
                 if let Some(t) = triple {
                     // end triple quotes
-                    if b == t[0] && next == t[1] && i + 2 < input.len() && input[i+2] == t[2] {
-                        out.push(next); out.push(input[i+2]);
-                        i += 3; in_str = false; triple = None; continue;
+                    if b == t[0] && next == t[1] && i + 2 < input.len() && input[i + 2] == t[2] {
+                        out.push(next);
+                        out.push(input[i + 2]);
+                        i += 3;
+                        in_str = false;
+                        triple = None;
+                        continue;
                     }
                 } else if b == delim && prev_not_escape(&out) {
                     in_str = false;
                 }
-                i += 1; continue;
+                i += 1;
+                continue;
             }
 
             // start comments or strings
-            if b == b'#' { in_sl_comment = true; i += 1; continue; }
-            if b == b'/' && next == b'/' { in_sl_comment = true; i += 2; continue; }
-            if b == b'/' && next == b'*' { in_ml_comment = true; i += 2; continue; }
+            if b == b'#' {
+                in_sl_comment = true;
+                i += 1;
+                continue;
+            }
+            if b == b'/' && next == b'/' {
+                in_sl_comment = true;
+                i += 2;
+                continue;
+            }
+            if b == b'/' && next == b'*' {
+                in_ml_comment = true;
+                i += 2;
+                continue;
+            }
             if b == b'\'' || b == b'"' {
-                delim = b; in_str = true; out.push(b); i += 1; continue;
+                delim = b;
+                in_str = true;
+                out.push(b);
+                i += 1;
+                continue;
             }
-            if b == b'"' && next == b'"' && i + 2 < input.len() && input[i+2] == b'"' {
-                triple = Some([b'"', b'"', b'"']); in_str = true;
-                out.push(b'"'); out.push(b'"'); out.push(b'"');
-                i += 3; continue;
+            if b == b'"' && next == b'"' && i + 2 < input.len() && input[i + 2] == b'"' {
+                triple = Some([b'"', b'"', b'"']);
+                in_str = true;
+                out.push(b'"');
+                out.push(b'"');
+                out.push(b'"');
+                i += 3;
+                continue;
             }
-            if b == b'\'' && next == b'\'' && i + 2 < input.len() && input[i+2] == b'\'' {
-                triple = Some([b'\'', b'\'', b'\'']); in_str = true;
-                out.push(b'\''); out.push(b'\''); out.push(b'\'');
-                i += 3; continue;
+            if b == b'\'' && next == b'\'' && i + 2 < input.len() && input[i + 2] == b'\'' {
+                triple = Some([b'\'', b'\'', b'\'']);
+                in_str = true;
+                out.push(b'\'');
+                out.push(b'\'');
+                out.push(b'\'');
+                i += 3;
+                continue;
             }
 
-            out.push(b); i += 1;
+            out.push(b);
+            i += 1;
         }
         out
     }
@@ -414,7 +500,11 @@ mod strip {
         let mut i = out.len();
         while i > 0 {
             i -= 1;
-            if out[i] == b'\\' { n += 1; } else { break; }
+            if out[i] == b'\\' {
+                n += 1;
+            } else {
+                break;
+            }
         }
         n % 2 == 0
     }
@@ -460,17 +550,31 @@ impl LineIndex {
     pub fn new(bytes: &[u8]) -> Self {
         let mut starts = vec![0usize];
         for (i, b) in bytes.iter().enumerate() {
-            if *b == b'\n' { starts.push(i + 1); }
+            if *b == b'\n' {
+                starts.push(i + 1);
+            }
         }
-        Self { line_starts: starts }
+        Self {
+            line_starts: starts,
+        }
     }
 
     pub fn to_line_col(&self, offset: usize) -> Span {
         match self.line_starts.binary_search(&offset) {
-            Ok(idx) => Span { line: idx + 1, column: 1 },
+            Ok(idx) => Span {
+                line: idx + 1,
+                column: 1,
+            },
             Err(idx) => {
-                let line_start = if idx == 0 { 0 } else { self.line_starts[idx - 1] };
-                Span { line: idx, column: offset - line_start + 1 }
+                let line_start = if idx == 0 {
+                    0
+                } else {
+                    self.line_starts[idx - 1]
+                };
+                Span {
+                    line: idx,
+                    column: offset - line_start + 1,
+                }
             }
         }
     }
@@ -485,22 +589,42 @@ pub struct Scanner<'a> {
 }
 
 impl<'a> Scanner<'a> {
-    pub fn new(registry: &'a PatternRegistry, detectors: Vec<Box<dyn Detector>>, config: Config) -> Self {
-        Self { registry, detectors, config }
+    pub fn new(
+        registry: &'a PatternRegistry,
+        detectors: Vec<Box<dyn Detector>>,
+        config: Config,
+    ) -> Self {
+        Self {
+            registry,
+            detectors,
+            config,
+        }
     }
 
     pub fn discover_files(&self, roots: &[PathBuf]) -> Vec<PathBuf> {
         let mut paths = Vec::new();
         for root in roots {
             let mut builder = WalkBuilder::new(root);
-            builder.hidden(false).git_ignore(true).git_exclude(true).ignore(true);
-            for _ig in &self.config.include_globs { builder.add("."); builder.filter_entry(|_| true); }
+            builder
+                .hidden(false)
+                .git_ignore(true)
+                .git_exclude(true)
+                .ignore(true);
+            for _ig in &self.config.include_globs {
+                builder.add(".");
+                builder.filter_entry(|_| true);
+            }
             // exclude_globs are handled later using globset for simplicity
             for result in builder.build() {
                 if let Ok(entry) = result {
-                    let md = match entry.metadata() { Ok(m) => m, Err(_) => continue };
+                    let md = match entry.metadata() {
+                        Ok(m) => m,
+                        Err(_) => continue,
+                    };
                     if md.is_file() {
-                        if md.len() as usize > self.config.max_file_size { continue; }
+                        if md.len() as usize > self.config.max_file_size {
+                            continue;
+                        }
                         paths.push(entry.into_path());
                     }
                 }
@@ -510,7 +634,13 @@ impl<'a> Scanner<'a> {
     }
 
     pub fn detect_language(path: &Path) -> Option<Language> {
-        match path.extension().and_then(|e| e.to_str()).unwrap_or("").to_ascii_lowercase().as_str() {
+        match path
+            .extension()
+            .and_then(|e| e.to_str())
+            .unwrap_or("")
+            .to_ascii_lowercase()
+            .as_str()
+        {
             "go" => Some(Language::Go),
             "java" => Some(Language::Java),
             "c" => Some(Language::C),
@@ -540,12 +670,23 @@ impl<'a> Scanner<'a> {
         files.par_iter().for_each_with(tx.clone(), |tx, path| {
             if let Some(lang) = Self::detect_language(path) {
                 if let Ok(bytes) = Self::load_file(path) {
-                    let unit = ScanUnit { path: path.clone(), lang, bytes: bytes.clone() };
+                    let unit = ScanUnit {
+                        path: path.clone(),
+                        lang,
+                        bytes: bytes.clone(),
+                    };
                     let stripped = strip_comments(lang, &bytes);
-                    let mut em = Emitter { tx: tx.clone(), rx: rx.clone() };
+                    let mut em = Emitter {
+                        tx: tx.clone(),
+                        rx: rx.clone(),
+                    };
                     for det in &self.detectors {
-                        if !det.languages().contains(&lang) { continue; }
-                        if !prefilter_hit(det, &stripped) { continue; }
+                        if !det.languages().contains(&lang) {
+                            continue;
+                        }
+                        if !prefilter_hit(det, &stripped) {
+                            continue;
+                        }
                         let _ = det.scan(&unit, &mut em);
                     }
                 }
@@ -553,12 +694,26 @@ impl<'a> Scanner<'a> {
         });
 
         drop(tx);
-        for f in rx.iter() { findings.push(f); }
+        for f in rx.iter() {
+            findings.push(f);
+        }
 
         if self.config.deterministic {
             findings.sort_by(|a, b| {
-                (a.file.to_string_lossy(), a.span.line, a.span.column, &a.library, &a.symbol)
-                    .cmp(&(b.file.to_string_lossy(), b.span.line, b.span.column, &b.library, &b.symbol))
+                (
+                    a.file.to_string_lossy(),
+                    a.span.line,
+                    a.span.column,
+                    &a.library,
+                    &a.symbol,
+                )
+                    .cmp(&(
+                        b.file.to_string_lossy(),
+                        b.span.line,
+                        b.span.column,
+                        &b.library,
+                        &b.symbol,
+                    ))
             });
         }
 
@@ -566,10 +721,11 @@ impl<'a> Scanner<'a> {
             findings.retain(|f| f.confidence >= min_c);
         }
 
-        findings
-            .retain(|f| self.config.allow_libs.is_empty() || self.config.allow_libs.iter().any(|a| a == &f.library));
-        findings
-            .retain(|f| !self.config.deny_libs.iter().any(|d| d == &f.library));
+        findings.retain(|f| {
+            self.config.allow_libs.is_empty()
+                || self.config.allow_libs.iter().any(|a| a == &f.library)
+        });
+        findings.retain(|f| !self.config.deny_libs.iter().any(|d| d == &f.library));
 
         Ok(findings)
     }
@@ -577,7 +733,9 @@ impl<'a> Scanner<'a> {
 
 fn prefilter_hit(det: &Box<dyn Detector>, stripped: &[u8]) -> bool {
     let pf = det.prefilter();
-    if pf.substrings.is_empty() { return true; }
+    if pf.substrings.is_empty() {
+        return true;
+    }
     let ac = AhoCorasickBuilder::new()
         .ascii_case_insensitive(true)
         .build(pf.substrings)
@@ -594,25 +752,43 @@ pub struct PatternDetector {
 }
 
 impl PatternDetector {
-    pub fn new(id: &'static str, languages: &'static [Language], registry: Arc<PatternRegistry>) -> Self {
-        Self { id, languages, registry }
+    pub fn new(
+        id: &'static str,
+        languages: &'static [Language],
+        registry: Arc<PatternRegistry>,
+    ) -> Self {
+        Self {
+            id,
+            languages,
+            registry,
+        }
     }
-
 }
 
 impl Detector for PatternDetector {
-    fn id(&self) -> &'static str { self.id }
-    fn languages(&self) -> &'static [Language] { self.languages }
+    fn id(&self) -> &'static str {
+        self.id
+    }
+    fn languages(&self) -> &'static [Language] {
+        self.languages
+    }
     fn prefilter(&self) -> Prefilter {
         let mut substrings = BTreeSet::new();
         for lib in self.registry.for_language(self.languages[0]) {
-            for s in &lib.prefilter_substrings { substrings.insert(s.clone()); }
+            for s in &lib.prefilter_substrings {
+                substrings.insert(s.clone());
+            }
         }
-        Prefilter { extensions: BTreeSet::new(), substrings }
+        Prefilter {
+            extensions: BTreeSet::new(),
+            substrings,
+        }
     }
     fn scan(&self, unit: &ScanUnit, em: &mut Emitter) -> Result<()> {
         let libs = self.registry.for_language(unit.lang);
-        if libs.is_empty() { return Ok(()); }
+        if libs.is_empty() {
+            return Ok(());
+        }
         let stripped = crate::strip_comments(unit.lang, &unit.bytes);
         let stripped_s = String::from_utf8_lossy(&stripped);
         let index = LineIndex::new(stripped_s.as_bytes());
@@ -673,9 +849,12 @@ impl Detector for PatternDetector {
 fn extract_line(s: &str, pos: usize) -> String {
     let bytes = s.as_bytes();
     let mut start = pos;
-    while start > 0 && bytes[start - 1] != b'\n' { start -= 1; }
+    while start > 0 && bytes[start - 1] != b'\n' {
+        start -= 1;
+    }
     let mut end = pos;
-    while end < bytes.len() && bytes[end] != b'\n' { end += 1; }
+    while end < bytes.len() && bytes[end] != b'\n' {
+        end += 1;
+    }
     s[start..end].trim().to_string()
 }
-
