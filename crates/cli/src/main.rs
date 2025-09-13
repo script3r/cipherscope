@@ -1,5 +1,6 @@
 use anyhow::{Context, Result};
 use clap::{ArgAction, Parser};
+use indicatif::{ProgressBar, ProgressStyle};
 use scanner_core::*;
 use std::fs;
 use std::path::PathBuf;
@@ -68,6 +69,10 @@ struct Args {
     /// Path to patterns file
     #[arg(long, value_name = "FILE", default_value = "patterns.toml")]
     patterns: PathBuf,
+
+    /// Show progress bar during scanning
+    #[arg(long, action = ArgAction::SetTrue)]
+    progress: bool,
 }
 
 fn main() -> Result<()> {
@@ -140,6 +145,24 @@ fn main() -> Result<()> {
     cfg.deny_libs = args.deny.clone();
     cfg.deterministic = args.deterministic;
 
+    // Set up progress reporting if requested
+    if args.progress {
+        let pb = ProgressBar::new(0);
+        pb.set_style(
+            ProgressStyle::default_bar()
+                .template("{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} files ({percent}%) | {msg}")
+                .unwrap()
+                .progress_chars("#>-"),
+        );
+        pb.set_message("Scanning files...");
+        
+        cfg.progress_callback = Some(Arc::new(move |processed, total, findings| {
+            pb.set_length(total as u64);
+            pb.set_position(processed as u64);
+            pb.set_message(format!("Found {} findings", findings));
+        }));
+    }
+
     let scanner = Scanner::new(&reg, dets, cfg);
     if args.dry_run {
         let files = scanner.discover_files(&args.paths);
@@ -150,6 +173,11 @@ fn main() -> Result<()> {
     }
 
     let findings = scanner.run(&args.paths)?;
+
+    // Clear progress bar if it was shown
+    if args.progress {
+        println!(); // Move to next line after progress bar
+    }
 
     if args.json {
         for f in &findings {

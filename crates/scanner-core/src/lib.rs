@@ -169,7 +169,7 @@ pub struct LibraryPatterns {
     pub apis: Vec<String>,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Deserialize)]
 pub struct Config {
     #[serde(default = "default_max_file_size")]
     pub max_file_size: usize, // bytes
@@ -185,10 +185,42 @@ pub struct Config {
     pub min_confidence: Option<f32>,
     #[serde(default)]
     pub deterministic: bool,
+    #[serde(skip)]
+    pub progress_callback: Option<Arc<dyn Fn(usize, usize, usize) + Send + Sync>>,
 }
 
 fn default_max_file_size() -> usize {
     2 * 1024 * 1024
+}
+
+impl std::fmt::Debug for Config {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Config")
+            .field("max_file_size", &self.max_file_size)
+            .field("include_globs", &self.include_globs)
+            .field("exclude_globs", &self.exclude_globs)
+            .field("allow_libs", &self.allow_libs)
+            .field("deny_libs", &self.deny_libs)
+            .field("min_confidence", &self.min_confidence)
+            .field("deterministic", &self.deterministic)
+            .field("progress_callback", &"<callback>")
+            .finish()
+    }
+}
+
+impl Clone for Config {
+    fn clone(&self) -> Self {
+        Self {
+            max_file_size: self.max_file_size,
+            include_globs: self.include_globs.clone(),
+            exclude_globs: self.exclude_globs.clone(),
+            allow_libs: self.allow_libs.clone(),
+            deny_libs: self.deny_libs.clone(),
+            min_confidence: self.min_confidence,
+            deterministic: self.deterministic,
+            progress_callback: self.progress_callback.clone(),
+        }
+    }
 }
 
 impl Default for Config {
@@ -201,6 +233,7 @@ impl Default for Config {
             deny_libs: Vec::new(),
             min_confidence: None,
             deterministic: false,
+            progress_callback: None,
         }
     }
 }
@@ -791,10 +824,34 @@ impl<'a> Scanner<'a> {
 
     pub fn run(&self, roots: &[PathBuf]) -> Result<Vec<Finding>> {
         let files = self.discover_files(roots);
+        let total_files = files.len();
         let mut findings: Vec<Finding> = Vec::new();
 
+        // Call progress callback with initial state
+        if let Some(ref callback) = self.config.progress_callback {
+            callback(0, total_files, 0);
+        }
+
         let (tx, rx) = bounded::<Finding>(8192);
-        files.par_iter().for_each_with(tx.clone(), |tx, path| {
+        let (progress_tx, progress_rx) = bounded::<usize>(1000);
+        
+        // Spawn a thread to collect progress updates
+        let progress_handle = if let Some(ref callback) = self.config.progress_callback {
+            let callback = callback.clone();
+            Some(std::thread::spawn(move || {
+                let mut processed = 0;
+                let mut findings_count = 0;
+                
+                while let Ok(_) = progress_rx.recv() {
+                    processed += 1;
+                    callback(processed, total_files, findings_count);
+                }
+            }))
+        } else {
+            None
+        };
+
+        files.par_iter().for_each_with((tx.clone(), progress_tx.clone()), |(tx, progress_tx), path| {
             if let Some(lang) = Self::detect_language(path) {
                 if let Ok(bytes) = Self::load_file(path) {
                     let unit = ScanUnit {
@@ -822,11 +879,25 @@ impl<'a> Scanner<'a> {
                     }
                 }
             }
+            // Signal that this file has been processed
+            let _ = progress_tx.send(1);
         });
 
         drop(tx);
+        drop(progress_tx);
+        
         for f in rx.iter() {
             findings.push(f);
+        }
+
+        // Wait for progress thread to finish
+        if let Some(handle) = progress_handle {
+            let _ = handle.join();
+        }
+
+        // Final progress update
+        if let Some(ref callback) = self.config.progress_callback {
+            callback(total_files, total_files, findings.len());
         }
 
         if self.config.deterministic {

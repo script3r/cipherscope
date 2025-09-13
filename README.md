@@ -21,6 +21,7 @@ Key flags:
 - `--threads N`: set thread pool size
 - `--max-file-size MB`: skip large files (default 2)
 - `--patterns PATH`: specify patterns file (default: `patterns.toml`)
+- `--progress`: show progress bar during scanning
 - `--include-glob GLOB` / `--exclude-glob GLOB`
 - `--allow LIB` / `--deny LIB`
 - `--deterministic`: stable output ordering
