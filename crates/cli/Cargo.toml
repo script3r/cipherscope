@@ -1,5 +1,5 @@
 [package]
-name = "cryptofind"
+name = "cipherscope"
 version = "0.1.0"
 edition = "2021"
 license = "Apache-2.0"
@@ -23,6 +23,6 @@ detector-objc = { path = "../detector-objc" }
 detector-kotlin = { path = "../detector-kotlin" }
 
 [[bin]]
-name = "cryptofind"
+name = "cipherscope"
 path = "src/main.rs"
 

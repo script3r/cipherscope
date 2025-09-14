@@ -19,9 +19,9 @@ resolver = "2"
 edition = "2021"
 license = "Apache-2.0"
 version = "0.1.0"
-authors = ["CryptoFind Contributors"]
-homepage = "https://example.com/cryptofind"
-repository = "https://example.com/cryptofind/repo"
+authors = ["CipherScope Contributors"]
+homepage = "https://example.com/cipherscope"
+repository = "https://example.com/cipherscope/repo"
 
 [workspace.dependencies]
 anyhow = "1"

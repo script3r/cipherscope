@@ -1,4 +1,4 @@
-## cryptofind
+## CipherScope
 
 Fast, low-false-positive static scanner that finds third-party cryptographic libraries and call sites across 10 programming languages: Go, Java, C, C++, Rust, Python, PHP, Swift, Objective-C, and Kotlin.
 
@@ -6,14 +6,14 @@ Fast, low-false-positive static scanner that finds third-party cryptographic lib
 
 ```bash
 cargo build --release
-./target/release/cryptofind .
+./target/release/cipherscope .
 ```
 
 JSONL and SARIF:
 
 ```bash
-./target/release/cryptofind . --json > findings.jsonl
-./target/release/cryptofind . --sarif findings.sarif
+./target/release/cipherscope . --json > findings.jsonl
+./target/release/cipherscope . --sarif findings.sarif
 ```
 
 Key flags:
@@ -50,7 +50,7 @@ JSONL example:
 SARIF snippet:
 
 ```json
-{"version":"2.1.0","runs":[{"tool":{"driver":{"name":"cryptofind"}},"results":[{"ruleId":"detector-rust","message":{"text":"RustCrypto in Rust"}}]}]}
+{"version":"2.1.0","runs":[{"tool":{"driver":{"name":"cipherscope"}},"results":[{"ruleId":"detector-rust","message":{"text":"RustCrypto in Rust"}}]}]}
 ```
 
 ### Configuration & Patterns

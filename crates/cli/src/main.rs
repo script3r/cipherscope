@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 #[derive(Parser, Debug)]
-#[command(name = "cryptofind")]
+#[command(name = "cipherscope")]
 #[command(version, about = "Fast static scanner for third-party crypto libraries", long_about = None)]
 struct Args {
     /// Paths to scan
