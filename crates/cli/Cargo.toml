@@ -18,6 +18,9 @@ aho-corasick = { workspace = true }
 crossbeam-channel = { workspace = true }
 indicatif = "0.17"
 scanner-core = { path = "../scanner-core" }
+detector-swift = { path = "../detector-swift" }
+detector-objc = { path = "../detector-objc" }
+detector-kotlin = { path = "../detector-kotlin" }
 
 [[bin]]
 name = "cryptofind"

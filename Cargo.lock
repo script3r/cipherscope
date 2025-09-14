@@ -283,6 +283,9 @@ dependencies = [
  "anyhow",
  "clap",
  "crossbeam-channel",
+ "detector-kotlin",
+ "detector-objc",
+ "detector-swift",
  "ignore",
  "indicatif",
  "once_cell",
@@ -327,6 +330,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "detector-kotlin"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "scanner-core",
+]
+
+[[package]]
+name = "detector-objc"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "scanner-core",
+]
+
+[[package]]
 name = "detector-php"
 version = "0.1.0"
 dependencies = [
@@ -344,6 +363,14 @@ dependencies = [
 
 [[package]]
 name = "detector-rust"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "scanner-core",
+]
+
+[[package]]
+name = "detector-swift"
 version = "0.1.0"
 dependencies = [
  "anyhow",
