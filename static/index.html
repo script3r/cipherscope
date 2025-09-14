@@ -207,11 +207,32 @@ Python | PyCA cryptography | 1 | auth.py:8 Fernet(key)
             </div>
 
             <div class="output-section">
-                <h4>SARIF Format</h4>
+                <h4>Patterns Configuration</h4>
                 <div class="code-block">
-                    <button class="copy-btn" onclick="copyToClipboard('{\"version\":\"2.1.0\",\"runs\":[{\"tool\":{\"driver\":{\"name\":\"cipherscope\"}},\"results\":[{\"ruleId\":\"detector-rust\",\"message\":{\"text\":\"RustCrypto library detected\"},\"locations\":[{\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"src/main.rs\"},\"region\":{\"startLine\":12}}]}]}]}')">Copy</button>
-{"version":"2.1.0","runs":[{"tool":{"driver":{"name":"cipherscope"}},"results":[{"ruleId":"detector-rust","message":{"text":"RustCrypto library detected"},"locations":[{"physicalLocation":{"artifactLocation":{"uri":"src/main.rs"},"region":{"startLine":12}}]}]}]}
+                    <button class="copy-btn" onclick="copyToClipboard('[[library]]\nname = \"PyCA cryptography\"\nlanguages = [\"Python\"]\n[library.patterns]\ninclude = [\"^\\\\s*from\\\\s+cryptography\\\\b\"]\napis = [\"\\\\bFernet(\\\\(\\\\)\", \"\\\\.encrypt(\\\\(\\\\)\", \"\\\\.decrypt(\\\\(\\\\)\"]')">Copy</button>
+[[library]]
+name = "PyCA cryptography"
+languages = ["Python"]
+[library.patterns]
+include = ["^\\s*from\\s+cryptography\\b"]
+apis = ["\\bFernet\\(", "\\.encrypt\\(", "\\.decrypt\\("]
                 </div>
+                <p style="margin-top: 0.8rem; color: #666; font-size: 0.9rem;">
+                    Define import patterns and API calls for each library
+                </p>
+                
+                <div class="code-block" style="margin-top: 1rem;">
+                    <button class="copy-btn" onclick="copyToClipboard('[[library]]\nname = \"OpenSSL\"\nlanguages = [\"C\", \"C++\"]\n[library.patterns]\ninclude = [\"^\\\\s*#\\\\s*include\\\\s*<openssl/[A-Za-z0-9_./-]+>\"]\napis = [\"\\\\bEVP_[A-Za-z0-9_]+\\\\s*\\\\(\\\\)\", \"\\\\bRSA_[A-Za-z0-9_]+\\\\s*\\\\(\\\\)\"]')">Copy</button>
+[[library]]
+name = "OpenSSL"
+languages = ["C", "C++"]
+[library.patterns]
+include = ["^\\s*#\\s*include\\s*<openssl/[A-Za-z0-9_./-]+>"]
+apis = ["\\bEVP_[A-Za-z0-9_]+\\s*\\(", "\\bRSA_[A-Za-z0-9_]+\\s*\\("]
+                </div>
+                <p style="margin-top: 0.8rem; color: #666; font-size: 0.9rem;">
+                    C/C++ libraries use include patterns and function calls
+                </p>
             </div>
         </div>
 
@@ -246,10 +267,6 @@ Python | PyCA cryptography | 1 | auth.py:8 Fernet(key)
                 <div class="code-block" style="margin: 0.5rem 0;">
                     <button class="copy-btn" onclick="copyToClipboard('cryptofind . --json > findings.jsonl')">Copy</button>
                     cryptofind . --json > findings.jsonl
-                </div>
-                <div class="code-block" style="margin: 0.5rem 0;">
-                    <button class="copy-btn" onclick="copyToClipboard('cryptofind . --sarif findings.sarif')">Copy</button>
-                    cryptofind . --sarif findings.sarif
                 </div>
             </div>
         </div>
