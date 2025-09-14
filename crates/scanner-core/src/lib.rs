@@ -1055,8 +1055,7 @@ impl PatternDetector {
                     }
                 }
             }
-            let should_report =
-                (lib.import.is_empty() || matched_import) && api_hits > 0;
+            let should_report = (lib.import.is_empty() || matched_import) && api_hits > 0;
             if should_report {
                 let finding = Finding {
                     language: unit.lang,

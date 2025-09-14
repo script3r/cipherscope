@@ -1,5 +1,5 @@
-use scanner_core::{Detector, Language, ScanUnit, Emitter, Prefilter};
 use anyhow::Result;
+use scanner_core::{Detector, Emitter, Language, Prefilter, ScanUnit};
 use std::collections::BTreeSet;
 
 pub struct ErlangDetector;
@@ -15,7 +15,11 @@ impl Detector for ErlangDetector {
 
     fn prefilter(&self) -> Prefilter {
         Prefilter {
-            extensions: BTreeSet::from([".erl".to_string(), ".hrl".to_string(), ".beam".to_string()]),
+            extensions: BTreeSet::from([
+                ".erl".to_string(),
+                ".hrl".to_string(),
+                ".beam".to_string(),
+            ]),
             substrings: BTreeSet::new(),
         }
     }
