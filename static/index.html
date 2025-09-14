@@ -190,7 +190,6 @@
             <div class="output-section">
                 <h4>Table Format (Default)</h4>
                 <div class="code-block">
-                    <button class="copy-btn" onclick="copyToClipboard('Language | Library | Count | Example\n---------|---------|-------|--------\nRust | RustCrypto | 2 | src/main.rs:12 aes_gcm::Aes256Gcm\nPython | PyCA cryptography | 1 | auth.py:8 Fernet(key)')">Copy</button>
 Language | Library | Count | Example
 ---------|---------|-------|--------
 Rust | RustCrypto | 2 | src/main.rs:12 aes_gcm::Aes256Gcm
@@ -201,7 +200,6 @@ Python | PyCA cryptography | 1 | auth.py:8 Fernet(key)
             <div class="output-section">
                 <h4>JSONL Format</h4>
                 <div class="code-block">
-                    <button class="copy-btn" onclick="copyToClipboard('{\"language\":\"Rust\",\"library\":\"RustCrypto\",\"file\":\"src/main.rs\",\"span\":{\"line\":12,\"column\":5},\"symbol\":\"aes_gcm::Aes256Gcm\",\"snippet\":\"use aes_gcm::Aes256Gcm;\",\"confidence\":0.99,\"detector_id\":\"detector-rust\"}')">Copy</button>
 {"language":"Rust","library":"RustCrypto","file":"src/main.rs","span":{"line":12,"column":5},"symbol":"aes_gcm::Aes256Gcm","snippet":"use aes_gcm::Aes256Gcm;","confidence":0.99,"detector_id":"detector-rust"}
                 </div>
             </div>
@@ -209,7 +207,6 @@ Python | PyCA cryptography | 1 | auth.py:8 Fernet(key)
             <div class="output-section">
                 <h4>Patterns Configuration</h4>
                 <div class="code-block">
-                    <button class="copy-btn" onclick="copyToClipboard('[[library]]\nname = \"PyCA cryptography\"\nlanguages = [\"Python\"]\n[library.patterns]\ninclude = [\"^\\\\s*from\\\\s+cryptography\\\\b\"]\napis = [\"\\\\bFernet(\\\\(\\\\)\", \"\\\\.encrypt(\\\\(\\\\)\", \"\\\\.decrypt(\\\\(\\\\)\"]')">Copy</button>
 [[library]]
 name = "PyCA cryptography"
 languages = ["Python"]
@@ -222,7 +219,6 @@ apis = ["\\bFernet\\(", "\\.encrypt\\(", "\\.decrypt\\("]
                 </p>
                 
                 <div class="code-block" style="margin-top: 1rem;">
-                    <button class="copy-btn" onclick="copyToClipboard('[[library]]\nname = \"OpenSSL\"\nlanguages = [\"C\", \"C++\"]\n[library.patterns]\ninclude = [\"^\\\\s*#\\\\s*include\\\\s*<openssl/[A-Za-z0-9_./-]+>\"]\napis = [\"\\\\bEVP_[A-Za-z0-9_]+\\\\s*\\\\(\\\\)\", \"\\\\bRSA_[A-Za-z0-9_]+\\\\s*\\\\(\\\\)\"]')">Copy</button>
 [[library]]
 name = "OpenSSL"
 languages = ["C", "C++"]
@@ -265,7 +261,6 @@ apis = ["\\bEVP_[A-Za-z0-9_]+\\s*\\(", "\\bRSA_[A-Za-z0-9_]+\\s*\\("]
             <div style="margin-top: 1.5rem;">
                 <h4 style="color: #000; margin-bottom: 0.8rem; font-size: 1rem;">Output Formats</h4>
                 <div class="code-block" style="margin: 0.5rem 0;">
-                    <button class="copy-btn" onclick="copyToClipboard('cryptofind . --json > findings.jsonl')">Copy</button>
                     cryptofind . --json > findings.jsonl
                 </div>
             </div>
