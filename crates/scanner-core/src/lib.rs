@@ -96,8 +96,8 @@ pub trait Detector: Send + Sync {
     fn scan_optimized(
         &self,
         unit: &ScanUnit,
-        stripped_s: &str,
-        index: &LineIndex,
+        _stripped_s: &str,
+        _index: &LineIndex,
         em: &mut Emitter,
     ) -> Result<()> {
         // Default implementation falls back to the original scan method
@@ -840,7 +840,7 @@ impl<'a> Scanner<'a> {
             let callback = callback.clone();
             Some(std::thread::spawn(move || {
                 let mut processed = 0;
-                let mut findings_count = 0;
+                let findings_count = 0;
 
                 while let Ok(_) = progress_rx.recv() {
                     processed += 1;

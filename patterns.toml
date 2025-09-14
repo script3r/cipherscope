@@ -438,3 +438,95 @@ include = [
 apis = [
   "\\bParagonIE\\\\Halite\\\\[A-Za-z0-9_\\\\]+::[A-Za-z0-9_]+\\s*\\(",
 ]
+
+# =========================
+# Objective-C: Apple/Common
+# =========================
+
+[[library]]
+name = "CommonCrypto (Objective-C)"
+languages = ["Objective-C"]
+[library.patterns]
+include = [
+  "^\\s*#\\s*(?:import|include)\\s*<CommonCrypto\\/[A-Za-z0-9_]+\\.h>",
+  "^\\s*@import\\s+CommonCrypto\\b",
+]
+apis = [
+  "\\bCCCrypt\\s*\\(",
+  "\\bCCCryptor(?:Create|Update|Final|Release)\\s*\\(",
+  "\\bCCHmac\\s*\\(",
+  "\\bCC_SHA(?:1|224|256|384|512)\\s*\\(",
+  "\\bCC_MD5\\s*\\(",
+  "\\bCCKeyDerivationPBKDF\\s*\\(",
+  "\\bCCRandomGenerateBytes\\s*\\(",
+]
+
+[[library]]
+name = "Security.framework (Objective-C)"
+languages = ["Objective-C"]
+[library.patterns]
+include = [
+  "^\\s*#\\s*(?:import|include)\\s*<Security\\/Security\\.h>",
+  "^\\s*@import\\s+Security\\b",
+]
+apis = [
+  "\\bSecKeyCreateRandomKey\\s*\\(",
+  "\\bSecKeyCreateEncryptedData\\s*\\(",
+  "\\bSecKeyCreateDecryptedData\\s*\\(",
+  "\\bSecKeyCreateSignature\\s*\\(",
+  "\\bSecKeyVerifySignature\\s*\\(",
+  "\\bSecRandomCopyBytes\\s*\\(",
+]
+
+# =========================
+# Objective-C: Third-party C libs used from Obj-C
+# =========================
+
+[[library]]
+name = "OpenSSL (Objective-C)"
+languages = ["Objective-C"]
+[library.patterns]
+include = [
+  "^\\s*#\\s*(?:import|include)\\s*<openssl/[A-Za-z0-9_./-]+>",
+]
+apis = [
+  "\\bEVP_[A-Za-z0-9_]+\\s*\\(",
+  "\\bRSA_[A-Za-z0-9_]+\\s*\\(",
+  "\\bECDSA_[A-Za-z0-9_]+\\s*\\(",
+  "\\bEC_KEY_[A-Za-z0-9_]+\\s*\\(",
+  "\\bX509_[A-Za-z0-9_]+\\s*\\(",
+  "\\bPKCS\\d_[A-Za-z0-9_]+\\s*\\(",
+]
+
+[[library]]
+name = "libsodium (Objective-C)"
+languages = ["Objective-C"]
+[library.patterns]
+include = [
+  "^\\s*#\\s*(?:import|include)\\s*<sodium(?:/[^>]+)?>",
+]
+apis = [
+  "\\bcrypto_secretbox_(?:easy|open_easy)\\s*\\(",
+  "\\bcrypto_aead_(?:x?chacha20poly1305_ietf|aes256gcm)_(?:encrypt|decrypt)\\s*\\(",
+  "\\bcrypto_sign_(?:detached|verify_detached)\\s*\\(",
+  "\\bcrypto_generichash\\s*\\(",
+  "\\bcrypto_scalarmult\\s*\\(",
+]
+
+# =========================
+# Objective-C: High-level but still primitive APIs
+# =========================
+
+[[library]]
+name = "Google Tink (Objective-C)"
+languages = ["Objective-C"]
+[library.patterns]
+include = [
+  "^\\s*@import\\s+Tink\\b",
+  "^\\s*#\\s*import\\s*<Tink\\/[A-Za-z0-9_]+\\.h>",
+  "^\\s*#\\s*import\\s*\"objc\\/TINK[A-Za-z0-9_]+\\.h\"",
+]
+apis = [
+  "\\bTINK(?:Aead|Mac|Hybrid(?:Encrypt|Decrypt)|PublicKey(?:Sign|Verify)|KeysetHandle|Config)\\b",
+  "\\b\\[TINK[A-Za-z0-9_]+Factory\\s+[A-Za-z0-9_]+WithKeysetHandle:.*\\]",
+]
