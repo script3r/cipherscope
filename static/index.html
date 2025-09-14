@@ -12,63 +12,61 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
             color: #333;
-            background: #f8f9fa;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: #fff;
         }
 
         .container {
-            background: white;
-            border: 1px solid #e1e5e9;
-            border-radius: 8px;
-            padding: 2.5rem;
             max-width: 800px;
-            width: 90%;
-            text-align: center;
+            margin: 0 auto;
+            padding: 2rem 1rem;
         }
 
-        h1 {
-            font-size: 3rem;
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo {
+            font-size: 2.5rem;
             font-weight: 700;
             color: #000;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
         }
 
-        .subtitle {
+        .tagline {
             font-size: 1.2rem;
             color: #666;
             margin-bottom: 2rem;
-            font-weight: 400;
         }
 
         .description {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #555;
-            margin-bottom: 2.5rem;
-            line-height: 1.7;
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            text-align: center;
         }
 
-        .install-section {
+        .install {
             background: #f8f9fa;
+            border: 1px solid #e1e5e9;
             border-radius: 8px;
             padding: 1.5rem;
             margin: 2rem 0;
-            border-left: 4px solid #000;
         }
 
         .install-title {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: #000;
             margin-bottom: 1rem;
         }
 
-        .code-block {
+        .code {
             background: #000;
             color: #fff;
             padding: 1rem 1.5rem;
@@ -77,22 +75,20 @@
             font-size: 0.9rem;
             margin: 1rem 0;
             overflow-x: auto;
-            position: relative;
             white-space: pre;
             line-height: 1.4;
         }
 
         .copy-btn {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
             background: #333;
             color: white;
             border: 1px solid #666;
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 0.8rem;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
+            float: right;
+            margin-top: -0.5rem;
             transition: background 0.2s;
         }
 
@@ -100,40 +96,95 @@
             background: #555;
         }
 
-        .output-examples {
-            margin: 2rem 0;
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
         }
 
-        .output-section {
-            margin: 1.5rem 0;
+        .feature {
+            text-align: center;
+            padding: 1.5rem;
         }
 
-        .output-section h4 {
-            color: #000;
-            margin-bottom: 0.8rem;
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
             font-size: 1.1rem;
             font-weight: 600;
+            color: #000;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-desc {
+            font-size: 0.9rem;
+            color: #666;
         }
 
         .languages {
+            text-align: center;
+            margin: 3rem 0;
+        }
+
+        .languages-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 1rem;
+        }
+
+        .lang-list {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 0.5rem;
-            margin: 1.5rem 0;
         }
 
         .lang-tag {
-            background: #000;
-            color: white;
-            padding: 0.4rem 0.8rem;
+            background: #f0f0f0;
+            color: #333;
+            padding: 0.3rem 0.8rem;
             border-radius: 20px;
             font-size: 0.9rem;
             font-weight: 500;
         }
 
+        .examples {
+            margin: 3rem 0;
+        }
+
+        .examples-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .example {
+            margin: 1.5rem 0;
+        }
+
+        .example-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 0.5rem;
+        }
+
+        .example-desc {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
         .footer {
-            margin-top: 2rem;
+            text-align: center;
+            margin-top: 4rem;
             padding-top: 2rem;
             border-top: 1px solid #eee;
             color: #666;
@@ -151,115 +202,59 @@
 
         @media (max-width: 600px) {
             .container {
-                padding: 2rem 1.5rem;
+                padding: 1rem 0.5rem;
             }
             
-            h1 {
-                font-size: 2.5rem;
+            .logo {
+                font-size: 2rem;
             }
             
-            .code-block {
-                font-size: 0.9rem;
-                padding: 1rem;
+            .features {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>CipherScope</h1>
-        <p class="subtitle">Fast static scanner for cryptographic libraries</p>
-        
-        <p class="description">
-            Find third-party cryptographic libraries and call sites across 10 programming languages 
-            with low false positives and high performance.
-        </p>
+        <div class="header">
+            <div class="logo">CipherScope</div>
+            <div class="tagline">Fast static scanner for cryptographic libraries</div>
+            <div class="description">
+                Find third-party cryptographic libraries and call sites across 10 programming languages 
+                with low false positives and high performance.
+            </div>
+        </div>
 
-        <div class="install-section">
-            <h3 class="install-title">Install & Run</h3>
-            <div class="code-block">
+        <div class="install">
+            <div class="install-title">Install</div>
+            <div class="code">
                 <button class="copy-btn" onclick="copyToClipboard('cargo install --git https://github.com/your-org/cipherscope')">Copy</button>
-                cargo install --git https://github.com/your-org/cipherscope
-            </div>
-            <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
-                Or build from source: <code>cargo build --release</code>
-            </p>
-        </div>
-
-        <div class="output-examples">
-            <h3 style="color: #000; margin-bottom: 1.5rem;">Example Outputs</h3>
-            
-            <div class="output-section">
-                <h4>Table Format (Default)</h4>
-                <div class="code-block">
-Language | Library | Count | Example
----------|---------|-------|--------
-Rust | RustCrypto | 2 | src/main.rs:12 aes_gcm::Aes256Gcm
-Python | PyCA cryptography | 1 | auth.py:8 Fernet(key)
-                </div>
-            </div>
-
-            <div class="output-section">
-                <h4>JSONL Format</h4>
-                <div class="code-block">
-{
-  "language": "Rust",
-  "library": "RustCrypto",
-  "file": "src/main.rs",
-  "span": {
-    "line": 12,
-    "column": 5
-  },
-  "symbol": "aes_gcm::Aes256Gcm",
-  "snippet": "use aes_gcm::Aes256Gcm;",
-  "confidence": 0.99,
-  "detector_id": "detector-rust"
-}
-                </div>
-            </div>
-
-            <div class="output-section">
-                <h4>Patterns Configuration</h4>
-                <div class="code-block">
-[[library]]
-name = "PyCA cryptography"
-languages = ["Python"]
-[library.patterns]
-include = [
-  "^\\s*from\\s+cryptography\\b"
-]
-apis = [
-  "\\bFernet\\(",
-  "\\.encrypt\\(",
-  "\\.decrypt\\("
-]
-                </div>
-                <p style="margin-top: 0.8rem; color: #666; font-size: 0.9rem;">
-                    Define import patterns and API calls for each library
-                </p>
-                
-                <div class="code-block" style="margin-top: 1rem;">
-[[library]]
-name = "OpenSSL"
-languages = ["C", "C++"]
-[library.patterns]
-include = [
-  "^\\s*#\\s*include\\s*<openssl/[A-Za-z0-9_./-]+>"
-]
-apis = [
-  "\\bEVP_[A-Za-z0-9_]+\\s*\\(",
-  "\\bRSA_[A-Za-z0-9_]+\\s*\\("
-]
-                </div>
-                <p style="margin-top: 0.8rem; color: #666; font-size: 0.9rem;">
-                    C/C++ libraries use include patterns and function calls
-                </p>
+cargo install --git https://github.com/your-org/cipherscope
             </div>
         </div>
 
-        <div>
-            <h3 style="color: #2c3e50; margin-bottom: 1rem;">Supported Languages</h3>
-            <div class="languages">
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">Fast</div>
+                <div class="feature-desc">Parallel processing with optimized pattern matching</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-title">Accurate</div>
+                <div class="feature-desc">Low false positives with smart pattern detection</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔧</div>
+                <div class="feature-title">Configurable</div>
+                <div class="feature-desc">Custom patterns and flexible output formats</div>
+            </div>
+        </div>
+
+        <div class="languages">
+            <div class="languages-title">Supported Languages</div>
+            <div class="lang-list">
                 <span class="lang-tag">C</span>
                 <span class="lang-tag">C++</span>
                 <span class="lang-tag">Java</span>
@@ -273,20 +268,45 @@ apis = [
             </div>
         </div>
 
-        <div class="install-section">
-            <h3 class="install-title">Quick Start</h3>
-            <div class="code-block">
-                <button class="copy-btn" onclick="copyToClipboard('cryptofind . --progress')">Copy</button>
-                cryptofind . --progress
-            </div>
-            <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
-                Scan current directory with progress bar
-            </p>
+        <div class="examples">
+            <div class="examples-title">Example Outputs</div>
             
-            <div style="margin-top: 1.5rem;">
-                <h4 style="color: #000; margin-bottom: 0.8rem; font-size: 1rem;">Output Formats</h4>
-                <div class="code-block" style="margin: 0.5rem 0;">
-                    cryptofind . --json > findings.jsonl
+            <div class="example">
+                <div class="example-title">Table Format</div>
+                <div class="example-desc">Clean, readable table output</div>
+                <div class="code">
+Language | Library | Count | Example
+---------|---------|-------|--------
+Rust | RustCrypto | 2 | src/main.rs:12 aes_gcm::Aes256Gcm
+Python | PyCA cryptography | 1 | auth.py:8 Fernet(key)
+                </div>
+            </div>
+
+            <div class="example">
+                <div class="example-title">JSONL Format</div>
+                <div class="example-desc">Structured JSON for integration</div>
+                <div class="code">
+{
+  "language": "Rust",
+  "library": "RustCrypto",
+  "file": "src/main.rs",
+  "span": {"line": 12, "column": 5},
+  "symbol": "aes_gcm::Aes256Gcm",
+  "confidence": 0.99
+}
+                </div>
+            </div>
+
+            <div class="example">
+                <div class="example-title">Patterns Configuration</div>
+                <div class="example-desc">Define custom detection rules</div>
+                <div class="code">
+[[library]]
+name = "PyCA cryptography"
+languages = ["Python"]
+[library.patterns]
+include = ["^\\s*from\\s+cryptography\\b"]
+apis = ["\\bFernet\\(", "\\.encrypt\\(", "\\.decrypt\\("]
                 </div>
             </div>
         </div>
@@ -294,11 +314,7 @@ apis = [
         <div class="footer">
             <p>
                 <a href="https://github.com/your-org/cipherscope">GitHub</a> • 
-                <a href="https://github.com/your-org/cipherscope/blob/main/README.md">Documentation</a> • 
-                <a href="https://github.com/your-org/cipherscope/issues">Issues</a>
-            </p>
-            <p style="margin-top: 0.5rem;">
-                CipherScope is an open-source project for security teams and developers.
+                <a href="https://github.com/your-org/cipherscope/blob/main/README.md">Documentation</a>
             </p>
         </div>
     </div>
