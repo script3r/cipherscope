@@ -411,3 +411,267 @@ apis = [
   "\\bopenssl_verify\\(",
 ]
 
+# =========================
+# Enhanced C/C++ Libraries
+# =========================
+
+[[library]]
+name = "MbedTLS"
+languages = ["C", "C++"]
+[library.patterns]
+include = [
+  "^\\s*#\\s*include\\s*<mbedtls/[A-Za-z0-9_./-]+>",
+]
+apis = [
+  "\\bmbedtls_[A-Za-z0-9_]+\\s*\\(",
+]
+
+[[library]]
+name = "wolfSSL/wolfCrypt"
+languages = ["C", "C++"]
+[library.patterns]
+include = [
+  "^\\s*#\\s*include\\s*<wolfssl/[A-Za-z0-9_./-]+>",
+]
+apis = [
+  "\\bwc_[A-Za-z0-9_]+\\s*\\(",
+]
+
+[[library]]
+name = "Botan"
+languages = ["C++"]
+[library.patterns]
+include = [
+  "^\\s*#\\s*include\\s*<botan/[A-Za-z0-9_./-]+>",
+]
+apis = [
+  "\\bBotan::[A-Za-z0-9_:]+\\s*\\(",
+  "\\bBotan::[A-Za-z0-9_:]+\\b",
+]
+
+# =========================
+# Enhanced Java Libraries
+# =========================
+
+[[library]]
+name = "Java JCA/JCE"
+languages = ["Java"]
+[library.patterns]
+include = [
+  "^\\s*import\\s+javax\\.crypto\\.",
+  "^\\s*import\\s+java\\.security\\.",
+]
+apis = [
+  "\\b(?:Cipher|MessageDigest|Signature|KeyPairGenerator)\\.getInstance\\s*\\(",
+  "\\bKeyFactory\\.getInstance\\s*\\(",
+  "\\bKeyAgreement\\.getInstance\\s*\\(",
+]
+
+[[library]]
+name = "Google Tink (Java)"
+languages = ["Java"]
+[library.patterns]
+include = [
+  "^\\s*import\\s+com\\.google\\.crypto\\.tink\\.",
+]
+apis = [
+  "\\bTinkConfig\\.register\\s*\\(",
+  "\\b(?:Aead|Mac|HybridDecrypt|HybridEncrypt|PublicKeySign|PublicKeyVerify)\\b",
+]
+
+[[library]]
+name = "Conscrypt"
+languages = ["Java"]
+[library.patterns]
+include = [
+  "^\\s*import\\s+org\\.conscrypt\\.",
+]
+apis = [
+  "\\bConscrypt\\.newProvider\\s*\\(",
+  "\\bOpenSSLProvider\\b",
+]
+
+# =========================
+# Enhanced Go Libraries
+# =========================
+
+[[library]]
+name = "Go std crypto"
+languages = ["Go"]
+[library.patterns]
+include = [
+  "^\\s*import\\s*(?:\\(.*\\)|)\\s*[\\s\\S]*?\"crypto/(?:aes|des|rc4|sha\\d*|md5|rsa|ecdsa|ed25519|x509|rand|tls)\"",
+]
+apis = [
+  "\\bcrypto\\.[A-Z][A-Za-z0-9_]*\\b",
+]
+
+[[library]]
+name = "Google Tink (Go)"
+languages = ["Go"]
+[library.patterns]
+include = [
+  "^\\s*import\\s*(?:\\(.*\\)|)\\s*[\\s\\S]*?\"github\\.com/google/tink/go/",
+]
+apis = [
+  "\\btink\\/[A-Za-z0-9_/]+\\b",
+]
+
+# =========================
+# Enhanced Rust Libraries
+# =========================
+
+[[library]]
+name = "ring"
+languages = ["Rust"]
+[library.patterns]
+include = [
+  "\\bextern\\s+crate\\s+ring\\b",
+  "\\buse\\s+ring::",
+  "\\bring::[A-Za-z0-9_]+::",
+]
+apis = [
+  "\\bring::[A-Za-z0-9_:]+\\b",
+]
+
+[[library]]
+name = "openssl (Rust)"
+languages = ["Rust"]
+[library.patterns]
+include = [
+  "\\bextern\\s+crate\\s+openssl\\b",
+  "\\buse\\s+openssl::",
+  "\\bopenssl::[A-Za-z0-9_]+::",
+]
+apis = [
+  "\\bopenssl::[A-Za-z0-9_:]+\\b",
+]
+
+# =========================
+# Swift Libraries
+# =========================
+
+[[library]]
+name = "CryptoKit"
+languages = ["Swift"]
+[library.patterns]
+include = [
+  "^\\s*import\\s+CryptoKit\\b",
+]
+apis = [
+  "\\b(SHA(?:256|384|512)|HMAC|ChaChaPoly|AES\\.GCM|Curve25519)\\b",
+]
+
+[[library]]
+name = "CommonCrypto (Swift)"
+languages = ["Swift"]
+[library.patterns]
+include = [
+  "^\\s*import\\s+CommonCrypto\\b",
+]
+apis = [
+  "\\bCC_(?:Crypt|SHA(?:1|224|256|384|512)|MD5|KeyDerivation|Random)[A-Za-z0-9_]*\\s*\\(",
+]
+
+[[library]]
+name = "CryptoSwift"
+languages = ["Swift"]
+[library.patterns]
+include = [
+  "^\\s*import\\s+CryptoSwift\\b",
+]
+apis = [
+  "\\bAES\\s*\\(",
+  "\\bChaCha20\\s*\\(",
+  "\\bPoly1305\\b",
+  "\\bHMAC\\b",
+  "\\bSHA(?:1|224|256|384|512)\\b",
+]
+
+[[library]]
+name = "Swift-Sodium"
+languages = ["Swift"]
+[library.patterns]
+include = [
+  "^\\s*import\\s+Sodium\\b",
+]
+apis = [
+  "\\bSodium\\s*\\(",
+  "\\bsodium\\.[A-Za-z0-9_]+\\b",
+]
+
+# =========================
+# Kotlin Libraries
+# =========================
+
+[[library]]
+name = "JCA/JCE (Kotlin)"
+languages = ["Kotlin"]
+[library.patterns]
+include = [
+  "^\\s*import\\s+(?:javax\\.crypto\\.|java\\.security\\.)",
+]
+apis = [
+  "\\b(?:Cipher|MessageDigest|Signature|KeyPairGenerator)\\.getInstance\\s*\\(",
+  "\\bKeyFactory\\.getInstance\\s*\\(",
+  "\\bKeyAgreement\\.getInstance\\s*\\(",
+]
+
+[[library]]
+name = "BouncyCastle (Kotlin)"
+languages = ["Kotlin"]
+[library.patterns]
+include = [
+  "^\\s*import\\s+org\\.bouncycastle\\.",
+]
+apis = [
+  "\\borg\\.bouncycastle\\.[A-Za-z0-9_.]+\\b",
+]
+
+[[library]]
+name = "Korlibs Krypto (Kotlin MPP)"
+languages = ["Kotlin"]
+[library.patterns]
+include = [
+  "^\\s*import\\s+com\\.soywiz\\.krypto\\.",
+]
+apis = [
+  "\\bcom\\.soywiz\\.krypto\\.[A-Za-z0-9_.]+\\b",
+]
+
+# =========================
+# Enhanced PHP Libraries
+# =========================
+
+[[library]]
+name = "Sodium (PHP)"
+languages = ["PHP"]
+[library.patterns]
+include = []
+apis = [
+  "\\bsodium_[a-z0-9_]+\\s*\\(",
+]
+
+[[library]]
+name = "phpseclib"
+languages = ["PHP"]
+[library.patterns]
+include = [
+  "^\\s*use\\s+phpseclib\\d*\\\\Crypt\\\\",
+]
+apis = [
+  "\\bnew\\s+\\\\?phpseclib\\d*\\\\Crypt\\\\[A-Za-z0-9_]+\\s*\\(",
+  "\\bnew\\s+Crypt_[A-Z][A-Za-z0-9_]*\\s*\\(",
+]
+
+[[library]]
+name = "Halite (ParagonIE)"
+languages = ["PHP"]
+[library.patterns]
+include = [
+  "^\\s*use\\s+ParagonIE\\\\Halite\\\\",
+]
+apis = [
+  "\\bParagonIE\\\\Halite\\\\[A-Za-z0-9_\\\\]+::[A-Za-z0-9_]+\\s*\\(",
+]
+
