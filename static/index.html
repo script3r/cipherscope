@@ -74,10 +74,12 @@
             padding: 1.5rem;
             border-radius: 6px;
             font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 1rem;
+            font-size: 0.9rem;
             margin: 1rem 0;
             overflow-x: auto;
             position: relative;
+            white-space: pre;
+            line-height: 1.4;
         }
 
         .copy-btn {
@@ -200,7 +202,19 @@ Python | PyCA cryptography | 1 | auth.py:8 Fernet(key)
             <div class="output-section">
                 <h4>JSONL Format</h4>
                 <div class="code-block">
-{"language":"Rust","library":"RustCrypto","file":"src/main.rs","span":{"line":12,"column":5},"symbol":"aes_gcm::Aes256Gcm","snippet":"use aes_gcm::Aes256Gcm;","confidence":0.99,"detector_id":"detector-rust"}
+{
+  "language": "Rust",
+  "library": "RustCrypto",
+  "file": "src/main.rs",
+  "span": {
+    "line": 12,
+    "column": 5
+  },
+  "symbol": "aes_gcm::Aes256Gcm",
+  "snippet": "use aes_gcm::Aes256Gcm;",
+  "confidence": 0.99,
+  "detector_id": "detector-rust"
+}
                 </div>
             </div>
 
@@ -211,8 +225,14 @@ Python | PyCA cryptography | 1 | auth.py:8 Fernet(key)
 name = "PyCA cryptography"
 languages = ["Python"]
 [library.patterns]
-include = ["^\\s*from\\s+cryptography\\b"]
-apis = ["\\bFernet\\(", "\\.encrypt\\(", "\\.decrypt\\("]
+include = [
+  "^\\s*from\\s+cryptography\\b"
+]
+apis = [
+  "\\bFernet\\(",
+  "\\.encrypt\\(",
+  "\\.decrypt\\("
+]
                 </div>
                 <p style="margin-top: 0.8rem; color: #666; font-size: 0.9rem;">
                     Define import patterns and API calls for each library
@@ -223,8 +243,13 @@ apis = ["\\bFernet\\(", "\\.encrypt\\(", "\\.decrypt\\("]
 name = "OpenSSL"
 languages = ["C", "C++"]
 [library.patterns]
-include = ["^\\s*#\\s*include\\s*<openssl/[A-Za-z0-9_./-]+>"]
-apis = ["\\bEVP_[A-Za-z0-9_]+\\s*\\(", "\\bRSA_[A-Za-z0-9_]+\\s*\\("]
+include = [
+  "^\\s*#\\s*include\\s*<openssl/[A-Za-z0-9_./-]+>"
+]
+apis = [
+  "\\bEVP_[A-Za-z0-9_]+\\s*\\(",
+  "\\bRSA_[A-Za-z0-9_]+\\s*\\("
+]
                 </div>
                 <p style="margin-top: 0.8rem; color: #666; font-size: 0.9rem;">
                     C/C++ libraries use include patterns and function calls
