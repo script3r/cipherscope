@@ -15,7 +15,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             line-height: 1.6;
             color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f8f9fa;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -24,8 +24,8 @@
 
         .container {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
             padding: 3rem;
             max-width: 800px;
             width: 90%;
@@ -35,12 +35,8 @@
         h1 {
             font-size: 3rem;
             font-weight: 700;
-            color: #2c3e50;
+            color: #000;
             margin-bottom: 1rem;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
         .subtitle {
@@ -62,19 +58,19 @@
             border-radius: 8px;
             padding: 2rem;
             margin: 2rem 0;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #000;
         }
 
         .install-title {
             font-size: 1.3rem;
             font-weight: 600;
-            color: #2c3e50;
+            color: #000;
             margin-bottom: 1rem;
         }
 
         .code-block {
-            background: #2c3e50;
-            color: #ecf0f1;
+            background: #000;
+            color: #fff;
             padding: 1.5rem;
             border-radius: 6px;
             font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
@@ -88,9 +84,9 @@
             position: absolute;
             top: 0.5rem;
             right: 0.5rem;
-            background: #667eea;
+            background: #333;
             color: white;
-            border: none;
+            border: 1px solid #666;
             padding: 0.5rem 1rem;
             border-radius: 4px;
             cursor: pointer;
@@ -99,7 +95,7 @@
         }
 
         .copy-btn:hover {
-            background: #5a6fd8;
+            background: #555;
         }
 
         .features {
@@ -113,11 +109,11 @@
             background: #f8f9fa;
             padding: 1.5rem;
             border-radius: 8px;
-            border-top: 3px solid #667eea;
+            border-top: 3px solid #000;
         }
 
         .feature h3 {
-            color: #2c3e50;
+            color: #000;
             margin-bottom: 0.5rem;
             font-size: 1.1rem;
         }
@@ -136,7 +132,7 @@
         }
 
         .lang-tag {
-            background: #667eea;
+            background: #000;
             color: white;
             padding: 0.4rem 0.8rem;
             border-radius: 20px;
@@ -153,7 +149,7 @@
         }
 
         .footer a {
-            color: #667eea;
+            color: #000;
             text-decoration: none;
         }
 
@@ -258,10 +254,10 @@
                 const btn = event.target;
                 const originalText = btn.textContent;
                 btn.textContent = 'Copied!';
-                btn.style.background = '#27ae60';
+                btn.style.background = '#000';
                 setTimeout(() => {
                     btn.textContent = originalText;
-                    btn.style.background = '#667eea';
+                    btn.style.background = '#333';
                 }, 2000);
             }).catch(function(err) {
                 console.error('Could not copy text: ', err);
