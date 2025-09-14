@@ -335,11 +335,11 @@ include = [
 ]
 apis = [
   "\\bFernet\\(",
-  "\\.encrypt\\(",
-  "\\.decrypt\\(",
   "\\bAESGCM\\(",
   "\\bhmac\\.HMAC\\(",
   "\\.finalize\\(",
+  "\\b(?:cryptography\\.|from\\s+cryptography\\s+import).*?\\.(?:encrypt|decrypt)\\(",
+  "\\b(?:Fernet|AESGCM|ChaCha20Poly1305|AES|Blowfish|CAST5|ARC4|ChaCha20|Salsa20|XOR)\\(",
   "\\.verify\\(",
   "\\.sign\\(",
 ]
@@ -354,11 +354,11 @@ include = [
 ]
 apis = [
   "\\bCrypto\\.Cipher\\.AES\\.new\\(",
-  "\\.encrypt\\(",
-  "\\.decrypt\\(",
   "\\bCrypto\\.Hash\\.HMAC\\.new\\(",
   "\\bCrypto\\.Signature\\.pkcs1_15\\.new\\(.*\\)\\.sign\\(",
   "\\bCrypto\\.Signature\\.pkcs1_15\\.new\\(.*\\)\\.verify\\(",
+  "\\bCrypto\\.(?:Cipher|Hash|Signature|Protocol|PublicKey)\\.",
+  "\\b(?:AES|DES|DES3|Blowfish|CAST|ARC2|ARC4|ChaCha20|Salsa20|XOR)\\(",
 ]
 
 [[library]]
@@ -386,10 +386,8 @@ apis = [
   "\\bSigningKey\\.sign\\(",
   "\\bVerifyKey\\.verify\\(",
   "\\bSignedMessage\\.",
-  "\\.encrypt\\(",
-  "\\.decrypt\\(",
-  "\\.sign\\(",
-  "\\.verify\\(",
+  "\\bnacl\\.(?:secret|signing|encoding|hash|pwhash)\\.",
+  "\\b(?:SecretBox|SigningKey|VerifyKey|SignedMessage)\\.",
   "\\bHexEncoder",
   "\\bBase64Encoder",
 ]
@@ -530,6 +528,23 @@ apis = [
   "\\bTINK(?:Aead|Mac|Hybrid(?:Encrypt|Decrypt)|PublicKey(?:Sign|Verify)|KeysetHandle|Config)\\b",
   "\\b\\[TINK[A-Za-z0-9_]+Factory\\s+[A-Za-z0-9_]+WithKeysetHandle:.*\\]",
 ]
+# =========================
+# Google Tink (Python)
+[[library]]
+name = "Google Tink (Python)"
+languages = ["Python"]
+[library.patterns]
+include = [
+  "^\\s*from\\s+tink\\b",
+  "^\\s*import\\s+tink\\b",
+]
+apis = [
+  "\\btink\\.(?:aead|mac|hybrid|signature|prf|streaming_aead)\\b",
+  "\\b(?:JsonKeysetReader|JsonKeysetWriter|cleartext_keyset_handle|KeysetHandle)\\b",
+  "\\b(?:Aead|Mac|HybridEncrypt|HybridDecrypt|PublicKeySign|PublicKeyVerify)\\b",
+  "\\btink\\.core\\.PrimitiveSet\\b",
+]
+
 # =========================
 # Erlang / OTP primitives
 # =========================

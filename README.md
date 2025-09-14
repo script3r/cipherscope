@@ -1,5 +1,9 @@
 ## CipherScope
 
+<div align="center">
+  <img src="cipherscope.png" alt="CipherScope Logo" width="350" height="350">
+</div>
+
 Fast, low-false-positive static scanner that finds third-party cryptographic libraries and call sites across 11 programming languages: Go, Java, C, C++, Rust, Python, PHP, Swift, Objective-C, Kotlin, and Erlang.
 
 ### Install & Run
