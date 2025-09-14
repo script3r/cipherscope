@@ -98,29 +98,19 @@
             background: #555;
         }
 
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
+        .output-examples {
             margin: 2rem 0;
         }
 
-        .feature {
-            background: #f8f9fa;
-            padding: 1.5rem;
-            border-radius: 8px;
-            border-top: 3px solid #000;
+        .output-section {
+            margin: 1.5rem 0;
         }
 
-        .feature h3 {
+        .output-section h4 {
             color: #000;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.8rem;
             font-size: 1.1rem;
-        }
-
-        .feature p {
-            color: #666;
-            font-size: 0.95rem;
+            font-weight: 600;
         }
 
         .languages {
@@ -194,18 +184,34 @@
             </p>
         </div>
 
-        <div class="features">
-            <div class="feature">
-                <h3>🚀 Fast & Efficient</h3>
-                <p>Parallel processing with Aho-Corasick prefiltering and pattern caching for maximum speed.</p>
+        <div class="output-examples">
+            <h3 style="color: #000; margin-bottom: 1.5rem;">Example Outputs</h3>
+            
+            <div class="output-section">
+                <h4>Table Format (Default)</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyToClipboard('Language | Library | Count | Example\n---------|---------|-------|--------\nRust | RustCrypto | 2 | src/main.rs:12 aes_gcm::Aes256Gcm\nPython | PyCA cryptography | 1 | auth.py:8 Fernet(key)')">Copy</button>
+Language | Library | Count | Example
+---------|---------|-------|--------
+Rust | RustCrypto | 2 | src/main.rs:12 aes_gcm::Aes256Gcm
+Python | PyCA cryptography | 1 | auth.py:8 Fernet(key)
+                </div>
             </div>
-            <div class="feature">
-                <h3>🎯 Low False Positives</h3>
-                <p>Smart pattern matching with comment stripping and import validation to reduce noise.</p>
+
+            <div class="output-section">
+                <h4>JSONL Format</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyToClipboard('{\"language\":\"Rust\",\"library\":\"RustCrypto\",\"file\":\"src/main.rs\",\"span\":{\"line\":12,\"column\":5},\"symbol\":\"aes_gcm::Aes256Gcm\",\"snippet\":\"use aes_gcm::Aes256Gcm;\",\"confidence\":0.99,\"detector_id\":\"detector-rust\"}')">Copy</button>
+{"language":"Rust","library":"RustCrypto","file":"src/main.rs","span":{"line":12,"column":5},"symbol":"aes_gcm::Aes256Gcm","snippet":"use aes_gcm::Aes256Gcm;","confidence":0.99,"detector_id":"detector-rust"}
+                </div>
             </div>
-            <div class="feature">
-                <h3>📊 Multiple Outputs</h3>
-                <p>Pretty tables, JSONL, and SARIF formats for integration with CI/CD pipelines.</p>
+
+            <div class="output-section">
+                <h4>SARIF Format</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyToClipboard('{\"version\":\"2.1.0\",\"runs\":[{\"tool\":{\"driver\":{\"name\":\"cipherscope\"}},\"results\":[{\"ruleId\":\"detector-rust\",\"message\":{\"text\":\"RustCrypto library detected\"},\"locations\":[{\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"src/main.rs\"},\"region\":{\"startLine\":12}}]}]}]}')">Copy</button>
+{"version":"2.1.0","runs":[{"tool":{"driver":{"name":"cipherscope"}},"results":[{"ruleId":"detector-rust","message":{"text":"RustCrypto library detected"},"locations":[{"physicalLocation":{"artifactLocation":{"uri":"src/main.rs"},"region":{"startLine":12}}]}]}]}
+                </div>
             </div>
         </div>
 
@@ -234,6 +240,18 @@
             <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
                 Scan current directory with progress bar
             </p>
+            
+            <div style="margin-top: 1.5rem;">
+                <h4 style="color: #000; margin-bottom: 0.8rem; font-size: 1rem;">Output Formats</h4>
+                <div class="code-block" style="margin: 0.5rem 0;">
+                    <button class="copy-btn" onclick="copyToClipboard('cryptofind . --json > findings.jsonl')">Copy</button>
+                    cryptofind . --json > findings.jsonl
+                </div>
+                <div class="code-block" style="margin: 0.5rem 0;">
+                    <button class="copy-btn" onclick="copyToClipboard('cryptofind . --sarif findings.sarif')">Copy</button>
+                    cryptofind . --sarif findings.sarif
+                </div>
+            </div>
         </div>
 
         <div class="footer">
