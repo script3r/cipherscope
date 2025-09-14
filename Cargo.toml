@@ -8,6 +8,9 @@ members = [
     "crates/detector-rust",
     "crates/detector-python",
     "crates/detector-php",
+    "crates/detector-swift",
+    "crates/detector-objc",
+    "crates/detector-kotlin",
     "crates/cli",
 ]
 resolver = "2"

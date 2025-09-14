@@ -1,0 +1,13 @@
+[package]
+name = "detector-swift"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+
+[dependencies]
+scanner-core = { path = "../scanner-core" }
+anyhow = { workspace = true }
+
+[lib]
+name = "detector_swift"
+path = "src/lib.rs"

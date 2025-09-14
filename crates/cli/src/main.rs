@@ -132,6 +132,21 @@ fn main() -> Result<()> {
             &[Language::Php],
             reg.clone(),
         )),
+        Box::new(PatternDetector::new(
+            "detector-swift",
+            &[Language::Swift],
+            reg.clone(),
+        )),
+        Box::new(PatternDetector::new(
+            "detector-objc",
+            &[Language::ObjC],
+            reg.clone(),
+        )),
+        Box::new(PatternDetector::new(
+            "detector-kotlin",
+            &[Language::Kotlin],
+            reg.clone(),
+        )),
     ];
 
     let mut cfg = Config::default();

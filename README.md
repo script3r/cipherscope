@@ -1,6 +1,6 @@
 ## cryptofind
 
-Fast, low-false-positive static scanner that finds third-party cryptographic libraries and call sites across Go, Java, C, C++, Rust, Python, PHP, Swift, Objective-C, and Kotlin codebases.
+Fast, low-false-positive static scanner that finds third-party cryptographic libraries and call sites across 10 programming languages: Go, Java, C, C++, Rust, Python, PHP, Swift, Objective-C, and Kotlin.
 
 ### Install & Run
 
@@ -78,9 +78,22 @@ The scanner automatically detects and processes files with these extensions:
 - **Aho-Corasick Prefiltering**: Fast substring matching before expensive regex operations
 - **Parallel Processing**: Multi-threaded file scanning using Rayon
 
-### Extending Detectors
+### Detector Architecture
 
-Detectors are plugin-like. Add a new crate under `crates/` implementing the `Detector` trait, or extend the `patterns.toml` to cover additional libraries. See `crates/scanner-core/src/lib.rs` for the trait and pattern-driven detector.
+The scanner uses a modular detector architecture with dedicated crates for each language:
+
+- **detector-c**: C language support
+- **detector-cpp**: C++ language support  
+- **detector-go**: Go language support
+- **detector-java**: Java language support
+- **detector-rust**: Rust language support
+- **detector-python**: Python language support
+- **detector-php**: PHP language support
+- **detector-swift**: Swift language support
+- **detector-objc**: Objective-C language support
+- **detector-kotlin**: Kotlin language support
+
+Each detector implements the `Detector` trait and can be extended independently. To add support for a new language, create a new detector crate under `crates/` or extend the `patterns.toml` to cover additional libraries. See `crates/scanner-core/src/lib.rs` for the trait definition and pattern-driven detector implementation.
 
 ### Tests & Benchmarks
 
