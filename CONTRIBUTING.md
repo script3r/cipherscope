@@ -1,6 +1,6 @@
-## Contributing to cryptofind
+## Contributing to CipherScope
 
-Thank you for improving cryptofind! This project aims for speed, precision, and extensibility.
+Thank you for improving CipherScope! This project aims for speed, precision, and extensibility.
 
 ### Adding a New Library via patterns
 

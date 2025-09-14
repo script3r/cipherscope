@@ -52,7 +52,7 @@ jobs:
       run: cargo build --release --verbose
       
     - name: Test CLI help
-      run: ./target/release/cryptofind --help
+      run: ./target/release/cipherscope --help
 
   test-windows:
     name: Test (Windows)

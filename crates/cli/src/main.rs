@@ -297,7 +297,7 @@ fn to_sarif(findings: &[Finding]) -> SarifLog {
         runs: vec![SarifRun {
             tool: SarifTool {
                 driver: SarifDriver {
-                    name: "cryptofind".into(),
+                    name: "cipherscope".into(),
                     version: env!("CARGO_PKG_VERSION").into(),
                 },
             },
