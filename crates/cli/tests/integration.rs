@@ -48,7 +48,7 @@ fn scan_fixtures() {
     ];
     let scanner = Scanner::new(&reg, dets, Config::default());
     let fixtures = workspace.join("fixtures");
-    let findings = scanner.run(&[fixtures.clone()]).unwrap();
+    let findings = scanner.run(std::slice::from_ref(&fixtures)).unwrap();
 
     // Debug: print all findings
     println!("Found {} findings:", findings.len());

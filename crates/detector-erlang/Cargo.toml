@@ -1,0 +1,11 @@
+[package]
+name = "detector-erlang"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Erlang cryptographic library detector for CipherScope"
+
+[dependencies]
+scanner-core = { path = "../scanner-core" }
+anyhow = "1"

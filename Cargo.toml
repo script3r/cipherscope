@@ -11,6 +11,7 @@ members = [
     "crates/detector-swift",
     "crates/detector-objc",
     "crates/detector-kotlin",
+    "crates/detector-erlang",
     "crates/cli",
 ]
 resolver = "2"

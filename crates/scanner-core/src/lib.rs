@@ -14,6 +14,8 @@ use std::sync::Mutex;
 
 // ---------------- Types ----------------
 
+type ProgressCallback = Arc<dyn Fn(usize, usize, usize) + Send + Sync>;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
 pub enum Language {
     Go,
@@ -26,6 +28,7 @@ pub enum Language {
     Swift,
     ObjC,
     Kotlin,
+    Erlang,
 }
 
 impl<'de> Deserialize<'de> for Language {
@@ -47,6 +50,7 @@ impl<'de> Deserialize<'de> for Language {
             "swift" => Ok(Language::Swift),
             "objc" | "objective-c" | "objectivec" => Ok(Language::ObjC),
             "kotlin" | "kt" => Ok(Language::Kotlin),
+            "erlang" | "erl" => Ok(Language::Erlang),
             other => Err(D::Error::invalid_value(
                 Unexpected::Str(other),
                 &"valid language",
@@ -129,7 +133,7 @@ impl Emitter {
         self.rx.try_iter().collect()
     }
 
-    pub fn into_iter(self) -> Receiver<Finding> {
+    pub fn into_receiver(self) -> Receiver<Finding> {
         self.rx
     }
 }
@@ -186,7 +190,7 @@ pub struct Config {
     #[serde(default)]
     pub deterministic: bool,
     #[serde(skip)]
-    pub progress_callback: Option<Arc<dyn Fn(usize, usize, usize) + Send + Sync>>,
+    pub progress_callback: Option<ProgressCallback>,
 }
 
 fn default_max_file_size() -> usize {
@@ -277,6 +281,10 @@ fn default_include_globs() -> Vec<String> {
         // Kotlin
         "**/*.kt".to_string(),
         "**/*.kts".to_string(),
+        // Erlang
+        "**/*.erl".to_string(),
+        "**/*.hrl".to_string(),
+        "**/*.beam".to_string(),
     ]
 }
 
@@ -305,7 +313,7 @@ impl PatternRegistry {
         let libs = pf
             .library
             .into_iter()
-            .map(|lib| compile_library(lib))
+            .map(compile_library)
             .collect::<Result<Vec<_>>>()?;
 
         // Build language cache only if we have many libraries
@@ -409,7 +417,8 @@ mod strip {
             | Language::Rust
             | Language::Swift
             | Language::ObjC
-            | Language::Kotlin => strip_c_like(language, input),
+            | Language::Kotlin
+            | Language::Erlang => strip_c_like(language, input),
             Language::Python | Language::Php => strip_hash_like(language, input),
         }
     }
@@ -746,10 +755,7 @@ impl<'a> Scanner<'a> {
                     }
                 }
             }
-            match builder.build() {
-                Ok(matcher) => Some(matcher),
-                Err(_) => None,
-            }
+            builder.build().ok()
         } else {
             None
         };
@@ -762,28 +768,26 @@ impl<'a> Scanner<'a> {
                 .git_exclude(true)
                 .ignore(true);
 
-            for result in builder.build() {
-                if let Ok(entry) = result {
-                    let md = match entry.metadata() {
-                        Ok(m) => m,
-                        Err(_) => continue,
-                    };
-                    if md.is_file() {
-                        if md.len() as usize > self.config.max_file_size {
+            for entry in builder.build().flatten() {
+                let md = match entry.metadata() {
+                    Ok(m) => m,
+                    Err(_) => continue,
+                };
+                if md.is_file() {
+                    if md.len() as usize > self.config.max_file_size {
+                        continue;
+                    }
+
+                    let path = entry.into_path();
+
+                    // Apply include glob filtering
+                    if let Some(ref matcher) = include_matcher {
+                        if !matcher.is_match(&path) {
                             continue;
                         }
-
-                        let path = entry.into_path();
-
-                        // Apply include glob filtering
-                        if let Some(ref matcher) = include_matcher {
-                            if !matcher.is_match(&path) {
-                                continue;
-                            }
-                        }
-
-                        paths.push(path);
                     }
+
+                    paths.push(path);
                 }
             }
         }
@@ -811,6 +815,7 @@ impl<'a> Scanner<'a> {
             "swift" => Some(Language::Swift),
             "m" | "mm" | "M" => Some(Language::ObjC),
             "kt" | "kts" => Some(Language::Kotlin),
+            "erl" | "hrl" | "beam" => Some(Language::Erlang),
             _ => None,
         }
     }
@@ -842,7 +847,7 @@ impl<'a> Scanner<'a> {
                 let mut processed = 0;
                 let findings_count = 0;
 
-                while let Ok(_) = progress_rx.recv() {
+                while progress_rx.recv().is_ok() {
                     processed += 1;
                     callback(processed, total_files, findings_count);
                 }
@@ -874,7 +879,7 @@ impl<'a> Scanner<'a> {
                             if !det.languages().contains(&lang) {
                                 continue;
                             }
-                            if !prefilter_hit(det, &stripped) {
+                            if !prefilter_hit(det.as_ref(), &stripped) {
                                 continue;
                             }
                             let _ = det.scan_optimized(&unit, &stripped_s, &index, &mut em);
@@ -936,7 +941,7 @@ impl<'a> Scanner<'a> {
     }
 }
 
-fn prefilter_hit(det: &Box<dyn Detector>, stripped: &[u8]) -> bool {
+fn prefilter_hit(det: &dyn Detector, stripped: &[u8]) -> bool {
     let pf = det.prefilter();
     if pf.substrings.is_empty() {
         return true;
@@ -1051,7 +1056,7 @@ impl PatternDetector {
                 }
             }
             let should_report =
-                (matched_import && api_hits > 0) || (lib.import.is_empty() && api_hits > 0);
+                (lib.import.is_empty() || matched_import) && api_hits > 0;
             if should_report {
                 let finding = Finding {
                     language: unit.lang,
@@ -1089,14 +1094,12 @@ impl Detector for PatternDetector {
                 substrings.insert(s.clone());
             }
         }
-        let pf = Prefilter {
-            extensions: BTreeSet::new(),
-            substrings,
-        };
-
         // Note: We can't actually cache here due to &self, but this is still faster
         // than recomputing every time since we're using the cached language lookup
-        pf
+        Prefilter {
+            extensions: BTreeSet::new(),
+            substrings,
+        }
     }
     fn scan(&self, unit: &ScanUnit, em: &mut Emitter) -> Result<()> {
         let libs = self.registry.for_language(unit.lang);

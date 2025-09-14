@@ -1,6 +1,6 @@
 ## CipherScope
 
-Fast, low-false-positive static scanner that finds third-party cryptographic libraries and call sites across 10 programming languages: Go, Java, C, C++, Rust, Python, PHP, Swift, Objective-C, and Kotlin.
+Fast, low-false-positive static scanner that finds third-party cryptographic libraries and call sites across 11 programming languages: Go, Java, C, C++, Rust, Python, PHP, Swift, Objective-C, Kotlin, and Erlang.
 
 ### Install & Run
 
@@ -70,6 +70,7 @@ The scanner automatically detects and processes files with these extensions:
 - **Swift**: `.swift`
 - **Objective-C**: `.m`, `.mm`, `.M`
 - **Kotlin**: `.kt`, `.kts`
+- **Erlang**: `.erl`, `.hrl`, `.beam`
 
 #### Performance Optimizations
 
@@ -92,6 +93,7 @@ The scanner uses a modular detector architecture with dedicated crates for each 
 - **detector-swift**: Swift language support
 - **detector-objc**: Objective-C language support
 - **detector-kotlin**: Kotlin language support
+- **detector-erlang**: Erlang language support
 
 Each detector implements the `Detector` trait and can be extended independently. To add support for a new language, create a new detector crate under `crates/` or extend the `patterns.toml` to cover additional libraries. See `crates/scanner-core/src/lib.rs` for the trait definition and pattern-driven detector implementation.
 

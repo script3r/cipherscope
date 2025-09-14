@@ -4,336 +4,126 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CipherScope</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: #fff;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .logo {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #000;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.02em;
-        }
-
-        .tagline {
-            font-size: 1.2rem;
-            color: #666;
-            margin-bottom: 2rem;
-        }
-
-        .description {
-            font-size: 1rem;
-            color: #555;
-            max-width: 600px;
-            margin: 0 auto 3rem;
-            text-align: center;
-        }
-
-        .install {
-            background: #f8f9fa;
-            border: 1px solid #e1e5e9;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .install-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #000;
-            margin-bottom: 1rem;
-        }
-
-        .code {
-            background: #000;
-            color: #fff;
-            padding: 1rem 1.5rem;
-            border-radius: 6px;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 0.9rem;
-            margin: 1rem 0;
-            overflow-x: auto;
-            white-space: pre;
-            line-height: 1.4;
-        }
-
-        .copy-btn {
-            background: #333;
-            color: white;
-            border: 1px solid #666;
-            padding: 0.4rem 0.8rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            float: right;
-            margin-top: -0.5rem;
-            transition: background 0.2s;
-        }
-
-        .copy-btn:hover {
-            background: #555;
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin: 3rem 0;
-        }
-
-        .feature {
-            text-align: center;
-            padding: 1.5rem;
-        }
-
-        .feature-icon {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        .feature-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #000;
-            margin-bottom: 0.5rem;
-        }
-
-        .feature-desc {
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .languages {
-            text-align: center;
-            margin: 3rem 0;
-        }
-
-        .languages-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #000;
-            margin-bottom: 1rem;
-        }
-
-        .lang-list {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .lang-tag {
-            background: #f0f0f0;
-            color: #333;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .examples {
-            margin: 3rem 0;
-        }
-
-        .examples-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #000;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-
-        .example {
-            margin: 1.5rem 0;
-        }
-
-        .example-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #000;
-            margin-bottom: 0.5rem;
-        }
-
-        .example-desc {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 0.5rem;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 4rem;
-            padding-top: 2rem;
-            border-top: 1px solid #eee;
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .footer a {
-            color: #000;
-            text-decoration: none;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 1rem 0.5rem;
+    <link rel="stylesheet" href="style.css">
+    <script>
+        // ECB Penguin-inspired animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const cipherText = document.querySelector('.cipher-text');
+            const originalText = 'CipherScope';
+            
+            // Create a pattern that "leaks through" like ECB mode
+            function createECBPattern() {
+                const patterns = [
+                    '01001000', '01100101', '01101100', '01101100', '01101111',
+                    '01010111', '01101111', '01110010', '01101100', '01100100'
+                ];
+                return patterns.join('');
             }
             
-            .logo {
-                font-size: 2rem;
+            // Simulate the ECB penguin effect - patterns that leak through encryption
+            function animateECBPenguin() {
+                let index = 0;
+                const pattern = createECBPattern();
+                
+                setInterval(() => {
+                    if (index < pattern.length) {
+                        const char = pattern[index];
+                        const opacity = char === '1' ? '0.8' : '0.2';
+                        cipherText.style.opacity = opacity;
+                        index++;
+                    } else {
+                        index = 0;
+                        cipherText.style.opacity = '1';
+                    }
+                }, 150);
             }
             
-            .features {
-                grid-template-columns: 1fr;
+            // Add Matrix-style character scrambling
+            function scrambleText() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
+                let scrambled = '';
+                
+                for (let i = 0; i < originalText.length; i++) {
+                    if (Math.random() < 0.3) {
+                        scrambled += chars[Math.floor(Math.random() * chars.length)];
+                    } else {
+                        scrambled += originalText[i];
+                    }
+                }
+                
+                cipherText.textContent = scrambled;
             }
-        }
-    </style>
+            
+            // Start animations
+            animateECBPenguin();
+            setInterval(scrambleText, 2000);
+        });
+    </script>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <div class="logo">CipherScope</div>
-            <div class="tagline">Fast static scanner for cryptographic libraries</div>
-            <div class="description">
-                Find third-party cryptographic libraries and call sites across 10 programming languages 
-                with low false positives and high performance.
-            </div>
-        </div>
+        <header>
+            <h1 class="cipher-title">
+                <span class="cipher-text" data-text="CipherScope">CipherScope</span>
+            </h1>
+            <p>Fast, low-false-positive static scanner for cryptographic libraries across 11 programming languages</p>
+        </header>
 
-        <div class="install">
-            <div class="install-title">Install</div>
-            <div class="code">
-                <button class="copy-btn" onclick="copyToClipboard('cargo install --git https://github.com/your-org/cipherscope')">Copy</button>
-cargo install --git https://github.com/your-org/cipherscope
-            </div>
-        </div>
-
-        <div class="features">
-            <div class="feature">
-                <div class="feature-icon">⚡</div>
-                <div class="feature-title">Fast</div>
-                <div class="feature-desc">Parallel processing with optimized pattern matching</div>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🎯</div>
-                <div class="feature-title">Accurate</div>
-                <div class="feature-desc">Low false positives with smart pattern detection</div>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🔧</div>
-                <div class="feature-title">Configurable</div>
-                <div class="feature-desc">Custom patterns and flexible output formats</div>
-            </div>
-        </div>
-
-        <div class="languages">
-            <div class="languages-title">Supported Languages</div>
-            <div class="lang-list">
-                <span class="lang-tag">C</span>
-                <span class="lang-tag">C++</span>
-                <span class="lang-tag">Java</span>
-                <span class="lang-tag">Go</span>
-                <span class="lang-tag">Rust</span>
-                <span class="lang-tag">Python</span>
-                <span class="lang-tag">PHP</span>
-                <span class="lang-tag">Swift</span>
-                <span class="lang-tag">Objective-C</span>
-                <span class="lang-tag">Kotlin</span>
-            </div>
-        </div>
-
-        <div class="examples">
-            <div class="examples-title">Example Outputs</div>
-            
-            <div class="example">
-                <div class="example-title">Table Format</div>
-                <div class="example-desc">Clean, readable table output</div>
-                <div class="code">
-Language | Library | Count | Example
----------|---------|-------|--------
-Rust | RustCrypto | 2 | src/main.rs:12 aes_gcm::Aes256Gcm
-Python | PyCA cryptography | 1 | auth.py:8 Fernet(key)
+        <main>
+            <section class="install">
+                <h2>🚀 Install & Run</h2>
+                <div class="code-block">
+                    <code>cargo build --release</code>
+                    <code>./target/release/cipherscope your-project/</code>
                 </div>
-            </div>
+            </section>
 
-            <div class="example">
-                <div class="example-title">JSONL Format</div>
-                <div class="example-desc">Structured JSON for integration</div>
-                <div class="code">
-{
-  "language": "Rust",
-  "library": "RustCrypto",
-  "file": "src/main.rs",
-  "span": {"line": 12, "column": 5},
-  "symbol": "aes_gcm::Aes256Gcm",
-  "confidence": 0.99
-}
+            <section class="output">
+                <h2>📊 Example Output</h2>
+                <div class="code-block">
+                    <code>Language | Library | Count | Example</code>
+                    <code>---------|---------|-------|--------</code>
+                    <code>Python | PyCA cryptography | 1 | fixtures/python/positive/main.py:1</code>
                 </div>
-            </div>
+            </section>
 
-            <div class="example">
-                <div class="example-title">Patterns Configuration</div>
-                <div class="example-desc">Define custom detection rules</div>
-                <div class="code">
-[[library]]
-name = "PyCA cryptography"
-languages = ["Python"]
-[library.patterns]
-include = ["^\\s*from\\s+cryptography\\b"]
-apis = ["\\bFernet\\(", "\\.encrypt\\(", "\\.decrypt\\("]
+            <section class="json">
+                <h2>📄 JSON Output</h2>
+                <div class="code-block">
+                    <code>./target/release/cipherscope . --json > findings.jsonl</code>
                 </div>
-            </div>
-        </div>
+                <pre><code>{
+  "language": "Python",
+  "library": "PyCA cryptography", 
+  "file": "fixtures/python/positive/main.py",
+  "span": {"line": 1, "column": 1},
+  "symbol": "(?m)^\\s*from\\s+cryptography\\b",
+  "snippet": "from cryptography.fernet import Fernet",
+  "confidence": 0.99,
+  "detector_id": "detector-python"
+}</code></pre>
+            </section>
 
-        <div class="footer">
-            <p>
-                <a href="https://github.com/your-org/cipherscope">GitHub</a> • 
-                <a href="https://github.com/your-org/cipherscope/blob/main/README.md">Documentation</a>
-            </p>
-        </div>
+            <section class="languages">
+                <h2>🌐 Supported Languages</h2>
+                <div class="lang-grid">
+                    <span>C/C++</span>
+                    <span>Java</span>
+                    <span>Go</span>
+                    <span>Rust</span>
+                    <span>Python</span>
+                    <span>PHP</span>
+                    <span>Swift</span>
+                    <span>Objective-C</span>
+                    <span>Kotlin</span>
+                    <span>Erlang</span>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p><a href="https://github.com/script3r/cipherscope" target="_blank">GitHub</a> • Apache 2.0 License</p>
+        </footer>
     </div>
-
-    <script>
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(function() {
-                const btn = event.target;
-                const originalText = btn.textContent;
-                btn.textContent = 'Copied!';
-                btn.style.background = '#000';
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.style.background = '#333';
-                }, 2000);
-            }).catch(function(err) {
-                console.error('Could not copy text: ', err);
-            });
-        }
-    </script>
 </body>
 </html>

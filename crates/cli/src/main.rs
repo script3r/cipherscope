@@ -147,18 +147,25 @@ fn main() -> Result<()> {
             &[Language::Kotlin],
             reg.clone(),
         )),
+        Box::new(PatternDetector::new(
+            "detector-erlang",
+            &[Language::Erlang],
+            reg.clone(),
+        )),
     ];
 
-    let mut cfg = Config::default();
-    cfg.min_confidence = args.min_confidence;
+    let mut cfg = Config {
+        min_confidence: args.min_confidence,
+        include_globs: args.include_glob.clone(),
+        exclude_globs: args.exclude_glob.clone(),
+        allow_libs: args.allow.clone(),
+        deny_libs: args.deny.clone(),
+        deterministic: args.deterministic,
+        ..Default::default()
+    };
     if let Some(mb) = args.max_file_size {
         cfg.max_file_size = mb * 1024 * 1024;
     }
-    cfg.include_globs = args.include_glob.clone();
-    cfg.exclude_globs = args.exclude_glob.clone();
-    cfg.allow_libs = args.allow.clone();
-    cfg.deny_libs = args.deny.clone();
-    cfg.deterministic = args.deterministic;
 
     // Set up progress reporting if requested
     if args.progress {

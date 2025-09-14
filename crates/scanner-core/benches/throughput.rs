@@ -51,7 +51,7 @@ fn bench_scan(c: &mut Criterion) {
         .throughput(Throughput::Bytes(10_000_000))
         .bench_function("fixtures", |b| {
             b.iter(|| {
-                let _ = scanner.run(&[root.clone()]).unwrap();
+                let _ = scanner.run(std::slice::from_ref(&root)).unwrap();
             });
         });
 }

@@ -314,6 +314,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "detector-erlang"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "scanner-core",
+]
+
+[[package]]
 name = "detector-go"
 version = "0.1.0"
 dependencies = [

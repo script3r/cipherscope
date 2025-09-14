@@ -530,3 +530,73 @@ apis = [
   "\\bTINK(?:Aead|Mac|Hybrid(?:Encrypt|Decrypt)|PublicKey(?:Sign|Verify)|KeysetHandle|Config)\\b",
   "\\b\\[TINK[A-Za-z0-9_]+Factory\\s+[A-Za-z0-9_]+WithKeysetHandle:.*\\]",
 ]
+# =========================
+# Erlang / OTP primitives
+# =========================
+
+[[library]]
+name = "Erlang/OTP crypto"
+languages = ["Erlang"]
+[library.patterns]
+# Detect explicit imports of the module (rare but possible)
+include = [
+  "^\\s*-import\\s*\\(\\s*crypto\\s*,\\s*\\[",
+]
+# Detect canonical crypto primitives with module-qualified calls
+apis = [
+  "\\bcrypto:(?:hash|hash_init|hash_update|hash_final)\\s*\\(",
+  "\\bcrypto:(?:mac|mac_init|mac_update|mac_final)\\s*\\(",
+  "\\bcrypto:crypto_(?:init|update|final|one_time(?:_aead)?(?:_init)?)\\s*\\(",
+  "\\bcrypto:(?:compute_key|generate_key)\\s*\\(",
+  "\\bcrypto:pbkdf2_hmac\\s*\\(",
+  "\\bcrypto:rand_seed(?:_alg)?\\s*\\(",
+  "\\bcrypto:hash_xof\\s*\\(",
+]
+
+[[library]]
+name = "Erlang/OTP public_key"
+languages = ["Erlang"]
+[library.patterns]
+# Record/include line commonly present when using PKI/ASN.1 records
+include = [
+  "^\\s*-include_lib\\s*\\(\\s*\"public_key/include/public_key\\.hrl\"\\s*\\)",
+  "^\\s*-import\\s*\\(\\s*public_key\\s*,\\s*\\[",
+]
+apis = [
+  "\\bpublic_key:(?:sign|verify)\\s*\\(",
+  "\\bpublic_key:(?:encrypt_public|decrypt_private|encrypt_private|decrypt_public)\\s*\\(",
+  "\\bpublic_key:(?:pem_decode|pem_entry_decode|der_decode|der_encode)\\s*\\(",
+  "\\bpublic_key:(?:compute_key|generate_key)\\s*\\(",
+]
+
+# =========================
+# Third-party primitive libs
+# =========================
+
+[[library]]
+name = "enacl (libsodium/NaCl)"
+languages = ["Erlang"]
+[library.patterns]
+include = [
+  "^\\s*-import\\s*\\(\\s*enacl\\s*,\\s*\\[",
+]
+apis = [
+  "\\benacl:(?:secretbox|box(?:_open)?|box_(?:beforenm|afternm|keypair)|box_seal(?:_open)?)\\s*\\(",
+  "\\benacl:aead_(?:x?chacha20poly1305_ietf)_(?:encrypt|decrypt)\\s*\\(",
+  "\\benacl:(?:generichash(?:_init|_update|_final)?|hash)\\s*\\(",
+  "\\benacl:(?:crypto_sign_ed25519_(?:keypair|sk_to_pk|public_to_curve25519|secret_to_curve25519))\\s*\\(",
+  "\\benacl:(?:curve25519_scalarmult(?:_base)?)\\s*\\(",
+  "\\benacl:(?:pwhash|pwhash_str_verify)\\s*\\(",
+  "\\benacl:randombytes(?:_uniform|_uint32)?\\s*\\(",
+]
+
+[[library]]
+name = "bcrypt (Erlang)"
+languages = ["Erlang"]
+[library.patterns]
+include = [
+  "^\\s*-import\\s*\\(\\s*bcrypt\\s*,\\s*\\[",
+]
+apis = [
+  "\\bbcrypt:(?:gen_salt|hashpw|checkpw)\\s*\\(",
+]
