@@ -850,7 +850,7 @@ impl<'a> Scanner<'a> {
 
                     // Update discovered files counter atomically (no lock!)
                     files_discovered.fetch_add(1, Ordering::Relaxed);
-                    
+
                     // Send discovery progress update (1 = discovery signal)
                     if let Some(ref progress_tx) = progress_sender {
                         let _ = progress_tx.send(1);
@@ -872,19 +872,19 @@ impl<'a> Scanner<'a> {
         progress_sender: Option<Sender<usize>>,
     ) -> Result<()> {
         const BATCH_SIZE: usize = 1000; // Process files in batches for better cache locality
-        
+
         let mut batch = Vec::with_capacity(BATCH_SIZE);
         let mut _processed_count = 0usize;
-        
+
         // Collect files into batches and process them
         for path in work_receiver.iter() {
             batch.push(path);
-            
+
             if batch.len() >= BATCH_SIZE {
                 let (processed, findings) = self.process_batch(&batch, &findings_sender)?;
                 _processed_count += processed;
                 batch.clear();
-                
+
                 // Send processing progress update (2 = processing signal, repeated for batch size)
                 if let Some(ref progress_tx) = progress_sender {
                     for _ in 0..processed {
@@ -897,12 +897,12 @@ impl<'a> Scanner<'a> {
                 }
             }
         }
-        
+
         // Process remaining files in the final batch
         if !batch.is_empty() {
             let (processed, findings) = self.process_batch(&batch, &findings_sender)?;
             _processed_count += processed;
-            
+
             if let Some(ref progress_tx) = progress_sender {
                 for _ in 0..processed {
                     let _ = progress_tx.send(2);
@@ -916,27 +916,25 @@ impl<'a> Scanner<'a> {
 
         Ok(())
     }
-    
+
     /// Process a batch of files in parallel for better performance
     fn process_batch(
         &self,
-        batch: &[PathBuf], 
-        findings_sender: &Sender<Finding>
+        batch: &[PathBuf],
+        findings_sender: &Sender<Finding>,
     ) -> Result<(usize, usize)> {
         // Process the batch in parallel using rayon
         let results: Vec<usize> = batch
             .par_iter()
-            .map(|path| {
-                match self.scan_file(path, findings_sender) {
-                    Ok(findings_count) => findings_count,
-                    Err(e) => {
-                        eprintln!("Error scanning file {:?}: {}", path, e);
-                        0
-                    }
+            .map(|path| match self.scan_file(path, findings_sender) {
+                Ok(findings_count) => findings_count,
+                Err(e) => {
+                    eprintln!("Error scanning file {:?}: {}", path, e);
+                    0
                 }
             })
             .collect();
-            
+
         let total_findings = results.iter().sum();
         Ok((batch.len(), total_findings))
     }
@@ -1059,36 +1057,36 @@ impl<'a> Scanner<'a> {
     /// Ultra-fast language detection that avoids string allocations
     pub fn detect_language(path: &Path) -> Option<Language> {
         let ext = path.extension()?;
-        
+
         // Fast path: check common extensions without string conversion
         match ext.as_encoded_bytes() {
             // Single char extensions
             b"c" => Some(Language::C),
             b"h" => Some(Language::C),
             b"m" | b"M" => Some(Language::ObjC),
-            
-            // Two char extensions  
+
+            // Two char extensions
             b"go" => Some(Language::Go),
             b"rs" => Some(Language::Rust),
             b"py" => Some(Language::Python),
             b"kt" => Some(Language::Kotlin),
             b"cc" => Some(Language::Cpp),
             b"mm" => Some(Language::ObjC),
-            
+
             // Three char extensions
             b"cpp" | b"cxx" | b"hpp" | b"hxx" => Some(Language::Cpp),
             b"php" => Some(Language::Php),
             b"pyw" | b"pyi" => Some(Language::Python),
             b"kts" => Some(Language::Kotlin),
             b"erl" | b"hrl" => Some(Language::Erlang),
-            
+
             // Four+ char extensions
             b"java" => Some(Language::Java),
             b"swift" => Some(Language::Swift),
             b"phtml" => Some(Language::Php),
             b"php3" | b"php4" | b"php5" | b"phps" => Some(Language::Php),
             b"beam" => Some(Language::Erlang),
-            
+
             // Fallback to string comparison for edge cases
             _ => {
                 let ext_str = ext.to_str()?.to_ascii_lowercase();
