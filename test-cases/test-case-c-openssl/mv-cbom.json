@@ -1,0 +1,22 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:cdafcfb0-d868-4f0d-822e-5c86608ba5e2",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "name": "test-case-c-openssl",
+      "path": "/workspace/test-cases/test-case-c-openssl"
+    },
+    "timestamp": "2025-09-15T17:15:42.696369468Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [],
+  "dependencies": []
+}

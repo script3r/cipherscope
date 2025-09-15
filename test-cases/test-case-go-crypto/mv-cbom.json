@@ -1,0 +1,23 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:5ee598c7-d4bb-4734-b4ab-2bdd0bb64bf4",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "name": "crypto-test",
+      "version": "1.19",
+      "path": "/workspace/test-cases/test-case-go-crypto"
+    },
+    "timestamp": "2025-09-15T17:14:56.873260986Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [],
+  "dependencies": []
+}

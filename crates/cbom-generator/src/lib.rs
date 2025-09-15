@@ -15,10 +15,12 @@ use uuid::Uuid;
 pub mod certificate_parser;
 pub mod dependency_analyzer;
 pub mod algorithm_detector;
+pub mod dependency_parser;
 
 use certificate_parser::CertificateParser;
 use dependency_analyzer::DependencyAnalyzer;
 use algorithm_detector::AlgorithmDetector;
+use dependency_parser::DependencyParser;
 
 /// The main MV-CBOM document structure
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -186,6 +188,7 @@ pub struct CbomGenerator {
     certificate_parser: CertificateParser,
     dependency_analyzer: DependencyAnalyzer,
     algorithm_detector: AlgorithmDetector,
+    dependency_parser: DependencyParser,
 }
 
 impl CbomGenerator {
@@ -194,6 +197,7 @@ impl CbomGenerator {
             certificate_parser: CertificateParser::new(),
             dependency_analyzer: DependencyAnalyzer::new(),
             algorithm_detector: AlgorithmDetector::new(),
+            dependency_parser: DependencyParser::new(),
         }
     }
 
@@ -202,8 +206,15 @@ impl CbomGenerator {
         let scan_path = scan_path.canonicalize()
             .with_context(|| format!("Failed to canonicalize path: {}", scan_path.display()))?;
 
-        // Create simple component info based on directory name
-        let component_info = self.create_component_info(&scan_path);
+        // Parse project information and dependencies from various project files
+        let (project_info, project_dependencies) = self.dependency_parser.parse_project(&scan_path)?;
+        
+        // Create component info from parsed project information
+        let component_info = ComponentInfo {
+            name: project_info.name,
+            version: project_info.version,
+            path: scan_path.display().to_string(),
+        };
         
         // Parse certificates in the directory
         let certificates = self.certificate_parser.parse_certificates(&scan_path)?;
@@ -211,11 +222,12 @@ impl CbomGenerator {
         // Detect algorithms from findings and static analysis
         let algorithms = self.algorithm_detector.detect_algorithms(&scan_path, findings)?;
         
-        // Analyze dependencies (uses vs implements) - no cargo dependencies needed
+        // Analyze dependencies (uses vs implements) with project dependencies
         let dependencies = self.dependency_analyzer.analyze_dependencies(
             &component_info,
             &algorithms,
             &certificates,
+            &project_dependencies,
             findings,
         )?;
 
@@ -245,19 +257,6 @@ impl CbomGenerator {
         Ok(cbom)
     }
 
-    /// Create simple component information from the scanned directory
-    fn create_component_info(&self, scan_path: &Path) -> ComponentInfo {
-        let name = scan_path.file_name()
-            .and_then(|n| n.to_str())
-            .unwrap_or("unknown-project")
-            .to_string();
-
-        ComponentInfo {
-            name,
-            version: None, // No version detection without Cargo parsing
-            path: scan_path.display().to_string(),
-        }
-    }
 
     /// Write the MV-CBOM to a JSON file
     pub fn write_cbom(&self, cbom: &MvCbom, output_path: &Path) -> Result<()> {

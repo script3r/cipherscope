@@ -1,0 +1,6 @@
+cryptography>=3.4.8
+pycryptodome==3.15.0
+requests==2.28.1
+# Development dependencies
+pytest>=7.0.0
+black==22.3.0
