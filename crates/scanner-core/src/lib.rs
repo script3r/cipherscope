@@ -938,12 +938,66 @@ impl<'a> Scanner<'a> {
         // Drain emitter and forward findings to main channel
         drop(emitter.tx); // Close the emitter sender to stop receiving
         for finding in emitter.rx.iter() {
-            if let Err(_) = findings_sender.send(finding) {
+            if findings_sender.send(finding).is_err() {
                 break; // Main receiver has been dropped, stop sending
             }
         }
 
         Ok(())
+    }
+
+    /// Simple file discovery for dry-run functionality - doesn't use the full producer-consumer architecture
+    pub fn discover_files(&self, roots: &[PathBuf]) -> Vec<PathBuf> {
+        let mut paths = Vec::new();
+
+        // Build glob matcher for include patterns
+        let include_matcher: Option<globset::GlobSet> = if !self.config.include_globs.is_empty() {
+            let mut builder = globset::GlobSetBuilder::new();
+            for pattern in &self.config.include_globs {
+                if let Ok(glob) = globset::Glob::new(pattern) {
+                    builder.add(glob);
+                }
+            }
+            builder.build().ok()
+        } else {
+            None
+        };
+
+        for root in roots {
+            let mut builder = WalkBuilder::new(root);
+            builder
+                .hidden(false)
+                .git_ignore(true)
+                .git_exclude(true)
+                .ignore(true);
+
+            for entry in builder.build().flatten() {
+                let md = match entry.metadata() {
+                    Ok(m) => m,
+                    Err(_) => continue,
+                };
+                if md.is_file() {
+                    if md.len() as usize > self.config.max_file_size {
+                        continue;
+                    }
+
+                    let path = entry.into_path();
+
+                    // Apply include glob filtering
+                    if let Some(ref matcher) = include_matcher {
+                        if !matcher.is_match(&path) {
+                            continue;
+                        }
+                    }
+
+                    // Only include files with supported languages
+                    if Self::detect_language(&path).is_some() {
+                        paths.push(path);
+                    }
+                }
+            }
+        }
+        paths
     }
 
     pub fn detect_language(path: &Path) -> Option<Language> {
@@ -983,10 +1037,10 @@ impl<'a> Scanner<'a> {
         // Create bounded channels for work queue and findings
         const WORK_QUEUE_SIZE: usize = 10_000; // Backpressure management
         const FINDINGS_QUEUE_SIZE: usize = 50_000; // Large buffer for findings
-        
+
         let (work_sender, work_receiver) = bounded::<PathBuf>(WORK_QUEUE_SIZE);
         let (findings_sender, findings_receiver) = bounded::<Finding>(FINDINGS_QUEUE_SIZE);
-        
+
         // Progress tracking
         let (progress_sender, progress_receiver) = if self.config.progress_callback.is_some() {
             let (tx, rx) = bounded::<usize>(1000);
@@ -1031,7 +1085,7 @@ impl<'a> Scanner<'a> {
         };
 
         // Use thread::scope to ensure all threads complete before returning
-        let findings = thread::scope(|s| {
+        let findings = thread::scope(|s| -> Result<Vec<Finding>> {
             // Spawn producer thread
             let producer_handle = {
                 let work_sender = work_sender.clone();
@@ -1063,9 +1117,7 @@ impl<'a> Scanner<'a> {
             }
 
             // Wait for producer to complete
-            if let Err(e) = producer_handle.join().unwrap() {
-                return Err(e);
-            }
+            producer_handle.join().unwrap()?;
 
             // Check consumer result
             consumer_result?;
