@@ -289,18 +289,33 @@ impl AlgorithmDetector {
                     for symbol_match in symbol_pattern.find_iter(&content) {
                         let symbol = symbol_match.as_str();
 
-                        // Extract parameters from the matched symbol
+                        // Extract parameters from the entire file content around this symbol
                         let mut parameters = HashMap::new();
                         for param_pattern in &algorithm.parameter_patterns {
-                            if let Some(captures) = param_pattern.pattern.captures(symbol) {
-                                if let Some(value_match) = captures.get(1) {
-                                    let value_str = value_match.as_str();
-                                    let value = if let Ok(num) = value_str.parse::<u64>() {
-                                        json!(num)
-                                    } else {
-                                        json!(value_str)
-                                    };
-                                    parameters.insert(param_pattern.name.clone(), value);
+                            // Try to extract from the full content first, then fall back to symbol
+                            let sources = vec![&content, symbol];
+                            let mut found_param = false;
+                            
+                            for source in sources {
+                                if let Some(captures) = param_pattern.pattern.captures(source) {
+                                    if let Some(value_match) = captures.get(1) {
+                                        let value_str = value_match.as_str();
+                                        let value = if let Ok(num) = value_str.parse::<u64>() {
+                                            json!(num)
+                                        } else {
+                                            json!(value_str)
+                                        };
+                                        parameters.insert(param_pattern.name.clone(), value);
+                                        found_param = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                            // Use default value if pattern doesn't match anywhere
+                            if !found_param {
+                                if let Some(default) = &param_pattern.default_value {
+                                    parameters.insert(param_pattern.name.clone(), default.clone());
                                 }
                             }
                         }

@@ -575,6 +575,60 @@ apis = [
   "\\.sign\\(",
 ]
 
+# Algorithm definitions for PyCA cryptography
+[[library.algorithms]]
+name = "RSA"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\brsa\\.generate_private_key",
+  "\\bRSA",
+]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "key_size\\s*=\\s*(\\d+)"
+default_value = 2048
+
+[[library.algorithms]]
+name = "Fernet"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bFernet\\(",
+  "\\bfernet",
+]
+[[library.algorithms.parameter_patterns]]
+name = "algorithm"
+pattern = ".*"
+default_value = "AES-128-CBC + HMAC-SHA256"
+
+[[library.algorithms]]
+name = "SHA-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bhashes\\.SHA256\\(",
+  "\\bSHA256",
+]
+
+[[library.algorithms]]
+name = "AES-GCM"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bAESGCM\\(",
+  "\\bAES.*GCM",
+]
+
+[[library.algorithms]]
+name = "PBKDF2"
+primitive = "kdf"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bPBKDF2HMAC\\(",
+  "\\bpbkdf2",
+]
+
 [[library]]
 name = "PyCryptodome"
 languages = ["Python"]
