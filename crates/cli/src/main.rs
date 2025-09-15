@@ -157,12 +157,25 @@ fn main() -> Result<()> {
                 .unwrap()
                 .progress_chars("#>-")
         );
-        pb.set_message("Scanning files...");
+        pb.set_message("Starting scan...");
+        
+        // Show immediate feedback
+        pb.println("🔍 Initializing scanner and discovering files...");
 
         cfg.progress_callback = Some(Arc::new(move |processed, total, findings| {
-            pb.set_length(total as u64);
-            pb.set_position(processed as u64);
-            pb.set_message(format!("Found {} findings", findings));
+            if total > 0 {
+                pb.set_length(total as u64);
+                pb.set_position(processed as u64);
+                if processed == 0 {
+                    pb.set_message(format!("Found {} files to scan", total));
+                } else if processed < total {
+                    pb.set_message(format!("Processing files... {} findings so far", findings));
+                } else {
+                    pb.set_message(format!("Completed! Found {} findings", findings));
+                }
+            } else {
+                pb.set_message("Discovering files...");
+            }
         }));
     }
 
@@ -177,11 +190,19 @@ fn main() -> Result<()> {
 
     let scanner = Scanner::new(&reg, dets, cfg);
     if args.dry_run {
+        if !args.progress {
+            eprintln!("🔍 Discovering files...");
+        }
         let files = scanner.discover_files(&args.paths);
         for p in files {
             println!("{}", p.display());
         }
         return Ok(());
+    }
+
+    // Show startup message if not using progress bar
+    if !args.progress && !args.json {
+        eprintln!("🔍 Starting scan of {} path(s)...", args.paths.len());
     }
 
     let findings = scanner.run(&args.paths)?;
