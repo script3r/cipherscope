@@ -72,7 +72,6 @@ pub struct Span {
     pub column: usize,
 }
 
-pub type Confidence = f32;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Finding {
@@ -82,7 +81,6 @@ pub struct Finding {
     pub span: Span,
     pub symbol: String,
     pub snippet: String,
-    pub confidence: Confidence,
     pub detector_id: String,
 }
 
@@ -182,12 +180,6 @@ pub struct Config {
     #[serde(default)]
     pub exclude_globs: Vec<String>,
     #[serde(default)]
-    pub allow_libs: Vec<String>,
-    #[serde(default)]
-    pub deny_libs: Vec<String>,
-    #[serde(default)]
-    pub min_confidence: Option<f32>,
-    #[serde(default)]
     pub deterministic: bool,
     #[serde(skip)]
     pub progress_callback: Option<ProgressCallback>,
@@ -203,9 +195,6 @@ impl std::fmt::Debug for Config {
             .field("max_file_size", &self.max_file_size)
             .field("include_globs", &self.include_globs)
             .field("exclude_globs", &self.exclude_globs)
-            .field("allow_libs", &self.allow_libs)
-            .field("deny_libs", &self.deny_libs)
-            .field("min_confidence", &self.min_confidence)
             .field("deterministic", &self.deterministic)
             .field("progress_callback", &"<callback>")
             .finish()
@@ -218,9 +207,6 @@ impl Clone for Config {
             max_file_size: self.max_file_size,
             include_globs: self.include_globs.clone(),
             exclude_globs: self.exclude_globs.clone(),
-            allow_libs: self.allow_libs.clone(),
-            deny_libs: self.deny_libs.clone(),
-            min_confidence: self.min_confidence,
             deterministic: self.deterministic,
             progress_callback: self.progress_callback.clone(),
         }
@@ -233,9 +219,6 @@ impl Default for Config {
             max_file_size: default_max_file_size(),
             include_globs: default_include_globs(),
             exclude_globs: Vec::new(),
-            allow_libs: Vec::new(),
-            deny_libs: Vec::new(),
-            min_confidence: None,
             deterministic: false,
             progress_callback: None,
         }
@@ -927,16 +910,6 @@ impl<'a> Scanner<'a> {
             });
         }
 
-        if let Some(min_c) = self.config.min_confidence {
-            findings.retain(|f| f.confidence >= min_c);
-        }
-
-        findings.retain(|f| {
-            self.config.allow_libs.is_empty()
-                || self.config.allow_libs.iter().any(|a| a == &f.library)
-        });
-        findings.retain(|f| !self.config.deny_libs.iter().any(|d| d == &f.library));
-
         Ok(findings)
     }
 }
@@ -1021,7 +994,6 @@ impl PatternDetector {
     ) -> Result<()> {
         for lib in libs {
             // import/include/namespace first
-            let mut best_conf = 0.0f32;
             let mut first_span = Span { line: 1, column: 1 };
             let mut first_symbol = String::new();
             let mut first_snippet = String::new();
@@ -1030,7 +1002,6 @@ impl PatternDetector {
             for re in lib.include.iter().chain(&lib.import).chain(&lib.namespace) {
                 if let Some(m) = re.find(stripped_s) {
                     matched_import = true;
-                    best_conf = best_conf.max(0.95);
                     first_span = index.to_line_col(m.start());
                     first_symbol = re.as_str().to_string();
                     first_snippet = extract_line(stripped_s, m.start());
@@ -1045,17 +1016,17 @@ impl PatternDetector {
                     last_api = Some((m.start(), re.as_str().to_string()));
                 }
             }
-            if api_hits > 0 {
-                best_conf = best_conf.max(if matched_import { 0.99 } else { 0.80 });
-                if first_symbol.is_empty() {
-                    if let Some((pos, sym)) = last_api.clone() {
-                        first_span = index.to_line_col(pos);
-                        first_symbol = sym;
-                        first_snippet = extract_line(stripped_s, pos);
-                    }
+            if api_hits > 0 && first_symbol.is_empty() {
+                if let Some((pos, sym)) = last_api.clone() {
+                    first_span = index.to_line_col(pos);
+                    first_symbol = sym;
+                    first_snippet = extract_line(stripped_s, pos);
                 }
             }
-            let should_report = (lib.import.is_empty() || matched_import) && api_hits > 0;
+            // Require anchor only if patterns define any; always require at least one API hit
+            let has_anchor_patterns = !lib.include.is_empty() || !lib.import.is_empty() || !lib.namespace.is_empty();
+            let anchor_satisfied = if has_anchor_patterns { matched_import } else { true };
+            let should_report = anchor_satisfied && api_hits > 0;
             if should_report {
                 let finding = Finding {
                     language: unit.lang,
@@ -1064,7 +1035,6 @@ impl PatternDetector {
                     span: first_span,
                     symbol: first_symbol,
                     snippet: first_snippet,
-                    confidence: best_conf,
                     detector_id: self.id.to_string(),
                 };
                 let _ = em.send(finding);
