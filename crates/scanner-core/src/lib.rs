@@ -72,7 +72,6 @@ pub struct Span {
     pub column: usize,
 }
 
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Finding {
     pub language: Language,
@@ -1024,8 +1023,13 @@ impl PatternDetector {
                 }
             }
             // Require anchor only if patterns define any; always require at least one API hit
-            let has_anchor_patterns = !lib.include.is_empty() || !lib.import.is_empty() || !lib.namespace.is_empty();
-            let anchor_satisfied = if has_anchor_patterns { matched_import } else { true };
+            let has_anchor_patterns =
+                !lib.include.is_empty() || !lib.import.is_empty() || !lib.namespace.is_empty();
+            let anchor_satisfied = if has_anchor_patterns {
+                matched_import
+            } else {
+                true
+            };
             let should_report = anchor_satisfied && api_hits > 0;
             if should_report {
                 let finding = Finding {

@@ -14,7 +14,10 @@ fn write_file(dir: &Path, rel: &str, contents: &str) {
 
 fn tmp_dir(prefix: &str) -> PathBuf {
     let mut base = std::env::temp_dir();
-    let ts = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
+    let ts = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_nanos();
     let pid = std::process::id();
     base.push(format!("cipherscope_test_{}_{}_{}", prefix, pid, ts));
     fs::create_dir_all(&base).unwrap();
@@ -48,9 +51,7 @@ public class ImportOnly {
     );
     let findings = scanner.run(std::slice::from_ref(&dir_import_only)).unwrap();
     assert!(
-        !findings
-            .iter()
-            .any(|f| f.library == "Google Tink (Java)"),
+        !findings.iter().any(|f| f.library == "Google Tink (Java)"),
         "Tink should not be reported with import only"
     );
 
@@ -71,9 +72,7 @@ public class ApiOnly {
     );
     let findings = scanner.run(std::slice::from_ref(&dir_api_only)).unwrap();
     assert!(
-        !findings
-            .iter()
-            .any(|f| f.library == "Google Tink (Java)"),
+        !findings.iter().any(|f| f.library == "Google Tink (Java)"),
         "Tink should not be reported with API mentions only"
     );
 
@@ -95,10 +94,7 @@ public class Both {
     );
     let findings = scanner.run(std::slice::from_ref(&dir_both)).unwrap();
     assert!(
-        findings
-            .iter()
-            .any(|f| f.library == "Google Tink (Java)"),
+        findings.iter().any(|f| f.library == "Google Tink (Java)"),
         "Tink should be reported when import and API are present"
     );
 }
-

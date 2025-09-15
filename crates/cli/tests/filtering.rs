@@ -14,7 +14,10 @@ fn write_file(dir: &Path, rel: &str, contents: &str) {
 
 fn tmp_dir(prefix: &str) -> PathBuf {
     let mut base = std::env::temp_dir();
-    let ts = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
+    let ts = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_nanos();
     let pid = std::process::id();
     base.push(format!("cipherscope_test_{}_{}_{}", prefix, pid, ts));
     fs::create_dir_all(&base).unwrap();
@@ -54,9 +57,7 @@ public class Main {
     );
     let findings = scanner.run(std::slice::from_ref(&dir)).unwrap();
     assert!(
-        !findings
-            .iter()
-            .any(|f| f.library == "Java JCA/JCE"),
+        !findings.iter().any(|f| f.library == "Java JCA/JCE"),
         "JCA/JCE should not be reported when import is commented"
     );
 }
@@ -93,8 +94,16 @@ echo $ciphertext;
 fn include_glob_filters_file_types() {
     let reg = load_registry();
     let dets_java: Vec<Box<dyn Detector>> = vec![
-        Box::new(PatternDetector::new("detector-java", &[Language::Java], reg.clone())),
-        Box::new(PatternDetector::new("detector-php", &[Language::Php], reg.clone())),
+        Box::new(PatternDetector::new(
+            "detector-java",
+            &[Language::Java],
+            reg.clone(),
+        )),
+        Box::new(PatternDetector::new(
+            "detector-php",
+            &[Language::Php],
+            reg.clone(),
+        )),
     ];
 
     let dir = tmp_dir("include_glob_filters");
@@ -139,8 +148,16 @@ echo openssl_encrypt("data", "aes-256-cbc", "key", 0, "1234567890123456");
         ..Default::default()
     };
     let dets_php: Vec<Box<dyn Detector>> = vec![
-        Box::new(PatternDetector::new("detector-java", &[Language::Java], reg.clone())),
-        Box::new(PatternDetector::new("detector-php", &[Language::Php], reg.clone())),
+        Box::new(PatternDetector::new(
+            "detector-java",
+            &[Language::Java],
+            reg.clone(),
+        )),
+        Box::new(PatternDetector::new(
+            "detector-php",
+            &[Language::Php],
+            reg.clone(),
+        )),
     ];
     let scanner_php = Scanner::new(&reg, dets_php, cfg_php_only);
     let findings_php = scanner_php.run(std::slice::from_ref(&dir)).unwrap();
@@ -177,6 +194,8 @@ fn max_file_size_skips_large_files() {
     };
     let scanner = Scanner::new(&reg, dets, cfg_small_limit);
     let findings = scanner.run(std::slice::from_ref(&dir)).unwrap();
-    assert!(findings.is_empty(), "Large file should be skipped by max_file_size");
+    assert!(
+        findings.is_empty(),
+        "Large file should be skipped by max_file_size"
+    );
 }
-

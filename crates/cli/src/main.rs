@@ -22,7 +22,6 @@ struct Args {
     #[arg(long, value_name = "FILE")]
     sarif: Option<PathBuf>,
 
-
     /// Number of threads
     #[arg(long, value_name = "N")]
     threads: Option<usize>,
