@@ -1,0 +1,22 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:5f0056b0-a456-450e-ae94-3149870d2c78",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "name": "submodule",
+      "path": "/workspace/fixtures/buck-nested/module2/submodule"
+    },
+    "timestamp": "2025-09-15T17:57:33.338551775Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [],
+  "dependencies": []
+}

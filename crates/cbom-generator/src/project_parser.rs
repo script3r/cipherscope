@@ -4,8 +4,9 @@ use anyhow::{Context, Result};
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use regex::Regex;
+use walkdir::WalkDir;
 
 /// Information about a project dependency
 #[derive(Debug, Clone)]
@@ -84,7 +85,7 @@ impl ProjectParser {
         parser
     }
 
-    /// Parse project information and dependencies from a directory
+    /// Parse project information and dependencies from a directory (non-recursive)
     pub fn parse_project(&self, scan_path: &Path) -> Result<(ProjectInfo, Vec<ProjectDependency>)> {
         // Try to detect project type by looking for common files
         if let Some((project_type, file_path)) = self.detect_project_type(scan_path) {
@@ -119,6 +120,90 @@ impl ProjectParser {
             };
             
             Ok((project_info, Vec::new()))
+        }
+    }
+
+    /// Recursively discover all projects in a directory tree
+    pub fn discover_projects(&self, scan_path: &Path) -> Result<Vec<(PathBuf, ProjectInfo, Vec<ProjectDependency>)>> {
+        let mut projects = Vec::new();
+        
+        // Use walkdir to recursively scan for project files
+        for entry in walkdir::WalkDir::new(scan_path)
+            .into_iter()
+            .filter_map(|e| e.ok())
+            .filter(|e| e.file_type().is_file())
+        {
+            let file_path = entry.path();
+            let dir_path = file_path.parent().unwrap_or(scan_path);
+            
+            // Check if this file indicates a project root
+            if let Some(project_type) = self.classify_project_file(file_path) {
+                // Skip if we already found a project in this directory
+                if projects.iter().any(|(path, _, _)| path == dir_path) {
+                    continue;
+                }
+                
+                // Parse the project
+                match self.parse_project_from_file(file_path, dir_path, project_type) {
+                    Ok((project_info, dependencies)) => {
+                        projects.push((dir_path.to_path_buf(), project_info, dependencies));
+                    }
+                    Err(e) => {
+                        eprintln!("Warning: Failed to parse project at {}: {}", dir_path.display(), e);
+                    }
+                }
+            }
+        }
+        
+        // If no projects found, create a default one for the root
+        if projects.is_empty() {
+            let (project_info, dependencies) = self.parse_project(scan_path)?;
+            projects.push((scan_path.to_path_buf(), project_info, dependencies));
+        }
+        
+        Ok(projects)
+    }
+
+    /// Classify a file to determine if it's a project configuration file
+    fn classify_project_file(&self, file_path: &Path) -> Option<ProjectType> {
+        let file_name = file_path.file_name()?.to_str()?;
+        
+        match file_name {
+            "Cargo.toml" => Some(ProjectType::Cargo),
+            "pom.xml" => Some(ProjectType::Maven),
+            "build.gradle" | "build.gradle.kts" => Some(ProjectType::Gradle),
+            "go.mod" => Some(ProjectType::GoMod),
+            "package.json" => Some(ProjectType::NPM),
+            "requirements.txt" => Some(ProjectType::Requirements),
+            "Pipfile" => Some(ProjectType::Pipfile),
+            "Gemfile" => Some(ProjectType::Gemfile),
+            "composer.json" => Some(ProjectType::Composer),
+            "Makefile" | "makefile" => Some(ProjectType::Makefile),
+            "CMakeLists.txt" => Some(ProjectType::CMake),
+            "WORKSPACE" | "BUILD" | "BUILD.bazel" => Some(ProjectType::Bazel),
+            "BUCK" | ".buckconfig" => Some(ProjectType::Buck),
+            name if name.ends_with(".podspec") => Some(ProjectType::Podspec),
+            _ => None,
+        }
+    }
+
+    /// Parse a project from a specific file and directory
+    fn parse_project_from_file(&self, file_path: &Path, dir_path: &Path, project_type: ProjectType) -> Result<(ProjectInfo, Vec<ProjectDependency>)> {
+        match project_type {
+            ProjectType::Cargo => self.parse_cargo_project(file_path),
+            ProjectType::Maven => self.parse_maven_project(file_path),
+            ProjectType::Gradle => self.parse_gradle_project(file_path),
+            ProjectType::GoMod => self.parse_go_project(file_path),
+            ProjectType::NPM => self.parse_npm_project(file_path),
+            ProjectType::Requirements => self.parse_requirements_project(file_path, dir_path),
+            ProjectType::Pipfile => self.parse_pipfile_project(file_path),
+            ProjectType::Gemfile => self.parse_gemfile_project(file_path),
+            ProjectType::Composer => self.parse_composer_project(file_path),
+            ProjectType::Makefile => self.parse_makefile_project(file_path, dir_path),
+            ProjectType::CMake => self.parse_cmake_project(file_path, dir_path),
+            ProjectType::Podspec => self.parse_podspec_project(file_path),
+            ProjectType::Bazel => self.parse_bazel_project(file_path, dir_path),
+            ProjectType::Buck => self.parse_buck_project(file_path, dir_path),
         }
     }
 

@@ -1,0 +1,22 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:6d168502-b4ec-43ce-b254-a43054b7125b",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "name": "python-module",
+      "path": "/workspace/fixtures/bazel-nested/python-module"
+    },
+    "timestamp": "2025-09-15T17:58:54.417261622Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [],
+  "dependencies": []
+}

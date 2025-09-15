@@ -1,0 +1,15 @@
+workspace(name = "multi_lang_crypto")
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# Java dependencies
+maven_jar(
+    name = "bouncycastle",
+    artifact = "org.bouncycastle:bcprov-jdk15on:1.70",
+)
+
+# Python dependencies  
+pip_import(
+    name = "pip_deps",
+    requirements = "//python-module:requirements.txt",
+)

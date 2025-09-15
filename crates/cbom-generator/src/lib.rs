@@ -9,7 +9,7 @@ use chrono::{DateTime, Utc};
 use scanner_core::{Finding, PatternRegistry};
 use serde::{Deserialize, Serialize};
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use uuid::Uuid;
 
@@ -211,7 +211,7 @@ impl CbomGenerator {
         }
     }
 
-    /// Generate an MV-CBOM for the given directory
+    /// Generate an MV-CBOM for the given directory (single project)
     pub fn generate_cbom(&self, scan_path: &Path, findings: &[Finding]) -> Result<MvCbom> {
         let scan_path = scan_path.canonicalize()
             .with_context(|| format!("Failed to canonicalize path: {}", scan_path.display()))?;
@@ -267,6 +267,76 @@ impl CbomGenerator {
         Ok(cbom)
     }
 
+    /// Generate MV-CBOMs for all projects discovered recursively
+    pub fn generate_cboms_recursive(&self, scan_path: &Path, findings: &[Finding]) -> Result<Vec<(PathBuf, MvCbom)>> {
+        let scan_path = scan_path.canonicalize()
+            .with_context(|| format!("Failed to canonicalize path: {}", scan_path.display()))?;
+
+        // Discover all projects recursively
+        let discovered_projects = self.project_parser.discover_projects(&scan_path)?;
+        
+        let mut cboms = Vec::new();
+        
+        for (project_path, project_info, project_dependencies) in discovered_projects {
+            // Filter findings relevant to this specific project
+            let project_findings: Vec<Finding> = findings.iter()
+                .filter(|finding| {
+                    // Check if the finding's file is within this project's directory
+                    finding.file.starts_with(&project_path)
+                })
+                .cloned()
+                .collect();
+
+            // Create component info from parsed project information
+            let component_info = ComponentInfo {
+                name: project_info.name,
+                version: project_info.version,
+                path: project_path.display().to_string(),
+            };
+            
+            // Parse certificates in this project directory
+            let certificates = self.certificate_parser.parse_certificates(&project_path)?;
+            
+            // Detect algorithms from findings and static analysis for this project
+            let algorithms = self.algorithm_detector.detect_algorithms(&project_path, &project_findings)?;
+            
+            // Analyze dependencies for this project
+            let dependencies = self.dependency_analyzer.analyze_dependencies(
+                &component_info,
+                &algorithms,
+                &certificates,
+                &project_dependencies,
+                &project_findings,
+            )?;
+
+            // Build crypto assets list
+            let mut crypto_assets = Vec::new();
+            crypto_assets.extend(algorithms);
+            crypto_assets.extend(certificates);
+
+            let cbom = MvCbom {
+                bom_format: "MV-CBOM".to_string(),
+                spec_version: "1.0".to_string(),
+                serial_number: format!("urn:uuid:{}", Uuid::new_v4()),
+                version: 1,
+                metadata: CbomMetadata {
+                    component: component_info,
+                    timestamp: Utc::now(),
+                    tools: vec![ToolInfo {
+                        name: "cipherscope".to_string(),
+                        version: env!("CARGO_PKG_VERSION").to_string(),
+                        vendor: "CipherScope Contributors".to_string(),
+                    }],
+                },
+                crypto_assets,
+                dependencies,
+            };
+
+            cboms.push((project_path, cbom));
+        }
+
+        Ok(cboms)
+    }
 
     /// Write the MV-CBOM to a JSON file
     pub fn write_cbom(&self, cbom: &MvCbom, output_path: &Path) -> Result<()> {
@@ -277,6 +347,19 @@ impl CbomGenerator {
             .with_context(|| format!("Failed to write MV-CBOM to {}", output_path.display()))?;
         
         Ok(())
+    }
+
+    /// Write multiple MV-CBOMs to JSON files (one per project)
+    pub fn write_cboms(&self, cboms: &[(PathBuf, MvCbom)]) -> Result<Vec<PathBuf>> {
+        let mut written_files = Vec::new();
+        
+        for (project_path, cbom) in cboms {
+            let output_path = project_path.join("mv-cbom.json");
+            self.write_cbom(cbom, &output_path)?;
+            written_files.push(output_path);
+        }
+        
+        Ok(written_files)
     }
 }
 

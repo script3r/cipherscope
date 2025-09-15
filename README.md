@@ -18,7 +18,11 @@ cargo build --release
 Generate MV-CBOM (Cryptographic Bill of Materials):
 
 ```bash
+# Single project CBOM
 ./target/release/cipherscope . --cbom
+
+# Recursive CBOM generation for all discovered projects
+./target/release/cipherscope . --cbom-recursive
 ```
 
 JSONL and SARIF:
@@ -30,6 +34,7 @@ JSONL and SARIF:
 
 Key flags:
 - `--cbom`: generate MV-CBOM (Minimal Viable Cryptographic Bill of Materials)
+- `--cbom-recursive`: generate MV-CBOMs recursively for all discovered projects
 - `--threads N`: set thread pool size
 - `--max-file-size MB`: skip large files (default 2)
 - `--patterns PATH`: specify patterns file (default: `patterns.toml`)
@@ -55,6 +60,7 @@ The MV-CBOM includes:
 - **Cryptographic Assets**: Algorithms, certificates, and related crypto material with NIST security levels
 - **Dependency Relationships**: Distinguishes between "uses" (actively called) vs "implements" (available but unused)
 - **Parameter Extraction**: Key sizes, curves, and other algorithm-specific parameters
+- **Recursive Project Discovery**: Automatically discovers and analyzes nested projects (BUCK, Bazel, Maven modules, etc.)
 
 Example MV-CBOM snippet:
 ```json
@@ -194,12 +200,13 @@ The MV-CBOM generation is implemented in the `cbom-generator` crate with modular
 - Extensible: new algorithms added by editing patterns, not code
 
 The MV-CBOM pipeline:
-1. **Static Analysis**: Scanner finds cryptographic usage patterns using `patterns.toml`
-2. **Algorithm Detection**: **Pattern-driven** extraction of algorithms and parameters
-3. **Certificate Parsing**: Discovers and analyzes X.509 certificates in the project
-4. **Project Analysis**: Multi-language dependency parsing (Cargo, Maven, go.mod, Makefile, Bazel, BUCK, etc.)
-5. **Dependency Analysis**: Correlates project dependencies with actual code usage
-6. **CBOM Generation**: Produces standards-compliant JSON with NIST security levels
+1. **Project Discovery**: **Recursive** scanning for project files (BUILD, pom.xml, Cargo.toml, etc.)
+2. **Static Analysis**: Scanner finds cryptographic usage patterns using `patterns.toml`
+3. **Algorithm Detection**: **Pattern-driven** extraction of algorithms and parameters
+4. **Certificate Parsing**: Discovers and analyzes X.509 certificates in each project
+5. **Project Analysis**: Multi-language dependency parsing (Cargo, Maven, go.mod, Makefile, Bazel, BUCK, etc.)
+6. **Dependency Analysis**: Correlates project dependencies with actual code usage per project
+7. **CBOM Generation**: Produces standards-compliant JSON with NIST security levels (one per project)
 
 ### Tests & Benchmarks
 
@@ -256,6 +263,14 @@ cat fixtures/rust/rsa-vulnerable/mv-cbom.json | jq '.cryptoAssets[] | select(.as
 
 # Test certificate parsing
 ./target/release/cipherscope fixtures/certificates/x509-rsa-ecdsa --cbom
+
+# Test recursive project discovery
+./target/release/cipherscope fixtures/buck-nested --cbom-recursive
+./target/release/cipherscope fixtures/bazel-nested --cbom-recursive
+
+# Verify multiple CBOMs generated
+find fixtures/buck-nested -name "mv-cbom.json" | wc -l  # Should show 3
+find fixtures/bazel-nested -name "mv-cbom.json" | wc -l # Should show 4
 ```
 
 Benchmark scan throughput on test fixtures:

@@ -1,0 +1,32 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:4c593f6f-fe3d-4a1d-b094-5af4479cada2",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "name": "bazel-nested",
+      "path": "/workspace/fixtures/bazel-nested"
+    },
+    "timestamp": "2025-09-15T17:58:54.417213569Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [
+    {
+      "bom-ref": "2285ca10-d77b-4eff-a672-853b3457e491",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "nistQuantumSecurityLevel": 0
+      }
+    }
+  ],
+  "dependencies": []
+}

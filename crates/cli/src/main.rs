@@ -27,6 +27,10 @@ struct Args {
     #[arg(long, action = ArgAction::SetTrue)]
     cbom: bool,
 
+    /// Generate MV-CBOMs recursively for all discovered projects
+    #[arg(long, action = ArgAction::SetTrue)]
+    cbom_recursive: bool,
+
     /// Number of threads
     #[arg(long, value_name = "N")]
     threads: Option<usize>,
@@ -201,31 +205,69 @@ fn main() -> Result<()> {
     }
 
     // Generate MV-CBOM if requested
-    if args.cbom {
+    if args.cbom || args.cbom_recursive {
         let cbom_generator = CbomGenerator::with_registry(reg.clone());
         
         // Use the first path as the scan root for CBOM generation
         let default_path = PathBuf::from(".");
         let scan_path = args.paths.first().unwrap_or(&default_path);
         
-        match cbom_generator.generate_cbom(scan_path, &findings) {
-            Ok(cbom) => {
-                let output_path = scan_path.join("mv-cbom.json");
-                match cbom_generator.write_cbom(&cbom, &output_path) {
-                    Ok(()) => {
-                        if !args.json {
-                            println!("MV-CBOM written to: {}", output_path.display());
-                            println!("Found {} cryptographic assets", cbom.crypto_assets.len());
-                            println!("Created {} dependency relationships", cbom.dependencies.len());
+        if args.cbom_recursive {
+            // Recursive CBOM generation for all discovered projects
+            match cbom_generator.generate_cboms_recursive(scan_path, &findings) {
+                Ok(cboms) => {
+                    match cbom_generator.write_cboms(&cboms) {
+                        Ok(written_files) => {
+                            if !args.json {
+                                println!("Generated {} MV-CBOMs for discovered projects:", cboms.len());
+                                let mut total_assets = 0;
+                                let mut total_dependencies = 0;
+                                
+                                for (i, (project_path, cbom)) in cboms.iter().enumerate() {
+                                    total_assets += cbom.crypto_assets.len();
+                                    total_dependencies += cbom.dependencies.len();
+                                    println!("  {}. {}: {} assets, {} dependencies", 
+                                            i + 1, 
+                                            project_path.display(),
+                                            cbom.crypto_assets.len(),
+                                            cbom.dependencies.len());
+                                }
+                                
+                                println!("Total: {} cryptographic assets, {} dependency relationships", 
+                                        total_assets, total_dependencies);
+                                println!("Files written: {}", written_files.len());
+                            }
+                        }
+                        Err(e) => {
+                            eprintln!("Failed to write MV-CBOMs: {}", e);
                         }
                     }
-                    Err(e) => {
-                        eprintln!("Failed to write MV-CBOM: {}", e);
-                    }
+                }
+                Err(e) => {
+                    eprintln!("Failed to generate recursive MV-CBOMs: {}", e);
                 }
             }
-            Err(e) => {
-                eprintln!("Failed to generate MV-CBOM: {}", e);
+        } else {
+            // Single CBOM generation
+            match cbom_generator.generate_cbom(scan_path, &findings) {
+                Ok(cbom) => {
+                    let output_path = scan_path.join("mv-cbom.json");
+                    match cbom_generator.write_cbom(&cbom, &output_path) {
+                        Ok(()) => {
+                            if !args.json {
+                                println!("MV-CBOM written to: {}", output_path.display());
+                                println!("Found {} cryptographic assets", cbom.crypto_assets.len());
+                                println!("Created {} dependency relationships", cbom.dependencies.len());
+                            }
+                        }
+                        Err(e) => {
+                            eprintln!("Failed to write MV-CBOM: {}", e);
+                        }
+                    }
+                }
+                Err(e) => {
+                    eprintln!("Failed to generate MV-CBOM: {}", e);
+                }
             }
         }
     }
