@@ -144,7 +144,7 @@ pub struct RelatedCryptoMaterialProperties {
 }
 
 /// Classification of cryptographic primitives
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum CryptographicPrimitive {
     #[serde(rename = "pke")]

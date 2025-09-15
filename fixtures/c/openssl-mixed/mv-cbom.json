@@ -1,14 +1,14 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:fc0dc0c3-dddc-4a08-9bb5-ec9e8c57513d",
+  "serialNumber": "urn:uuid:807b91e0-f7ed-4066-b79c-28514ac1adb2",
   "version": 1,
   "metadata": {
     "component": {
       "name": "openssl-mixed",
       "path": "/workspace/fixtures/c/openssl-mixed"
     },
-    "timestamp": "2025-09-15T19:16:12.263741214Z",
+    "timestamp": "2025-09-15T19:35:58.494965345Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -19,34 +19,7 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "5da73c7c-874f-4a4a-bdd5-b788a4fd9828",
-      "assetType": "algorithm",
-      "name": "RSA",
-      "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
-      }
-    },
-    {
-      "bom-ref": "949c682f-245a-48ac-929c-321883f113e5",
-      "assetType": "algorithm",
-      "name": "RSA",
-      "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
-      }
-    },
-    {
-      "bom-ref": "21e6b5c1-a73c-4f06-9e65-2abb21dc7b8a",
-      "assetType": "algorithm",
-      "name": "RSA",
-      "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
-      }
-    },
-    {
-      "bom-ref": "d9ad0e25-6a6a-4795-b6c6-6fe43df020d9",
+      "bom-ref": "c266f971-0159-4e9e-b87e-c96ab6a04852",
       "assetType": "algorithm",
       "name": "ChaCha20Poly1305",
       "assetProperties": {
@@ -55,20 +28,20 @@
       }
     },
     {
-      "bom-ref": "d17963d8-afc3-4d9d-9639-40207e59cba2",
+      "bom-ref": "74d1ed1a-7841-4ccf-99e7-ae80f96df729",
       "assetType": "algorithm",
-      "name": "ChaCha20Poly1305",
+      "name": "RSA",
       "assetProperties": {
-        "primitive": "aead",
-        "nistQuantumSecurityLevel": 3
+        "primitive": "signature",
+        "nistQuantumSecurityLevel": 0
       }
     }
   ],
   "dependencies": [
     {
-      "ref": "9913e268-477a-44bd-b83c-e4507a13a864",
+      "ref": "f2ce9aef-23b3-4df1-8030-4c8d0fc04054",
       "dependsOn": [
-        "5da73c7c-874f-4a4a-bdd5-b788a4fd9828"
+        "74d1ed1a-7841-4ccf-99e7-ae80f96df729"
       ],
       "dependencyType": "implements"
     }

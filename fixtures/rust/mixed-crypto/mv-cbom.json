@@ -1,7 +1,7 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:1a35f3d2-bbf8-49cd-bb2d-8aca2ed28ba3",
+  "serialNumber": "urn:uuid:d36d4624-0f58-4695-859b-52778a62690b",
   "version": 1,
   "metadata": {
     "component": {
@@ -9,7 +9,7 @@
       "version": "0.2.0",
       "path": "/workspace/fixtures/rust/mixed-crypto"
     },
-    "timestamp": "2025-09-15T19:18:18.310509932Z",
+    "timestamp": "2025-09-15T19:35:58.326449197Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -20,184 +20,7 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "d876c692-84a3-435b-a596-9f9b33af55d6",
-      "assetType": "algorithm",
-      "name": "RSA",
-      "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
-      }
-    },
-    {
-      "bom-ref": "36d002e8-fa1b-47e1-b4d7-0ebdabfe89b5",
-      "assetType": "algorithm",
-      "name": "RSA",
-      "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
-      }
-    },
-    {
-      "bom-ref": "8200eb62-30fa-4484-9944-16f517dda0d4",
-      "assetType": "algorithm",
-      "name": "RSA",
-      "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
-      }
-    },
-    {
-      "bom-ref": "528f5180-ed10-4dfe-97fa-c0528106e77b",
-      "assetType": "algorithm",
-      "name": "RSA",
-      "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
-      }
-    },
-    {
-      "bom-ref": "ef1f8d30-b5ff-4912-bd3e-a840e1b76ea1",
-      "assetType": "algorithm",
-      "name": "AES-GCM",
-      "assetProperties": {
-        "primitive": "aead",
-        "nistQuantumSecurityLevel": 3
-      }
-    },
-    {
-      "bom-ref": "b93a78be-5ca5-4006-88cf-c467720d8aa2",
-      "assetType": "algorithm",
-      "name": "RSA",
-      "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
-      }
-    },
-    {
-      "bom-ref": "124e457f-782a-4252-9e41-0b0c5d04aa3a",
-      "assetType": "algorithm",
-      "name": "RSA",
-      "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
-      }
-    },
-    {
-      "bom-ref": "e691bac5-e1ad-4c6a-a2fe-3c37ad0d9c4a",
-      "assetType": "algorithm",
-      "name": "RSA",
-      "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
-      }
-    },
-    {
-      "bom-ref": "a006ba46-1180-4434-9054-d5b111579b28",
-      "assetType": "algorithm",
-      "name": "RSA",
-      "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
-      }
-    },
-    {
-      "bom-ref": "4e8a5269-ad9b-4a36-b867-acaaceebca65",
-      "assetType": "algorithm",
-      "name": "RSA",
-      "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
-      }
-    },
-    {
-      "bom-ref": "cc74defa-1cdd-4532-b6bf-889cc30bc8bd",
-      "assetType": "algorithm",
-      "name": "AES-GCM",
-      "assetProperties": {
-        "primitive": "aead",
-        "nistQuantumSecurityLevel": 3
-      }
-    },
-    {
-      "bom-ref": "62a38186-374f-4aa3-b7aa-db1fcdc8cbd6",
-      "assetType": "algorithm",
-      "name": "AES-GCM",
-      "assetProperties": {
-        "primitive": "aead",
-        "parameterSet": {
-          "keySize": 256
-        },
-        "nistQuantumSecurityLevel": 3
-      }
-    },
-    {
-      "bom-ref": "75a8dd18-0ef4-43fc-9f5c-4c3eed36dd79",
-      "assetType": "algorithm",
-      "name": "AES-GCM",
-      "assetProperties": {
-        "primitive": "aead",
-        "nistQuantumSecurityLevel": 3
-      }
-    },
-    {
-      "bom-ref": "7179b0e5-33b2-4e81-8aab-6f0a75713ba8",
-      "assetType": "algorithm",
-      "name": "AES-GCM",
-      "assetProperties": {
-        "primitive": "aead",
-        "parameterSet": {
-          "keySize": 256
-        },
-        "nistQuantumSecurityLevel": 3
-      }
-    },
-    {
-      "bom-ref": "47e58803-bf32-4806-a939-a14492298e45",
-      "assetType": "algorithm",
-      "name": "AES-GCM",
-      "assetProperties": {
-        "primitive": "aead",
-        "parameterSet": {
-          "keySize": 256
-        },
-        "nistQuantumSecurityLevel": 3
-      }
-    },
-    {
-      "bom-ref": "8d28b9e2-c44c-4f66-a1ed-46e1994fe6be",
-      "assetType": "algorithm",
-      "name": "SHA-256",
-      "assetProperties": {
-        "primitive": "hash",
-        "nistQuantumSecurityLevel": 3
-      }
-    },
-    {
-      "bom-ref": "25743a36-cb7e-4648-967e-62bb948d9595",
-      "assetType": "algorithm",
-      "name": "SHA-256",
-      "assetProperties": {
-        "primitive": "hash",
-        "parameterSet": {
-          "outputSize": 256
-        },
-        "nistQuantumSecurityLevel": 3
-      }
-    },
-    {
-      "bom-ref": "129beb11-d301-4787-8b0d-b66ffd32ddcf",
-      "assetType": "algorithm",
-      "name": "SHA-256",
-      "assetProperties": {
-        "primitive": "hash",
-        "parameterSet": {
-          "outputSize": 256
-        },
-        "nistQuantumSecurityLevel": 3
-      }
-    },
-    {
-      "bom-ref": "abb398ef-9117-4ae4-8692-141d8afae39f",
+      "bom-ref": "ae994634-ef0b-422b-96be-9a862a0860b1",
       "assetType": "algorithm",
       "name": "SHA-512",
       "assetProperties": {
@@ -206,108 +29,56 @@
       }
     },
     {
-      "bom-ref": "c8eb8421-f072-48eb-bbdb-04af9427a9df",
+      "bom-ref": "f3652c7c-a5ae-40b1-a563-88301f4c086e",
       "assetType": "algorithm",
-      "name": "SHA-512",
+      "name": "Ed25519",
       "assetProperties": {
-        "primitive": "hash",
-        "parameterSet": {
-          "outputSize": 512
-        },
+        "primitive": "signature",
+        "nistQuantumSecurityLevel": 0
+      }
+    },
+    {
+      "bom-ref": "9ccd65fa-9919-46cd-8294-dac9710ffd14",
+      "assetType": "algorithm",
+      "name": "AES-GCM",
+      "assetProperties": {
+        "primitive": "aead",
         "nistQuantumSecurityLevel": 3
       }
     },
     {
-      "bom-ref": "b475c0c8-60f8-4c89-a7bf-effd712be2d8",
+      "bom-ref": "006c6146-8a2e-40c5-9c80-7537d7b7199b",
       "assetType": "algorithm",
-      "name": "SHA-512",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "nistQuantumSecurityLevel": 0
+      }
+    },
+    {
+      "bom-ref": "52342b3c-ebc2-4388-b9f2-60ba2084f166",
+      "assetType": "algorithm",
+      "name": "SHA-256",
       "assetProperties": {
         "primitive": "hash",
-        "parameterSet": {
-          "outputSize": 512
-        },
         "nistQuantumSecurityLevel": 3
-      }
-    },
-    {
-      "bom-ref": "861307b3-01d3-4731-b943-d6af4873c087",
-      "assetType": "algorithm",
-      "name": "Ed25519",
-      "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
-      }
-    },
-    {
-      "bom-ref": "ce61a999-f8ca-4cab-81b5-9fd255e84262",
-      "assetType": "algorithm",
-      "name": "Ed25519",
-      "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
-      }
-    },
-    {
-      "bom-ref": "84119353-bb84-4d2d-9dd4-d7fac3963554",
-      "assetType": "algorithm",
-      "name": "Ed25519",
-      "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
-      }
-    },
-    {
-      "bom-ref": "390cda5f-c4d2-4e20-a4c2-5182241e23b5",
-      "assetType": "algorithm",
-      "name": "Ed25519",
-      "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
-      }
-    },
-    {
-      "bom-ref": "788cd284-96b6-4011-89ed-d91e4022ffe5",
-      "assetType": "algorithm",
-      "name": "Ed25519",
-      "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
-      }
-    },
-    {
-      "bom-ref": "10d8792b-74f9-4fd5-b9a4-34ac056ed748",
-      "assetType": "algorithm",
-      "name": "Ed25519",
-      "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
-      }
-    },
-    {
-      "bom-ref": "ea9dc3c8-a9a7-4649-a522-e53d2daba383",
-      "assetType": "algorithm",
-      "name": "Ed25519",
-      "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
       }
     }
   ],
   "dependencies": [
     {
-      "ref": "7d06ba18-36b3-456f-86c6-bcf68fadc3ba",
+      "ref": "8560725c-7fec-472c-98c6-3d7dbe182d5b",
       "dependsOn": [
-        "129beb11-d301-4787-8b0d-b66ffd32ddcf",
-        "ea9dc3c8-a9a7-4649-a522-e53d2daba383"
+        "52342b3c-ebc2-4388-b9f2-60ba2084f166",
+        "f3652c7c-a5ae-40b1-a563-88301f4c086e"
       ],
       "dependencyType": "uses"
     },
     {
-      "ref": "7d06ba18-36b3-456f-86c6-bcf68fadc3ba",
+      "ref": "8560725c-7fec-472c-98c6-3d7dbe182d5b",
       "dependsOn": [
-        "8d28b9e2-c44c-4f66-a1ed-46e1994fe6be",
-        "abb398ef-9117-4ae4-8692-141d8afae39f",
-        "d876c692-84a3-435b-a596-9f9b33af55d6"
+        "006c6146-8a2e-40c5-9c80-7537d7b7199b",
+        "ae994634-ef0b-422b-96be-9a862a0860b1"
       ],
       "dependencyType": "implements"
     }

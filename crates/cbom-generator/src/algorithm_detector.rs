@@ -44,11 +44,7 @@ impl AlgorithmDetector {
                     self.extract_algorithms_from_finding_with_registry(finding, registry)?
                 {
                     for asset in algorithm_assets {
-                        let key = format!(
-                            "{}:{}",
-                            asset.name.as_ref().unwrap_or(&"unknown".to_string()),
-                            asset.bom_ref
-                        );
+                        let key = self.create_deduplication_key(&asset);
                         if seen_algorithms.insert(key) {
                             algorithms.push(asset);
                         }
@@ -60,11 +56,7 @@ impl AlgorithmDetector {
             let additional_algorithms =
                 self.perform_deep_static_analysis_with_registry(scan_path, registry)?;
             for asset in additional_algorithms {
-                let key = format!(
-                    "{}:{}",
-                    asset.name.as_ref().unwrap_or(&"unknown".to_string()),
-                    asset.bom_ref
-                );
+                let key = self.create_deduplication_key(&asset);
                 if seen_algorithms.insert(key) {
                     algorithms.push(asset);
                 }
@@ -76,11 +68,7 @@ impl AlgorithmDetector {
                     self.extract_algorithms_from_finding_fallback(finding)?
                 {
                     for asset in algorithm_assets {
-                        let key = format!(
-                            "{}:{}",
-                            asset.name.as_ref().unwrap_or(&"unknown".to_string()),
-                            asset.bom_ref
-                        );
+                        let key = self.create_deduplication_key(&asset);
                         if seen_algorithms.insert(key) {
                             algorithms.push(asset);
                         }
@@ -89,7 +77,9 @@ impl AlgorithmDetector {
             }
         }
 
-        Ok(algorithms)
+        // Merge duplicate algorithms with different parameter specificity
+        let merged_algorithms = self.merge_algorithm_assets(algorithms);
+        Ok(merged_algorithms)
     }
 
     /// Extract algorithms from finding using pattern registry
@@ -324,6 +314,49 @@ impl AlgorithmDetector {
         }
 
         Ok(algorithms)
+    }
+
+    /// Create a proper deduplication key based on algorithm properties, not bom_ref
+    fn create_deduplication_key(&self, asset: &CryptoAsset) -> String {
+        match &asset.asset_properties {
+            AssetProperties::Algorithm(props) => {
+                // For deduplication, use algorithm name and primitive only
+                // This will merge different parameter variations of the same algorithm
+                format!("{}:{}", 
+                    asset.name.as_ref().unwrap_or(&"unknown".to_string()),
+                    props.primitive as u8
+                )
+            }
+            _ => format!("{}:{}", 
+                asset.name.as_ref().unwrap_or(&"unknown".to_string()),
+                asset.bom_ref
+            )
+        }
+    }
+
+    /// Merge algorithm assets with the same name/primitive but different parameters
+    fn merge_algorithm_assets(&self, assets: Vec<CryptoAsset>) -> Vec<CryptoAsset> {
+        let mut merged_map: HashMap<String, CryptoAsset> = HashMap::new();
+        
+        for asset in assets {
+            let key = self.create_deduplication_key(&asset);
+            
+            if let Some(existing) = merged_map.get_mut(&key) {
+                // Merge parameters if the new asset has more specific information
+                if let (AssetProperties::Algorithm(existing_props), AssetProperties::Algorithm(new_props)) = 
+                    (&mut existing.asset_properties, &asset.asset_properties) {
+                    
+                    // If existing has no parameters but new one does, use the new parameters
+                    if existing_props.parameter_set.is_none() && new_props.parameter_set.is_some() {
+                        existing_props.parameter_set = new_props.parameter_set.clone();
+                    }
+                }
+            } else {
+                merged_map.insert(key, asset);
+            }
+        }
+        
+        merged_map.into_values().collect()
     }
 
     // Essential helper methods for fallback scenarios

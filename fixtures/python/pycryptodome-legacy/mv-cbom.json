@@ -1,15 +1,14 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:828a4340-3438-4dc4-ba64-ddb9adac0d41",
+  "serialNumber": "urn:uuid:7f2cf358-c11a-42e2-b5f9-cdc295da69a4",
   "version": 1,
   "metadata": {
     "component": {
-      "name": "test-rsa-uses",
-      "version": "0.1.0",
-      "path": "/workspace/fixtures/rust/rsa-vulnerable"
+      "name": "pycryptodome-legacy",
+      "path": "/workspace/fixtures/python/pycryptodome-legacy"
     },
-    "timestamp": "2025-09-15T19:35:58.351463651Z",
+    "timestamp": "2025-09-15T19:35:58.579448185Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -20,7 +19,7 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "763a7f3b-5162-4a8c-bc4e-f38797d8e900",
+      "bom-ref": "e79afd10-25ab-4122-97a4-0ffd54ae1d5d",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {
@@ -31,9 +30,9 @@
   ],
   "dependencies": [
     {
-      "ref": "f7c5bfd7-4d2c-43c3-a1c7-d90810de9829",
+      "ref": "4f3727c8-bb21-40e7-a710-a0b3fe1ef23a",
       "dependsOn": [
-        "763a7f3b-5162-4a8c-bc4e-f38797d8e900"
+        "e79afd10-25ab-4122-97a4-0ffd54ae1d5d"
       ],
       "dependencyType": "implements"
     }

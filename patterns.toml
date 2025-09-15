@@ -80,6 +80,43 @@ apis = [
   "\\bcrypto_scalarmult\\s*\\(",
 ]
 
+# Algorithm definitions for libsodium
+[[library.algorithms]]
+name = "ChaCha20Poly1305"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcrypto_aead_chacha20poly1305",
+  "\\bcrypto_aead_xchacha20poly1305",
+]
+
+[[library.algorithms]]
+name = "Ed25519"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bcrypto_sign_ed25519",
+  "\\bed25519",
+]
+
+[[library.algorithms]]
+name = "X25519"
+primitive = "kem"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bcrypto_scalarmult_curve25519",
+  "\\bcurve25519",
+]
+
+[[library.algorithms]]
+name = "BLAKE2b"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcrypto_generichash",
+  "\\bblake2b",
+]
+
 [[library]]
 name = "Libgcrypt"
 languages = ["C", "C++"]

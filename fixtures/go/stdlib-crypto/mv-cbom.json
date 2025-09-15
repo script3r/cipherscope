@@ -1,15 +1,15 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:ffe5c439-b50d-4360-9334-158997d78050",
+  "serialNumber": "urn:uuid:c1deb27e-4d9b-4ad1-8b73-7fa82adfbdfd",
   "version": 1,
   "metadata": {
     "component": {
-      "name": "crypto-test",
+      "name": "stdlib-crypto-fixture",
       "version": "1.19",
-      "path": "/workspace/fixtures/go/x-crypto-extended"
+      "path": "/workspace/fixtures/go/stdlib-crypto"
     },
-    "timestamp": "2025-09-15T19:35:58.536236278Z",
+    "timestamp": "2025-09-15T19:35:58.516104704Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -20,16 +20,7 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "35ea0ad6-c024-40ea-9575-e7f45024b7eb",
-      "assetType": "algorithm",
-      "name": "ChaCha20Poly1305",
-      "assetProperties": {
-        "primitive": "aead",
-        "nistQuantumSecurityLevel": 3
-      }
-    },
-    {
-      "bom-ref": "cc0110bf-624e-4a89-a66b-ed0ac7bd9863",
+      "bom-ref": "28113262-9793-4a1a-8f06-4c2d655e6319",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {

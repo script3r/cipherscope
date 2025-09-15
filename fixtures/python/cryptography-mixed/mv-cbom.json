@@ -1,14 +1,14 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:a273c12f-ddb9-45cd-8642-47ab12fc1183",
+  "serialNumber": "urn:uuid:6167fb18-dc69-4037-bfae-872abfc2daab",
   "version": 1,
   "metadata": {
     "component": {
-      "name": "test-case-python-crypto",
-      "path": "/workspace/test-cases/test-case-python-crypto"
+      "name": "cryptography-mixed",
+      "path": "/workspace/fixtures/python/cryptography-mixed"
     },
-    "timestamp": "2025-09-15T17:13:36.925338479Z",
+    "timestamp": "2025-09-15T19:35:58.558580875Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -17,6 +17,24 @@
       }
     ]
   },
-  "cryptoAssets": [],
-  "dependencies": []
+  "cryptoAssets": [
+    {
+      "bom-ref": "f62ac744-0e69-470b-a45b-4f4de7910bab",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "nistQuantumSecurityLevel": 0
+      }
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "269f8562-6a62-44ac-ba2d-bb1e6d22e536",
+      "dependsOn": [
+        "f62ac744-0e69-470b-a45b-4f4de7910bab"
+      ],
+      "dependencyType": "implements"
+    }
+  ]
 }

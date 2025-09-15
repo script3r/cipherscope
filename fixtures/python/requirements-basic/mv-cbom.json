@@ -1,0 +1,22 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:0cea0e71-86ee-42e9-a297-f1298523c300",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "name": "requirements-basic",
+      "path": "/workspace/fixtures/python/requirements-basic"
+    },
+    "timestamp": "2025-09-15T19:35:58.602734929Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [],
+  "dependencies": []
+}

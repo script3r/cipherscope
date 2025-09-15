@@ -1,7 +1,7 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:8f975a01-c294-4d77-baca-8cc524b1c0b3",
+  "serialNumber": "urn:uuid:b2f77f13-a509-4d68-a006-6f5d71aa08ce",
   "version": 1,
   "metadata": {
     "component": {
@@ -9,7 +9,7 @@
       "version": "1.0.0",
       "path": "/workspace/fixtures/java/maven-bouncycastle"
     },
-    "timestamp": "2025-09-15T17:50:59.179489895Z",
+    "timestamp": "2025-09-15T19:35:58.429370866Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -18,6 +18,24 @@
       }
     ]
   },
-  "cryptoAssets": [],
-  "dependencies": []
+  "cryptoAssets": [
+    {
+      "bom-ref": "a65f5602-4e17-48d4-867f-621691237053",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "nistQuantumSecurityLevel": 0
+      }
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "e220c435-7fa8-48e8-9993-1d01b89d8d7c",
+      "dependsOn": [
+        "a65f5602-4e17-48d4-867f-621691237053"
+      ],
+      "dependencyType": "implements"
+    }
+  ]
 }

@@ -1,15 +1,15 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:3531239e-3ffc-4921-abf9-84a76e54bac6",
+  "serialNumber": "urn:uuid:a0ba5ca1-20ab-4fe1-bc55-21d638c80952",
   "version": 1,
   "metadata": {
     "component": {
       "name": "test-implements-vs-uses",
       "version": "0.1.0",
-      "path": "/workspace/test-cases/test-case-2-implements-vs-uses"
+      "path": "/workspace/fixtures/rust/implements-vs-uses"
     },
-    "timestamp": "2025-09-15T17:01:30.134036204Z",
+    "timestamp": "2025-09-15T19:35:58.302169577Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -20,26 +20,38 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "a40bfef4-3768-43f1-a764-031cf35b54a0",
+      "bom-ref": "d92b5487-9bb0-414c-9499-0bce67468506",
       "assetType": "algorithm",
-      "name": "AES-256-GCM",
+      "name": "SHA-512",
       "assetProperties": {
-        "primitive": "aead",
-        "parameterSet": {
-          "keySize": 256,
-          "mode": "GCM"
-        },
+        "primitive": "hash",
+        "nistQuantumSecurityLevel": 3
+      }
+    },
+    {
+      "bom-ref": "bd6a5fc7-4e73-489f-98c2-25c10fd3923b",
+      "assetType": "algorithm",
+      "name": "SHA-256",
+      "assetProperties": {
+        "primitive": "hash",
         "nistQuantumSecurityLevel": 3
       }
     }
   ],
   "dependencies": [
     {
-      "ref": "687ed460-a755-4d68-89e6-d361bcb4ba53",
+      "ref": "6961c034-4df0-491d-8a03-0873a5ef6829",
       "dependsOn": [
-        "a40bfef4-3768-43f1-a764-031cf35b54a0"
+        "bd6a5fc7-4e73-489f-98c2-25c10fd3923b"
       ],
       "dependencyType": "uses"
+    },
+    {
+      "ref": "6961c034-4df0-491d-8a03-0873a5ef6829",
+      "dependsOn": [
+        "d92b5487-9bb0-414c-9499-0bce67468506"
+      ],
+      "dependencyType": "implements"
     }
   ]
 }

@@ -1,15 +1,14 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:828a4340-3438-4dc4-ba64-ddb9adac0d41",
+  "serialNumber": "urn:uuid:9ae8429f-3631-4e2c-9a90-a0326818997d",
   "version": 1,
   "metadata": {
     "component": {
-      "name": "test-rsa-uses",
-      "version": "0.1.0",
-      "path": "/workspace/fixtures/rust/rsa-vulnerable"
+      "name": "makefile-crypto",
+      "path": "/workspace/fixtures/c/makefile-crypto"
     },
-    "timestamp": "2025-09-15T19:35:58.351463651Z",
+    "timestamp": "2025-09-15T19:35:58.472153385Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -20,7 +19,7 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "763a7f3b-5162-4a8c-bc4e-f38797d8e900",
+      "bom-ref": "62aaec88-6e0c-45a5-a415-b8cfa87bc35e",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {
@@ -31,9 +30,9 @@
   ],
   "dependencies": [
     {
-      "ref": "f7c5bfd7-4d2c-43c3-a1c7-d90810de9829",
+      "ref": "8f754482-fc81-4702-b3b7-25e67376b287",
       "dependsOn": [
-        "763a7f3b-5162-4a8c-bc4e-f38797d8e900"
+        "62aaec88-6e0c-45a5-a415-b8cfa87bc35e"
       ],
       "dependencyType": "implements"
     }
