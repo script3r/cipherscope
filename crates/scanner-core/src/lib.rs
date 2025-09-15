@@ -11,7 +11,7 @@ use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::sync::Mutex;
-// use std::process::Command; // removed: no git fast path
+//
 
 // ---------------- Types ----------------
 
@@ -1121,7 +1121,7 @@ impl<'a> Scanner<'a> {
     }
 }
 
-// no git fast path per requirements
+//
 
 fn prefilter_hit(det: &dyn Detector, stripped: &[u8]) -> bool {
     let pf = det.prefilter();
