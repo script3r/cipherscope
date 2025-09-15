@@ -22,10 +22,6 @@ struct Args {
     #[arg(long, value_name = "FILE")]
     sarif: Option<PathBuf>,
 
-    /// Minimum confidence required
-    #[arg(long, value_name = "FLOAT")]
-    min_confidence: Option<f32>,
-
     /// Number of threads
     #[arg(long, value_name = "N")]
     threads: Option<usize>,
@@ -42,21 +38,9 @@ struct Args {
     #[arg(long, value_name = "GLOB")]
     exclude_glob: Vec<String>,
 
-    /// Allow only these libraries
-    #[arg(long, value_name = "LIB")]
-    allow: Vec<String>,
-
-    /// Deny these libraries
-    #[arg(long, value_name = "LIB")]
-    deny: Vec<String>,
-
     /// Deterministic output ordering
     #[arg(long, action = ArgAction::SetTrue)]
     deterministic: bool,
-
-    /// Fail with code 2 if findings are present
-    #[arg(long, action = ArgAction::SetTrue)]
-    fail_on_find: bool,
 
     /// Print merged patterns/config and exit
     #[arg(long, action = ArgAction::SetTrue)]
@@ -155,11 +139,8 @@ fn main() -> Result<()> {
     ];
 
     let mut cfg = Config {
-        min_confidence: args.min_confidence,
         include_globs: args.include_glob.clone(),
         exclude_globs: args.exclude_glob.clone(),
-        allow_libs: args.allow.clone(),
-        deny_libs: args.deny.clone(),
         deterministic: args.deterministic,
         ..Default::default()
     };
@@ -214,9 +195,6 @@ fn main() -> Result<()> {
         fs::write(sarif_path, serde_json::to_vec_pretty(&sarif)?)?;
     }
 
-    if args.fail_on_find && !findings.is_empty() {
-        std::process::exit(2);
-    }
     Ok(())
 }
 

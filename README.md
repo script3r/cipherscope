@@ -21,15 +21,12 @@ JSONL and SARIF:
 ```
 
 Key flags:
-- `--min-confidence 0.9`: filter low-confidence hits
 - `--threads N`: set thread pool size
 - `--max-file-size MB`: skip large files (default 2)
 - `--patterns PATH`: specify patterns file (default: `patterns.toml`)
 - `--progress`: show progress bar during scanning
 - `--include-glob GLOB` / `--exclude-glob GLOB`
-- `--allow LIB` / `--deny LIB`
 - `--deterministic`: stable output ordering
-- `--fail-on-find`: exit 2 if findings exist
 - `--print-config`: print loaded `patterns.toml`
 - `--dry-run`: list files to be scanned
 
@@ -48,7 +45,7 @@ Rust | RustCrypto | 2 | src/main.rs:12 aes_gcm::Aes256Gcm
 JSONL example:
 
 ```json
-{"language":"Rust","library":"RustCrypto","file":"src/main.rs","span":{"line":12,"column":5},"symbol":"aes_gcm::Aes256Gcm","snippet":"use aes_gcm::Aes256Gcm;","confidence":0.99,"detector_id":"detector-rust"}
+{"language":"Rust","library":"RustCrypto","file":"src/main.rs","span":{"line":12,"column":5},"symbol":"aes_gcm::Aes256Gcm","snippet":"use aes_gcm::Aes256Gcm;","detector_id":"detector-rust"}
 ```
 
 SARIF snippet:
