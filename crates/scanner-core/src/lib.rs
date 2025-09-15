@@ -37,6 +37,7 @@ use std::collections::{BTreeSet, HashMap};
 use std::fs;
 use std::io::Read;
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread;
 
@@ -778,7 +779,7 @@ impl<'a> Scanner<'a> {
         };
 
         let max_file_size = self.config.max_file_size;
-        let files_discovered = Arc::new(Mutex::new(0usize));
+        let files_discovered = Arc::new(AtomicUsize::new(0));
 
         for root in roots {
             let mut builder = WalkBuilder::new(root);
@@ -788,7 +789,9 @@ impl<'a> Scanner<'a> {
                 .git_exclude(true) // Respect .git/info/exclude
                 .ignore(true) // Respect .ignore files
                 .follow_links(false) // Don't follow symlinks for safety
-                .max_depth(None); // No depth limit
+                .max_depth(None) // No depth limit
+                .threads(num_cpus::get().max(4)) // Use optimal thread count for directory traversal
+                .same_file_system(true); // Don't cross filesystem boundaries for better performance
 
             // Configure exclude globs if provided
             for exclude_glob in &self.config.exclude_globs {
@@ -820,35 +823,38 @@ impl<'a> Scanner<'a> {
 
                     let path = entry.path();
 
-                    // Check file size before processing
-                    if let Ok(metadata) = entry.metadata() {
-                        if metadata.len() as usize > max_file_size {
-                            return ignore::WalkState::Continue;
-                        }
+                    // Fast language detection BEFORE expensive operations
+                    if Scanner::detect_language(path).is_none() {
+                        return ignore::WalkState::Continue;
                     }
 
-                    // Apply include glob filtering if specified
+                    // Apply include glob filtering if specified (after language check)
                     if let Some(ref matcher) = include_matcher {
                         if !matcher.is_match(path) {
                             return ignore::WalkState::Continue;
                         }
                     }
 
-                    // Only send files with supported extensions to reduce consumer work
-                    if Scanner::detect_language(path).is_some() {
-                        if work_sender.send(path.to_path_buf()).is_err() {
-                            return ignore::WalkState::Quit;
+                    // Check file size ONLY for files we're interested in
+                    // Use DirEntry's metadata which might be cached
+                    if let Ok(metadata) = entry.metadata() {
+                        if metadata.len() as usize > max_file_size {
+                            return ignore::WalkState::Continue;
                         }
+                    }
 
-                        // Update discovered files counter
-                        {
-                            let mut count = files_discovered.lock().unwrap();
-                            *count += 1;
-                        }
+                    // Send file to work queue
+                    if work_sender.send(path.to_path_buf()).is_err() {
+                        return ignore::WalkState::Quit;
+                    }
 
-                        // Send progress update if callback exists (1 = file discovered)
-                        if let Some(ref progress_tx) = progress_sender {
-                            let _ = progress_tx.send(1);
+                    // Update discovered files counter atomically (no lock!)
+                    let count = files_discovered.fetch_add(1, Ordering::Relaxed);
+                    
+                    // Send progress update every 1000 files to reduce channel overhead
+                    if let Some(ref progress_tx) = progress_sender {
+                        if count % 1000 == 0 {
+                            let _ = progress_tx.send(1000); // Send batch size
                         }
                     }
 
@@ -867,24 +873,56 @@ impl<'a> Scanner<'a> {
         findings_sender: Sender<Finding>,
         progress_sender: Option<Sender<usize>>,
     ) -> Result<()> {
-        // Use rayon to process files in parallel
-        work_receiver
-            .into_iter()
-            .collect::<Vec<_>>()
-            .par_iter()
-            .for_each(|path| {
-                // Placeholder function call - this is where the actual file scanning happens
-                if let Err(e) = self.scan_file(path, &findings_sender) {
-                    eprintln!("Error scanning file {:?}: {}", path, e);
-                }
-
-                // Send progress update if callback exists (2 = file processed)
+        const BATCH_SIZE: usize = 1000; // Process files in batches for better cache locality
+        
+        let mut batch = Vec::with_capacity(BATCH_SIZE);
+        let mut _processed_count = 0usize;
+        
+        // Collect files into batches and process them
+        for path in work_receiver.iter() {
+            batch.push(path);
+            
+            if batch.len() >= BATCH_SIZE {
+                _processed_count += self.process_batch(&batch, &findings_sender)?;
+                batch.clear();
+                
+                // Send progress update for the entire batch
                 if let Some(ref progress_tx) = progress_sender {
-                    let _ = progress_tx.send(2);
+                    let _ = progress_tx.send(BATCH_SIZE);
                 }
-            });
+            }
+        }
+        
+        // Process remaining files in the final batch
+        if !batch.is_empty() {
+            _processed_count += self.process_batch(&batch, &findings_sender)?;
+            
+            if let Some(ref progress_tx) = progress_sender {
+                let _ = progress_tx.send(batch.len());
+            }
+        }
 
         Ok(())
+    }
+    
+    /// Process a batch of files in parallel for better performance
+    fn process_batch(
+        &self,
+        batch: &[PathBuf], 
+        findings_sender: &Sender<Finding>
+    ) -> Result<usize> {
+        // Process the batch in parallel using rayon
+        batch
+            .par_iter()
+            .map(|path| {
+                if let Err(e) = self.scan_file(path, findings_sender) {
+                    eprintln!("Error scanning file {:?}: {}", path, e);
+                }
+                1 // Return 1 for each processed file
+            })
+            .sum::<usize>();
+            
+        Ok(batch.len())
     }
 
     /// Core file scanning logic - processes a single file
@@ -1000,29 +1038,47 @@ impl<'a> Scanner<'a> {
         paths
     }
 
+    /// Ultra-fast language detection that avoids string allocations
     pub fn detect_language(path: &Path) -> Option<Language> {
-        match path
-            .extension()
-            .and_then(|e| e.to_str())
-            .unwrap_or("")
-            .to_ascii_lowercase()
-            .as_str()
-        {
-            "go" => Some(Language::Go),
-            "java" => Some(Language::Java),
-            "c" => Some(Language::C),
-            "h" => Some(Language::C),
-            "hpp" => Some(Language::Cpp),
-            "hh" => Some(Language::Cpp),
-            "cc" | "cpp" | "cxx" => Some(Language::Cpp),
-            "rs" => Some(Language::Rust),
-            "py" | "pyw" | "pyi" => Some(Language::Python),
-            "php" | "phtml" | "php3" | "php4" | "php5" | "phps" => Some(Language::Php),
-            "swift" => Some(Language::Swift),
-            "m" | "mm" | "M" => Some(Language::ObjC),
-            "kt" | "kts" => Some(Language::Kotlin),
-            "erl" | "hrl" | "beam" => Some(Language::Erlang),
-            _ => None,
+        let ext = path.extension()?;
+        
+        // Fast path: check common extensions without string conversion
+        match ext.as_encoded_bytes() {
+            // Single char extensions
+            b"c" => Some(Language::C),
+            b"h" => Some(Language::C),
+            b"m" | b"M" => Some(Language::ObjC),
+            
+            // Two char extensions  
+            b"go" => Some(Language::Go),
+            b"rs" => Some(Language::Rust),
+            b"py" => Some(Language::Python),
+            b"kt" => Some(Language::Kotlin),
+            b"cc" => Some(Language::Cpp),
+            b"mm" => Some(Language::ObjC),
+            
+            // Three char extensions
+            b"cpp" | b"cxx" | b"hpp" | b"hxx" => Some(Language::Cpp),
+            b"php" => Some(Language::Php),
+            b"pyw" | b"pyi" => Some(Language::Python),
+            b"kts" => Some(Language::Kotlin),
+            b"erl" | b"hrl" => Some(Language::Erlang),
+            
+            // Four+ char extensions
+            b"java" => Some(Language::Java),
+            b"swift" => Some(Language::Swift),
+            b"phtml" => Some(Language::Php),
+            b"php3" | b"php4" | b"php5" | b"phps" => Some(Language::Php),
+            b"beam" => Some(Language::Erlang),
+            
+            // Fallback to string comparison for edge cases
+            _ => {
+                let ext_str = ext.to_str()?.to_ascii_lowercase();
+                match ext_str.as_str() {
+                    "c++" | "h++" => Some(Language::Cpp),
+                    _ => None,
+                }
+            }
         }
     }
 
@@ -1061,17 +1117,19 @@ impl<'a> Scanner<'a> {
                 // Initial callback
                 callback(0, 0, 0);
 
-                for update in progress_rx.iter() {
-                    if update == 1 {
-                        files_discovered += 1;
-                        // Update callback every 100 files discovered to avoid spam
-                        if files_discovered % 100 == 0 {
+                for batch_size in progress_rx.iter() {
+                    if batch_size >= 1000 {
+                        // This is a discovery batch
+                        files_discovered += batch_size;
+                        // Update callback every 10k files discovered to reduce overhead
+                        if files_discovered % 10_000 == 0 {
                             callback(files_processed, files_discovered, findings_count);
                         }
-                    } else if update == 2 {
-                        files_processed += 1;
-                        // Update callback every 50 files processed
-                        if files_processed % 50 == 0 {
+                    } else {
+                        // This is a processing batch
+                        files_processed += batch_size;
+                        // Update callback every 5k files processed
+                        if files_processed % 5_000 == 0 {
                             callback(files_processed, files_discovered, findings_count);
                         }
                     }

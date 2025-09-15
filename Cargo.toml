@@ -41,4 +41,5 @@ humantime = "2"
 globset = "0.4"
 crossbeam-channel = "0.5"
 walkdir = "2"
+num_cpus = "1"
 
