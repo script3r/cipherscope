@@ -1,14 +1,14 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:e1eb7020-382a-490d-9c92-469752da89b5",
+  "serialNumber": "urn:uuid:b17c5dd4-9841-43c2-bd30-8f74c4be0223",
   "version": 1,
   "metadata": {
     "component": {
       "name": "bazel-tink",
       "path": "/workspace/fixtures/java/bazel-tink"
     },
-    "timestamp": "2025-09-15T19:16:12.241784417Z",
+    "timestamp": "2025-09-15T19:25:05.976141843Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -19,7 +19,7 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "ba0df8fe-5e3b-492c-8f01-9f3358ef9297",
+      "bom-ref": "c60eefd8-4bad-4885-a8cb-8010ef3759fa",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {
@@ -28,7 +28,7 @@
       }
     },
     {
-      "bom-ref": "21c2707d-320f-4d89-bd67-fbd8f95b3f77",
+      "bom-ref": "8320b3e7-16dc-4fae-9c3a-4ce1e7987f9e",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {
@@ -37,7 +37,7 @@
       }
     },
     {
-      "bom-ref": "06134af5-446d-4e36-afc2-88748f6c22f8",
+      "bom-ref": "9a56b890-0b28-4c43-8a12-0fb34df0a48f",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {
@@ -46,7 +46,7 @@
       }
     },
     {
-      "bom-ref": "f6072edb-c2ba-4007-b969-69b13739c360",
+      "bom-ref": "256b9cbb-59e9-4f1c-bc16-a12dfdc58a2a",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {
@@ -55,7 +55,7 @@
       }
     },
     {
-      "bom-ref": "a5d23b59-8db1-4ee0-85e8-c2655dde0724",
+      "bom-ref": "d96e77d0-6d17-4f34-b03a-b2b5a79b09bc",
       "assetType": "algorithm",
       "name": "AES-GCM",
       "assetProperties": {
@@ -67,7 +67,7 @@
       }
     },
     {
-      "bom-ref": "dee29965-0905-40d1-a1b3-a58d8c27fb75",
+      "bom-ref": "98e9bcd1-f4d4-437d-a481-477fc9ee9c71",
       "assetType": "algorithm",
       "name": "AES-GCM",
       "assetProperties": {
@@ -76,7 +76,7 @@
       }
     },
     {
-      "bom-ref": "6ad6b958-0279-43c3-9630-adc14e3aab1a",
+      "bom-ref": "2ff45203-2177-4c28-a29f-e4b79757ce83",
       "assetType": "algorithm",
       "name": "AES-GCM",
       "assetProperties": {
@@ -85,7 +85,7 @@
       }
     },
     {
-      "bom-ref": "f7131de9-57b5-4367-8ca9-b7eb4b85917c",
+      "bom-ref": "9b63a0a2-505d-4109-949b-392a4b986a1b",
       "assetType": "algorithm",
       "name": "AES-GCM",
       "assetProperties": {
@@ -94,7 +94,7 @@
       }
     },
     {
-      "bom-ref": "61fb5bc1-e119-468c-acb2-a0cd8e15a97b",
+      "bom-ref": "882cac1b-b9d1-4dcc-8085-8145076c7597",
       "assetType": "algorithm",
       "name": "AES-GCM",
       "assetProperties": {
@@ -103,7 +103,7 @@
       }
     },
     {
-      "bom-ref": "7efb9e25-c4be-4254-98e7-7a324225e1ff",
+      "bom-ref": "84595541-a085-4c93-a447-01452df2eb90",
       "assetType": "algorithm",
       "name": "AES-GCM",
       "assetProperties": {
@@ -112,7 +112,7 @@
       }
     },
     {
-      "bom-ref": "bd07c47d-9736-4c07-948f-75c05d4654d8",
+      "bom-ref": "47dd0c36-0589-48e1-9143-d24d783a92fd",
       "assetType": "algorithm",
       "name": "AES-GCM",
       "assetProperties": {
@@ -121,7 +121,7 @@
       }
     },
     {
-      "bom-ref": "de8c36ae-8680-49d0-9776-42f0c395d945",
+      "bom-ref": "85379bfc-8241-415c-bd1a-f7e8c4bb8bd9",
       "assetType": "algorithm",
       "name": "AES-GCM",
       "assetProperties": {
