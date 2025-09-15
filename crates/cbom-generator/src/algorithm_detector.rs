@@ -295,7 +295,7 @@ impl AlgorithmDetector {
                             // Try to extract from the full content first, then fall back to symbol
                             let sources = vec![&content, symbol];
                             let mut found_param = false;
-                            
+
                             for source in sources {
                                 if let Some(captures) = param_pattern.pattern.captures(source) {
                                     if let Some(value_match) = captures.get(1) {
@@ -311,7 +311,7 @@ impl AlgorithmDetector {
                                     }
                                 }
                             }
-                            
+
                             // Use default value if pattern doesn't match anywhere
                             if !found_param {
                                 if let Some(default) = &param_pattern.default_value {
@@ -337,30 +337,34 @@ impl AlgorithmDetector {
             AssetProperties::Algorithm(props) => {
                 // For deduplication, use algorithm name and primitive only
                 // This will merge different parameter variations of the same algorithm
-                format!("{}:{}", 
+                format!(
+                    "{}:{}",
                     asset.name.as_ref().unwrap_or(&"unknown".to_string()),
                     props.primitive as u8
                 )
             }
-            _ => format!("{}:{}", 
+            _ => format!(
+                "{}:{}",
                 asset.name.as_ref().unwrap_or(&"unknown".to_string()),
                 asset.bom_ref
-            )
+            ),
         }
     }
 
     /// Merge algorithm assets with the same name/primitive but different parameters
     fn merge_algorithm_assets(&self, assets: Vec<CryptoAsset>) -> Vec<CryptoAsset> {
         let mut merged_map: HashMap<String, CryptoAsset> = HashMap::new();
-        
+
         for asset in assets {
             let key = self.create_deduplication_key(&asset);
-            
+
             if let Some(existing) = merged_map.get_mut(&key) {
                 // Merge parameters if the new asset has more specific information
-                if let (AssetProperties::Algorithm(existing_props), AssetProperties::Algorithm(new_props)) = 
-                    (&mut existing.asset_properties, &asset.asset_properties) {
-                    
+                if let (
+                    AssetProperties::Algorithm(existing_props),
+                    AssetProperties::Algorithm(new_props),
+                ) = (&mut existing.asset_properties, &asset.asset_properties)
+                {
                     // If existing has no parameters but new one does, use the new parameters
                     if existing_props.parameter_set.is_none() && new_props.parameter_set.is_some() {
                         existing_props.parameter_set = new_props.parameter_set.clone();
@@ -370,7 +374,7 @@ impl AlgorithmDetector {
                 merged_map.insert(key, asset);
             }
         }
-        
+
         merged_map.into_values().collect()
     }
 

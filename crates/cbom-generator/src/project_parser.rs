@@ -6,7 +6,6 @@ use serde::Deserialize;
 use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
-use walkdir::WalkDir;
 
 /// Information about a project dependency
 #[derive(Debug, Clone)]

@@ -1,14 +1,14 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:64d03398-eee1-4ade-9581-6abeaf93c7b5",
+  "serialNumber": "urn:uuid:43112169-1f7a-4fdf-9d38-cff265ff71be",
   "version": 1,
   "metadata": {
     "component": {
       "name": "cryptography-mixed",
       "path": "/workspace/fixtures/python/cryptography-mixed"
     },
-    "timestamp": "2025-09-15T19:50:59.616165470Z",
+    "timestamp": "2025-09-15T20:04:40.367225656Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -19,7 +19,7 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "6e6cdfb5-c506-40e9-8e0a-955b1a43b14b",
+      "bom-ref": "50972571-52dc-4ec1-ba54-79e9ad3983a4",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {
@@ -31,7 +31,16 @@
       }
     },
     {
-      "bom-ref": "ebdbfa3f-a101-4786-81cb-23d24709650b",
+      "bom-ref": "44315dd8-152d-472e-9370-955bec730e81",
+      "assetType": "algorithm",
+      "name": "SHA-256",
+      "assetProperties": {
+        "primitive": "hash",
+        "nistQuantumSecurityLevel": 3
+      }
+    },
+    {
+      "bom-ref": "b3945f0b-b3d6-405a-9045-09c355f4d1e7",
       "assetType": "algorithm",
       "name": "Fernet",
       "assetProperties": {
@@ -41,22 +50,13 @@
         },
         "nistQuantumSecurityLevel": 3
       }
-    },
-    {
-      "bom-ref": "45e8e556-be31-4126-b237-9633d1beebba",
-      "assetType": "algorithm",
-      "name": "SHA-256",
-      "assetProperties": {
-        "primitive": "hash",
-        "nistQuantumSecurityLevel": 3
-      }
     }
   ],
   "dependencies": [
     {
-      "ref": "c871f5e5-3368-41dc-89a3-c8767fe3e127",
+      "ref": "26cfd300-b1a9-466b-9f52-3030ee3ebda1",
       "dependsOn": [
-        "6e6cdfb5-c506-40e9-8e0a-955b1a43b14b"
+        "50972571-52dc-4ec1-ba54-79e9ad3983a4"
       ],
       "dependencyType": "implements"
     }
