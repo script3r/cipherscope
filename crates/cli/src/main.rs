@@ -168,16 +168,9 @@ fn main() -> Result<()> {
 
     // Stream JSONL findings as they arrive
     if args.json {
-        let stdout = std::io::stdout();
-        let lock = stdout.lock();
-        let write = std::sync::Mutex::new(lock);
         cfg.result_callback = Some(Arc::new(move |f: &Finding| {
             if let Ok(s) = serde_json::to_string(f) {
-                if let Ok(mut guard) = write.lock() {
-                    use std::io::Write;
-                    let _ = guard.write_all(s.as_bytes());
-                    let _ = guard.write_all(b"\n");
-                }
+                println!("{}", s);
             }
         }));
     }

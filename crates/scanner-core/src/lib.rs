@@ -2,7 +2,7 @@ use aho_corasick::AhoCorasickBuilder;
 use anyhow::{anyhow, Context, Result};
 use crossbeam_channel::{bounded, Receiver, Sender};
 use ignore::WalkBuilder;
-use rayon::prelude::*;
+// use rayon::prelude::*; // no longer using rayon parallel iterators in run()
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeSet, HashMap};
@@ -84,6 +84,9 @@ pub struct Finding {
     pub detector_id: String,
 }
 
+// Reduce clippy::type_complexity by aliasing the result callback type
+type ResultCallback = Arc<dyn Fn(&Finding) + Send + Sync>;
+
 #[derive(Debug, Clone, Default)]
 pub struct Prefilter {
     pub extensions: BTreeSet<String>,
@@ -113,7 +116,7 @@ pub trait Detector: Send + Sync {
 pub struct Emitter {
     tx: Sender<Finding>,
     rx: Receiver<Finding>,
-    on_result: Option<Arc<dyn Fn(&Finding) + Send + Sync>>,
+    on_result: Option<ResultCallback>,
 }
 
 impl Emitter {
@@ -188,7 +191,7 @@ pub struct Config {
     #[serde(skip)]
     pub progress_callback: Option<ProgressCallback>,
     #[serde(skip)]
-    pub result_callback: Option<Arc<dyn Fn(&Finding) + Send + Sync>>,
+    pub result_callback: Option<ResultCallback>,
 }
 
 fn default_max_file_size() -> usize {
@@ -845,9 +848,13 @@ impl<'a> Scanner<'a> {
                 })
             });
 
-            if let Ok(mut guard) = out.lock() {
-                discovered_paths.append(&mut *guard);
-            }
+            let drained: Vec<PathBuf> = {
+                match out.lock() {
+                    Ok(mut guard) => guard.drain(..).collect(),
+                    Err(_) => Vec::new(),
+                }
+            };
+            discovered_paths.extend(drained);
         }
         discovered_paths
     }
@@ -993,6 +1000,9 @@ impl<'a> Scanner<'a> {
                 let tx = tx_ref.clone();
                 let result_cb = result_cb.clone();
                 let progress_cb_inner = progress_cb_inner.clone();
+                let processed_ref2 = processed_ref.clone();
+                let discovered_ref2 = discovered_ref.clone();
+                let findings_cnt_ref2 = findings_cnt_ref.clone();
                 Box::new(move |res| {
                     let entry = match res {
                         Ok(e) => e,
@@ -1017,7 +1027,7 @@ impl<'a> Scanner<'a> {
                     }
 
                     // Count as discovered candidate
-                    discovered_ref.fetch_add(1, Ordering::Relaxed);
+                    discovered_ref2.fetch_add(1, Ordering::Relaxed);
 
                     // Size check
                     if let Ok(md) = fs::metadata(&path) {
@@ -1055,12 +1065,12 @@ impl<'a> Scanner<'a> {
                     }
 
                     // Mark processed and update progress
-                    let new_proc = processed_ref.fetch_add(1, Ordering::Relaxed) + 1;
+                    let new_proc = processed_ref2.fetch_add(1, Ordering::Relaxed) + 1;
                     if let Some(ref cb) = progress_cb_inner {
                         cb(
                             new_proc,
-                            discovered_ref.load(Ordering::Relaxed),
-                            findings_cnt_ref.load(Ordering::Relaxed),
+                            discovered_ref2.load(Ordering::Relaxed),
+                            findings_cnt_ref2.load(Ordering::Relaxed),
                         );
                     }
 
@@ -1105,37 +1115,7 @@ impl<'a> Scanner<'a> {
     }
 }
 
-fn git_list_files_fast(root: &Path) -> Option<Vec<PathBuf>> {
-    // Use git index for fast listing of tracked and untracked (non-ignored) files
-    // Equivalent to: git -C <root> ls-files -z --cached --others --exclude-standard
-    let output = Command::new("git")
-        .arg("-C")
-        .arg(root)
-        .arg("ls-files")
-        .arg("-z")
-        .arg("--cached")
-        .arg("--others")
-        .arg("--exclude-standard")
-        .output()
-        .ok()?;
-    if !output.status.success() {
-        return None;
-    }
-    let bytes = output.stdout;
-    if bytes.is_empty() {
-        return Some(Vec::new());
-    }
-    let mut list = Vec::new();
-    for rel in bytes.split(|b| *b == 0) {
-        if rel.is_empty() {
-            continue;
-        }
-        if let Ok(rel_path) = std::str::from_utf8(rel) {
-            list.push(root.join(rel_path));
-        }
-    }
-    Some(list)
-}
+// no git fast path per requirements
 
 fn prefilter_hit(det: &dyn Detector, stripped: &[u8]) -> bool {
     let pf = det.prefilter();
