@@ -353,7 +353,7 @@ mod tests {
     }
 
     #[test]
-    fn test_algorithm_extraction_from_finding() {
+    fn test_detailed_algorithm_extraction() {
         let analyzer = DependencyAnalyzer::new();
         
         // Create a mock finding that would indicate "uses"

@@ -2,7 +2,7 @@
 
 use anyhow::{Context, Result};
 use regex::Regex;
-use scanner_core::Finding;
+use scanner_core::{Finding, Language};
 use serde_json::json;
 use std::collections::{HashMap, HashSet};
 use std::fs;
