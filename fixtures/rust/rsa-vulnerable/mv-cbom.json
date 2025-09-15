@@ -1,7 +1,7 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:30620163-9660-42d9-a854-f8a330ca9fff",
+  "serialNumber": "urn:uuid:c98e21d5-2b8c-4e9b-b97b-bbe39d0d25ac",
   "version": 1,
   "metadata": {
     "component": {
@@ -9,7 +9,7 @@
       "version": "0.1.0",
       "path": "/workspace/fixtures/rust/rsa-vulnerable"
     },
-    "timestamp": "2025-09-15T17:50:59.156789972Z",
+    "timestamp": "2025-09-15T18:58:37.460925384Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -20,7 +20,7 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "b72c3419-5088-484c-8bd8-26cbbdc31025",
+      "bom-ref": "2e4b77fb-1de2-4761-b9da-9a007efbb089",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {
@@ -29,7 +29,7 @@
       }
     },
     {
-      "bom-ref": "67d53894-29c7-4a92-bef2-38ecae5f9ae2",
+      "bom-ref": "e5492ffd-0ea9-47bc-8ef3-6aa2dfc95d71",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {
@@ -38,7 +38,7 @@
       }
     },
     {
-      "bom-ref": "ff742575-645e-4708-b42e-7019129b91c3",
+      "bom-ref": "6edf4b41-c1f6-428e-bc40-c80b4d7aff56",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {
@@ -47,7 +47,7 @@
       }
     },
     {
-      "bom-ref": "dc5ca083-a022-412e-a876-b67fbc8fc848",
+      "bom-ref": "57cb35f6-998e-420b-8860-6b19555a21fd",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {
@@ -56,7 +56,7 @@
       }
     },
     {
-      "bom-ref": "7efee67e-2367-4230-9101-4c52f3728375",
+      "bom-ref": "3727cc74-9b89-47f2-81e5-17a3f035ebfd",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {
@@ -67,9 +67,9 @@
   ],
   "dependencies": [
     {
-      "ref": "1ec13698-e270-4dc4-9f12-4a9cf86d8a17",
+      "ref": "e61261d4-6cd0-4225-95bd-5ecaeb0eec88",
       "dependsOn": [
-        "b72c3419-5088-484c-8bd8-26cbbdc31025"
+        "2e4b77fb-1de2-4761-b9da-9a007efbb089"
       ],
       "dependencyType": "implements"
     }

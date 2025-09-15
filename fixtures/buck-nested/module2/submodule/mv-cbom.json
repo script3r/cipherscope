@@ -1,14 +1,14 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:5f0056b0-a456-450e-ae94-3149870d2c78",
+  "serialNumber": "urn:uuid:9a7c8d7e-6d43-482b-ba75-b55263a95a8d",
   "version": 1,
   "metadata": {
     "component": {
       "name": "submodule",
       "path": "/workspace/fixtures/buck-nested/module2/submodule"
     },
-    "timestamp": "2025-09-15T17:57:33.338551775Z",
+    "timestamp": "2025-09-15T18:57:27.222471197Z",
     "tools": [
       {
         "name": "cipherscope",

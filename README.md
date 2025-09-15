@@ -4,53 +4,37 @@
   <img src="cipherscope.png" alt="CipherScope Logo" width="350" height="350">
 </div>
 
-Fast, low-false-positive static scanner that finds third-party cryptographic libraries and call sites across 11 programming languages: Go, Java, C, C++, Rust, Python, PHP, Swift, Objective-C, Kotlin, and Erlang.
+**Cryptographic Bill of Materials (MV-CBOM) Generator** for Post-Quantum Cryptography (PQC) readiness assessment. 
 
-**NEW**: Now generates **Minimal Viable Cryptographic Bill of Materials (MV-CBOM)** for Post-Quantum Cryptography (PQC) readiness assessment.
+Analyzes codebases across 11 programming languages (Go, Java, C, C++, Rust, Python, PHP, Swift, Objective-C, Kotlin, Erlang) and generates machine-readable JSON inventories of cryptographic assets with NIST quantum security levels.
 
 ### Install & Run
 
 ```bash
 cargo build --release
+
+# Generate MV-CBOM for current directory
 ./target/release/cipherscope .
-```
 
-Generate MV-CBOM (Cryptographic Bill of Materials):
-
-```bash
-# Single project CBOM
-./target/release/cipherscope . --cbom
-
-# Recursive CBOM generation for all discovered projects
-./target/release/cipherscope . --cbom-recursive
-```
-
-JSONL and SARIF:
-
-```bash
-./target/release/cipherscope . --json > findings.jsonl
-./target/release/cipherscope . --sarif findings.sarif
+# Generate MV-CBOMs recursively for all discovered projects
+./target/release/cipherscope . --recursive
 ```
 
 Key flags:
-- `--cbom`: generate MV-CBOM (Minimal Viable Cryptographic Bill of Materials)
-- `--cbom-recursive`: generate MV-CBOMs recursively for all discovered projects
-- `--threads N`: set thread pool size
+- `--recursive`: generate MV-CBOMs recursively for all discovered projects
+- `--threads N`: set thread pool size  
 - `--max-file-size MB`: skip large files (default 2)
 - `--patterns PATH`: specify patterns file (default: `patterns.toml`)
 - `--progress`: show progress bar during scanning
-- `--include-glob GLOB` / `--exclude-glob GLOB`
-- `--deterministic`: stable output ordering
 - `--print-config`: print loaded `patterns.toml`
-- `--dry-run`: list files to be scanned
 
 ### Output
 
-Pretty table to stdout (default), optional JSONL/SARIF, and **MV-CBOM** for PQC readiness assessment.
+**MV-CBOM JSON files** written to each project directory for comprehensive Post-Quantum Cryptography (PQC) readiness assessment.
 
 #### MV-CBOM (Minimal Viable Cryptographic Bill of Materials)
 
-CipherScope can generate a comprehensive cryptographic inventory in JSON format that follows the MV-CBOM specification. This enables:
+CipherScope generates a comprehensive cryptographic inventory in JSON format that follows the MV-CBOM specification. This enables:
 
 - **Post-Quantum Cryptography (PQC) Risk Assessment**: Identifies algorithms vulnerable to quantum attacks (NIST Quantum Security Level 0)
 - **Crypto-Agility Planning**: Provides detailed algorithm parameters and usage patterns
@@ -89,124 +73,32 @@ Example MV-CBOM snippet:
 }
 ```
 
-Example table:
+### Configuration
 
-```text
-Language | Library | Count | Example
----------|---------|-------|--------
-Rust | RustCrypto | 2 | src/main.rs:12 aes_gcm::Aes256Gcm
-```
+Algorithm and library detection patterns are defined in `patterns.toml`. The schema supports:
+- **Library Detection**: `include`/`import`/`namespace`/`apis` patterns per language
+- **Algorithm Definitions**: Each library defines supported algorithms with NIST quantum security levels
+- **Parameter Extraction**: Patterns for extracting key sizes, curves, and algorithm parameters
 
-JSONL example:
-
-```json
-{"language":"Rust","library":"RustCrypto","file":"src/main.rs","span":{"line":12,"column":5},"symbol":"aes_gcm::Aes256Gcm","snippet":"use aes_gcm::Aes256Gcm;","detector_id":"detector-rust"}
-```
-
-SARIF snippet:
-
-```json
-{"version":"2.1.0","runs":[{"tool":{"driver":{"name":"cipherscope"}},"results":[{"ruleId":"detector-rust","message":{"text":"RustCrypto in Rust"}}]}]}
-```
-
-### Configuration & Patterns
-
-Patterns are loaded from `patterns.toml` (and optional `patterns.local.toml`, if you add it). The schema supports per-language `include`/`import`/`namespace`/`apis` anchored regexes. The engine strips comments and avoids string literals to reduce false positives.
-
-#### Supported Languages & File Extensions
-
-The scanner automatically detects and processes files with these extensions:
-
-- **C/C++**: `.c`, `.h`, `.cc`, `.cpp`, `.cxx`, `.c++`, `.hpp`, `.hxx`, `.h++`, `.hh`
-- **Java**: `.java`
-- **Go**: `.go`
-- **Rust**: `.rs`
-- **Python**: `.py`, `.pyw`, `.pyi`
-- **PHP**: `.php`, `.phtml`, `.php3`, `.php4`, `.php5`, `.phps`
-- **Swift**: `.swift`
-- **Objective-C**: `.m`, `.mm`, `.M`
-- **Kotlin**: `.kt`, `.kts`
-- **Erlang**: `.erl`, `.hrl`, `.beam`
+**Supported Languages**: C, C++, Java, Go, Rust, Python, PHP, Swift, Objective-C, Kotlin, Erlang
 
 #### High-Performance Architecture
 
-CipherScope uses a **producer-consumer model** inspired by ripgrep to achieve maximum throughput on large codebases:
-
-**Producer (Parallel Directory Walker)**:
-- Uses `ignore::WalkParallel` for parallel filesystem traversal
-- Automatically respects `.gitignore` files and skips hidden directories
-- Critical optimization: avoids descending into `node_modules`, `.git`, and other irrelevant directories
-- Language detection happens early to filter files before expensive operations
-
-**Consumers (Parallel File Processors)**:
-- Uses `rayon` thread pools for parallel file processing
-- Batched processing (1000 files per batch) for better cache locality
-- Comment stripping and preprocessing shared across all detectors
-- Lockless atomic counters for progress tracking
-
-**Key Optimizations**:
-- **Ultra-fast language detection**: Direct byte comparison, no string allocations
-- **Syscall reduction**: 90% fewer `metadata()` calls through early filtering  
-- **Aho-Corasick prefiltering**: Skip expensive regex matching when no keywords found
-- **Batched channel communication**: Reduces overhead between producer/consumer threads
-- **Optimal thread configuration**: Automatically uses `num_cpus` for directory traversal
-
-#### Performance Benchmarks
-
-**File Discovery Performance**:
-- **5M file directory**: ~20-30 seconds (previously 90+ seconds)
-- **Throughput**: 150,000-250,000 files/second discovery rate
-- **Processing**: 4+ GiB/s content scanning throughput
-
-**Scalability**:
-- Linear scaling with CPU cores for file processing
-- Efficient memory usage through batched processing
-- Progress reporting accuracy: 100% (matches `find` command results)
+- **Parallel Processing**: Producer-consumer model with `rayon` thread pools
+- **Smart Filtering**: Respects `.gitignore`, early language detection, Aho-Corasick prefiltering  
+- **Scalable**: 4+ GiB/s throughput, linear scaling with CPU cores
 
 ### Architecture
 
-#### Detector Architecture
+**Modular MV-CBOM Generation Pipeline**:
+1. **Project Discovery**: Recursive scanning for project files (BUILD, pom.xml, Cargo.toml, etc.)
+2. **Static Analysis**: Pattern-driven cryptographic library detection
+3. **Algorithm Detection**: Extract algorithms and parameters using `patterns.toml` definitions  
+4. **Certificate Parsing**: X.509 certificate analysis with signature algorithms
+5. **Dependency Analysis**: "Uses" vs "implements" relationship detection
+6. **CBOM Generation**: Standards-compliant JSON with NIST quantum security levels
 
-The scanner uses a modular detector architecture with dedicated crates for each language:
-
-- **detector-c**: C language support
-- **detector-cpp**: C++ language support  
-- **detector-go**: Go language support
-- **detector-java**: Java language support
-- **detector-rust**: Rust language support
-- **detector-python**: Python language support
-- **detector-php**: PHP language support
-- **detector-swift**: Swift language support
-- **detector-objc**: Objective-C language support
-- **detector-kotlin**: Kotlin language support
-- **detector-erlang**: Erlang language support
-
-Each detector implements the `Detector` trait and can be extended independently. To add support for a new language, create a new detector crate under `crates/` or extend the `patterns.toml` to cover additional libraries. See `crates/scanner-core/src/lib.rs` for the trait definition and pattern-driven detector implementation.
-
-#### MV-CBOM Architecture
-
-The MV-CBOM generation is implemented in the `cbom-generator` crate with modular components:
-
-- **cbom-generator**: Main CBOM generation and JSON serialization
-- **certificate-parser**: X.509 certificate parsing and signature algorithm extraction  
-- **algorithm-detector**: **Pattern-driven** algorithm detection using `patterns.toml` definitions
-- **dependency-analyzer**: Intelligent "uses" vs "implements" relationship detection
-- **project-parser**: Multi-language project metadata and dependency analysis (Cargo, Maven, go.mod, requirements.txt, Makefile, Bazel, BUCK, etc.)
-
-**Key Innovation: Pattern-Driven Algorithm Detection**
-- Algorithm definitions moved from hardcoded Rust to configurable `patterns.toml`
-- Each library can define supported algorithms with NIST security levels
-- Parameter extraction patterns (key sizes, curves) defined declaratively
-- Extensible: new algorithms added by editing patterns, not code
-
-The MV-CBOM pipeline:
-1. **Project Discovery**: **Recursive** scanning for project files (BUILD, pom.xml, Cargo.toml, etc.)
-2. **Static Analysis**: Scanner finds cryptographic usage patterns using `patterns.toml`
-3. **Algorithm Detection**: **Pattern-driven** extraction of algorithms and parameters
-4. **Certificate Parsing**: Discovers and analyzes X.509 certificates in each project
-5. **Project Analysis**: Multi-language dependency parsing (Cargo, Maven, go.mod, Makefile, Bazel, BUCK, etc.)
-6. **Dependency Analysis**: Correlates project dependencies with actual code usage per project
-7. **CBOM Generation**: Produces standards-compliant JSON with NIST security levels (one per project)
+**Key Innovation**: Algorithm detection moved from hardcoded Rust to configurable `patterns.toml` - new algorithms added by editing patterns, not code.
 
 ### Tests & Benchmarks
 
@@ -253,50 +145,24 @@ The `fixtures/` directory contains rich, realistic examples for testing MV-CBOM 
 Run fixture tests:
 ```bash
 # Test RSA vulnerability detection
-./target/release/cipherscope fixtures/rust/rsa-vulnerable --cbom
-cat fixtures/rust/rsa-vulnerable/mv-cbom.json | jq '.cryptoAssets[] | select(.assetProperties.nistQuantumSecurityLevel == 0)'
+./target/release/cipherscope fixtures/rust/rsa-vulnerable
+jq '.cryptoAssets[] | select(.assetProperties.nistQuantumSecurityLevel == 0)' fixtures/rust/rsa-vulnerable/mv-cbom.json
 
 # Test multi-language support
-./target/release/cipherscope fixtures/java/maven-bouncycastle --cbom
-./target/release/cipherscope fixtures/go/stdlib-crypto --cbom
-./target/release/cipherscope fixtures/python/cryptography-mixed --cbom
-
-# Test certificate parsing
-./target/release/cipherscope fixtures/certificates/x509-rsa-ecdsa --cbom
+./target/release/cipherscope fixtures/java/maven-bouncycastle
+./target/release/cipherscope fixtures/go/stdlib-crypto
+./target/release/cipherscope fixtures/python/cryptography-mixed
 
 # Test recursive project discovery
-./target/release/cipherscope fixtures/buck-nested --cbom-recursive
-./target/release/cipherscope fixtures/bazel-nested --cbom-recursive
-
-# Verify multiple CBOMs generated
-find fixtures/buck-nested -name "mv-cbom.json" | wc -l  # Should show 3
-find fixtures/bazel-nested -name "mv-cbom.json" | wc -l # Should show 4
+./target/release/cipherscope fixtures/buck-nested --recursive
+./target/release/cipherscope fixtures/bazel-nested --recursive
 ```
 
-Benchmark scan throughput on test fixtures:
+Benchmark performance:
 
 ```bash
+cargo test
 cargo bench
-```
-
-**Expected benchmark results** (on modern hardware):
-- **Throughput**: ~4.2 GiB/s content processing
-- **File discovery**: 150K-250K files/second  
-- **Memory efficient**: Batched processing prevents memory spikes
-
-**Real-world performance** (5M file Java codebase):
-- **Discovery phase**: 20-30 seconds (down from 90+ seconds)
-- **Processing phase**: Depends on file content and pattern complexity
-- **Progress accuracy**: Exact match with `find` command results
-
-To test progress reporting accuracy on your codebase:
-
-```bash
-# Count files that match your glob patterns
-find /path/to/code -name "*.java" | wc -l
-
-# Run cipherscope with same pattern - numbers should match
-./target/release/cipherscope /path/to/code --include-glob "*.java" --progress
 ```
 
 ### Contributing
