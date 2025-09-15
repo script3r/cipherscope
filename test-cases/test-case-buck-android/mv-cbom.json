@@ -1,0 +1,22 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:81ff24cf-73fd-4b74-b37f-7bd22b1f8505",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "name": "test-case-buck-android",
+      "path": "/workspace/test-cases/test-case-buck-android"
+    },
+    "timestamp": "2025-09-15T17:20:43.152237737Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [],
+  "dependencies": []
+}

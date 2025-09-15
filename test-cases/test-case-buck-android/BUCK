@@ -1,0 +1,36 @@
+android_library(
+    name = "crypto_lib",
+    srcs = glob(["src/main/java/**/*.java"]),
+    deps = [
+        ":bouncycastle",
+        ":conscrypt",
+    ],
+    visibility = ["PUBLIC"],
+)
+
+prebuilt_jar(
+    name = "bouncycastle",
+    binary_jar = "libs/bcprov-jdk15on-1.70.jar",
+)
+
+prebuilt_jar(
+    name = "conscrypt",
+    binary_jar = "libs/conscrypt-android-2.5.2.jar",
+)
+
+android_binary(
+    name = "crypto_app",
+    manifest = "AndroidManifest.xml",
+    deps = [
+        ":crypto_lib",
+    ],
+)
+
+java_test(
+    name = "crypto_test",
+    srcs = glob(["src/test/java/**/*.java"]),
+    deps = [
+        ":crypto_lib",
+        "//third-party/java/junit:junit",
+    ],
+)

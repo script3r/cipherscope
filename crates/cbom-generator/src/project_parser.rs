@@ -1,4 +1,4 @@
-//! Generic dependency parsing for multiple project types and languages
+//! Generic project parsing for multiple build systems and languages
 
 use anyhow::{Context, Result};
 use serde::Deserialize;
@@ -57,10 +57,12 @@ pub enum ProjectType {
     Makefile,   // Makefile, makefile
     CMake,      // CMakeLists.txt
     Podspec,    // *.podspec
+    Bazel,      // BUILD, BUILD.bazel, WORKSPACE
+    Buck,       // BUCK, .buckconfig
 }
 
-/// Generic dependency parser for multiple project types
-pub struct DependencyParser {
+/// Generic project parser for multiple build systems and languages
+pub struct ProjectParser {
     /// Known cryptographic packages/libraries by language
     crypto_packages: HashMap<ProjectLanguage, HashMap<String, CryptoPackageInfo>>,
 }
@@ -73,7 +75,7 @@ pub struct CryptoPackageInfo {
     pub description: String,
 }
 
-impl DependencyParser {
+impl ProjectParser {
     pub fn new() -> Self {
         let mut parser = Self {
             crypto_packages: HashMap::new(),
@@ -99,6 +101,8 @@ impl DependencyParser {
                 ProjectType::Makefile => self.parse_makefile_project(&file_path, scan_path),
                 ProjectType::CMake => self.parse_cmake_project(&file_path, scan_path),
                 ProjectType::Podspec => self.parse_podspec_project(&file_path),
+                ProjectType::Bazel => self.parse_bazel_project(&file_path, scan_path),
+                ProjectType::Buck => self.parse_buck_project(&file_path, scan_path),
             }
         } else {
             // Fallback: create minimal project info based on directory name
@@ -134,6 +138,11 @@ impl DependencyParser {
             ("Makefile", ProjectType::Makefile),
             ("makefile", ProjectType::Makefile),
             ("CMakeLists.txt", ProjectType::CMake),
+            ("WORKSPACE", ProjectType::Bazel),
+            ("BUILD", ProjectType::Bazel),
+            ("BUILD.bazel", ProjectType::Bazel),
+            ("BUCK", ProjectType::Buck),
+            (".buckconfig", ProjectType::Buck),
         ];
 
         for (filename, project_type) in candidates {
@@ -447,6 +456,209 @@ impl DependencyParser {
         }, Vec::new()))
     }
 
+    /// Parse Bazel project (BUILD, BUILD.bazel, WORKSPACE files)
+    fn parse_bazel_project(&self, bazel_path: &Path, scan_path: &Path) -> Result<(ProjectInfo, Vec<ProjectDependency>)> {
+        let content = fs::read_to_string(bazel_path)
+            .context("Failed to read Bazel file")?;
+
+        let project_name = scan_path.file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("bazel-project")
+            .to_string();
+
+        // Detect primary language based on file patterns and rules
+        let language = self.detect_bazel_language(&content, scan_path);
+
+        let project_info = ProjectInfo {
+            name: project_name,
+            version: None, // Bazel doesn't typically have project versions
+            language: language.clone(),
+            project_type: ProjectType::Bazel,
+        };
+
+        let mut dependencies = Vec::new();
+
+        // Parse common Bazel dependency patterns
+        self.parse_bazel_dependencies(&content, &language, &mut dependencies)?;
+
+        Ok((project_info, dependencies))
+    }
+
+    /// Parse BUCK project (BUCK, .buckconfig files)
+    fn parse_buck_project(&self, buck_path: &Path, scan_path: &Path) -> Result<(ProjectInfo, Vec<ProjectDependency>)> {
+        let content = fs::read_to_string(buck_path)
+            .context("Failed to read BUCK file")?;
+
+        let project_name = scan_path.file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("buck-project")
+            .to_string();
+
+        // Detect primary language based on BUCK rules
+        let language = self.detect_buck_language(&content, scan_path);
+
+        let project_info = ProjectInfo {
+            name: project_name,
+            version: None, // BUCK doesn't typically have project versions
+            language: language.clone(),
+            project_type: ProjectType::Buck,
+        };
+
+        let mut dependencies = Vec::new();
+
+        // Parse common BUCK dependency patterns
+        self.parse_buck_dependencies(&content, &language, &mut dependencies)?;
+
+        Ok((project_info, dependencies))
+    }
+
+    /// Detect the primary language in a Bazel project
+    fn detect_bazel_language(&self, content: &str, scan_path: &Path) -> ProjectLanguage {
+        // Check for language-specific rules in BUILD files
+        if content.contains("java_") || content.contains("kt_") {
+            return ProjectLanguage::Java;
+        }
+        if content.contains("cc_") || content.contains("cpp_") {
+            return ProjectLanguage::Cpp;
+        }
+        if content.contains("py_") || content.contains("python_") {
+            return ProjectLanguage::Python;
+        }
+        if content.contains("go_") || content.contains("golang_") {
+            return ProjectLanguage::Go;
+        }
+        if content.contains("rust_") {
+            return ProjectLanguage::Rust;
+        }
+        if content.contains("swift_") {
+            return ProjectLanguage::Swift;
+        }
+        if content.contains("js_") || content.contains("ts_") || content.contains("nodejs_") {
+            return ProjectLanguage::JavaScript;
+        }
+
+        // Fallback: scan directory for common file types
+        self.detect_language_from_files(scan_path)
+    }
+
+    /// Detect the primary language in a BUCK project
+    fn detect_buck_language(&self, content: &str, scan_path: &Path) -> ProjectLanguage {
+        // Check for language-specific rules in BUCK files
+        if content.contains("java_") || content.contains("android_") {
+            return ProjectLanguage::Java;
+        }
+        if content.contains("cxx_") || content.contains("cpp_") {
+            return ProjectLanguage::Cpp;
+        }
+        if content.contains("python_") {
+            return ProjectLanguage::Python;
+        }
+        if content.contains("go_") {
+            return ProjectLanguage::Go;
+        }
+        if content.contains("rust_") {
+            return ProjectLanguage::Rust;
+        }
+        if content.contains("swift_") {
+            return ProjectLanguage::Swift;
+        }
+
+        // Fallback: scan directory for common file types
+        self.detect_language_from_files(scan_path)
+    }
+
+    /// Detect language from files in the directory
+    fn detect_language_from_files(&self, scan_path: &Path) -> ProjectLanguage {
+        if let Ok(entries) = fs::read_dir(scan_path) {
+            let mut file_counts = HashMap::new();
+            
+            for entry in entries.flatten() {
+                if let Some(ext) = entry.path().extension().and_then(|e| e.to_str()) {
+                    let lang = match ext {
+                        "java" | "kt" => ProjectLanguage::Java,
+                        "cpp" | "cc" | "cxx" | "c" | "h" | "hpp" => ProjectLanguage::Cpp,
+                        "py" => ProjectLanguage::Python,
+                        "go" => ProjectLanguage::Go,
+                        "rs" => ProjectLanguage::Rust,
+                        "swift" => ProjectLanguage::Swift,
+                        "js" | "ts" => ProjectLanguage::JavaScript,
+                        "php" => ProjectLanguage::PHP,
+                        "rb" => ProjectLanguage::Ruby,
+                        _ => continue,
+                    };
+                    *file_counts.entry(lang).or_insert(0) += 1;
+                }
+            }
+            
+            // Return the most common language
+            if let Some((lang, _)) = file_counts.iter().max_by_key(|(_, count)| *count) {
+                return lang.clone();
+            }
+        }
+        
+        // Default fallback
+        ProjectLanguage::C
+    }
+
+    /// Parse Bazel dependencies from BUILD file content
+    fn parse_bazel_dependencies(&self, content: &str, language: &ProjectLanguage, dependencies: &mut Vec<ProjectDependency>) -> Result<()> {
+        // Parse deps = [...] patterns
+        let deps_re = Regex::new(r#"deps\s*=\s*\[\s*([^\]]+)\]"#).unwrap();
+        
+        for caps in deps_re.captures_iter(content) {
+            if let Some(deps_content) = caps.get(1) {
+                // Extract individual dependency strings
+                let dep_re = Regex::new(r#""([^"]+)""#).unwrap();
+                for dep_cap in dep_re.captures_iter(deps_content.as_str()) {
+                    if let Some(dep_name) = dep_cap.get(1) {
+                        let name = dep_name.as_str().to_string();
+                        dependencies.push(self.create_dependency(name, None, None, language.clone()));
+                    }
+                }
+            }
+        }
+
+        // Parse maven_jar and other external dependency patterns
+        let maven_re = Regex::new(r#"maven_jar\s*\(\s*name\s*=\s*"([^"]+)""#).unwrap();
+        for caps in maven_re.captures_iter(content) {
+            if let Some(name_match) = caps.get(1) {
+                let name = name_match.as_str().to_string();
+                dependencies.push(self.create_dependency(name, None, None, language.clone()));
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Parse BUCK dependencies from BUCK file content
+    fn parse_buck_dependencies(&self, content: &str, language: &ProjectLanguage, dependencies: &mut Vec<ProjectDependency>) -> Result<()> {
+        // Parse deps = [...] patterns (similar to Bazel)
+        let deps_re = Regex::new(r#"deps\s*=\s*\[\s*([^\]]+)\]"#).unwrap();
+        
+        for caps in deps_re.captures_iter(content) {
+            if let Some(deps_content) = caps.get(1) {
+                let dep_re = Regex::new(r#"['":]([^'"]+)['"]"#).unwrap();
+                for dep_cap in dep_re.captures_iter(deps_content.as_str()) {
+                    if let Some(dep_name) = dep_cap.get(1) {
+                        let name = dep_name.as_str().to_string();
+                        dependencies.push(self.create_dependency(name, None, None, language.clone()));
+                    }
+                }
+            }
+        }
+
+        // Parse prebuilt_jar and maven_jar patterns
+        let jar_re = Regex::new(r#"(?:prebuilt_jar|maven_jar)\s*\(\s*name\s*=\s*['""]([^'"]+)['""]"#).unwrap();
+        for caps in jar_re.captures_iter(content) {
+            if let Some(name_match) = caps.get(1) {
+                let name = name_match.as_str().to_string();
+                dependencies.push(self.create_dependency(name, None, None, language.clone()));
+            }
+        }
+
+        Ok(())
+    }
+
     /// Create a dependency with crypto detection
     fn create_dependency(&self, name: String, version: Option<String>, scope: Option<String>, language: ProjectLanguage) -> ProjectDependency {
         let is_crypto_related = self.is_crypto_package(&name, &language);
@@ -558,7 +770,7 @@ impl DependencyParser {
     }
 }
 
-impl Default for DependencyParser {
+impl Default for ProjectParser {
     fn default() -> Self {
         Self::new()
     }
@@ -587,8 +799,8 @@ mod tests {
     use std::io::Write;
 
     #[test]
-    fn test_dependency_parser_creation() {
-        let parser = DependencyParser::new();
+    fn test_project_parser_creation() {
+        let parser = ProjectParser::new();
         assert!(parser.is_crypto_package("rsa", &ProjectLanguage::Rust));
         assert!(parser.is_crypto_package("cryptography", &ProjectLanguage::Python));
         assert!(!parser.is_crypto_package("serde", &ProjectLanguage::Rust));
@@ -614,7 +826,7 @@ tokio = "1.0"
         
         std::fs::write(&cargo_path, cargo_content).unwrap();
         
-        let parser = DependencyParser::new();
+        let parser = ProjectParser::new();
         let (project_info, dependencies) = parser.parse_cargo_project(&cargo_path).unwrap();
         
         assert_eq!(project_info.name, "test-project");
@@ -640,7 +852,7 @@ pycryptodome~=3.10.0
         
         std::fs::write(&req_path, req_content).unwrap();
         
-        let parser = DependencyParser::new();
+        let parser = ProjectParser::new();
         let (project_info, dependencies) = parser.parse_requirements_project(&req_path, temp_dir.path()).unwrap();
         
         assert_eq!(project_info.language, ProjectLanguage::Python);

@@ -15,12 +15,12 @@ use uuid::Uuid;
 pub mod certificate_parser;
 pub mod dependency_analyzer;
 pub mod algorithm_detector;
-pub mod dependency_parser;
+pub mod project_parser;
 
 use certificate_parser::CertificateParser;
 use dependency_analyzer::DependencyAnalyzer;
 use algorithm_detector::AlgorithmDetector;
-use dependency_parser::DependencyParser;
+use project_parser::ProjectParser;
 
 /// The main MV-CBOM document structure
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -188,7 +188,7 @@ pub struct CbomGenerator {
     certificate_parser: CertificateParser,
     dependency_analyzer: DependencyAnalyzer,
     algorithm_detector: AlgorithmDetector,
-    dependency_parser: DependencyParser,
+    project_parser: ProjectParser,
 }
 
 impl CbomGenerator {
@@ -197,7 +197,7 @@ impl CbomGenerator {
             certificate_parser: CertificateParser::new(),
             dependency_analyzer: DependencyAnalyzer::new(),
             algorithm_detector: AlgorithmDetector::new(),
-            dependency_parser: DependencyParser::new(),
+            project_parser: ProjectParser::new(),
         }
     }
 
@@ -207,7 +207,7 @@ impl CbomGenerator {
             .with_context(|| format!("Failed to canonicalize path: {}", scan_path.display()))?;
 
         // Parse project information and dependencies from various project files
-        let (project_info, project_dependencies) = self.dependency_parser.parse_project(&scan_path)?;
+        let (project_info, project_dependencies) = self.project_parser.parse_project(&scan_path)?;
         
         // Create component info from parsed project information
         let component_info = ComponentInfo {

@@ -1,7 +1,7 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:1fbcb384-644c-4482-b3bd-ff9360117284",
+  "serialNumber": "urn:uuid:1eb7780b-c620-4533-af49-b6ecde6b532d",
   "version": 1,
   "metadata": {
     "component": {
@@ -9,7 +9,7 @@
       "version": "0.1.0",
       "path": "/workspace/test-cases/test-case-1-rsa-uses"
     },
-    "timestamp": "2025-09-15T17:13:03.045160581Z",
+    "timestamp": "2025-09-15T17:20:55.563520627Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -20,7 +20,7 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "d25b57d2-aeda-462e-9fc5-305de502cea9",
+      "bom-ref": "9401744e-ca4e-45fe-9914-c46a7d739120",
       "assetType": "algorithm",
       "name": "AES-256-GCM",
       "assetProperties": {
@@ -33,7 +33,7 @@
       }
     },
     {
-      "bom-ref": "32164b09-1f97-490b-8c2d-5b675f19cd64",
+      "bom-ref": "58f4da9a-a323-4fbf-887e-94689f8e67cf",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {
@@ -47,16 +47,16 @@
   ],
   "dependencies": [
     {
-      "ref": "71d908e5-bb5b-43cc-adc0-526172248d35",
+      "ref": "8184dc5d-d9ec-467c-8f47-42eb9d067718",
       "dependsOn": [
-        "d25b57d2-aeda-462e-9fc5-305de502cea9"
+        "9401744e-ca4e-45fe-9914-c46a7d739120"
       ],
       "dependencyType": "uses"
     },
     {
-      "ref": "71d908e5-bb5b-43cc-adc0-526172248d35",
+      "ref": "8184dc5d-d9ec-467c-8f47-42eb9d067718",
       "dependsOn": [
-        "32164b09-1f97-490b-8c2d-5b675f19cd64"
+        "58f4da9a-a323-4fbf-887e-94689f8e67cf"
       ],
       "dependencyType": "implements"
     }

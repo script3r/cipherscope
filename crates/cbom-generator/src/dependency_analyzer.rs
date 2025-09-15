@@ -7,7 +7,7 @@ use uuid::Uuid;
 
 use crate::{
     ComponentInfo, CryptoAsset, Dependency, DependencyType, AssetType,
-    dependency_parser::ProjectDependency,
+    project_parser::ProjectDependency,
 };
 
 /// Analyzer for determining dependency relationships between components and crypto assets

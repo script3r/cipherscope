@@ -1,0 +1,22 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:61b6b1a3-fa92-4a5a-b31c-16b8bf2e3dd6",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "name": "test-case-bazel-java",
+      "path": "/workspace/test-cases/test-case-bazel-java"
+    },
+    "timestamp": "2025-09-15T17:19:58.040508173Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [],
+  "dependencies": []
+}
