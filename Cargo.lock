@@ -205,7 +205,6 @@ dependencies = [
  "serde",
  "serde_json",
  "tempfile",
- "toml",
  "uuid",
  "walkdir",
  "x509-parser",

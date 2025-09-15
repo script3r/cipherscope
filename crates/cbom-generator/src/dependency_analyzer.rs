@@ -7,7 +7,6 @@ use uuid::Uuid;
 
 use crate::{
     ComponentInfo, CryptoAsset, Dependency, DependencyType, AssetType,
-    cargo_parser::CargoDependency,
 };
 
 /// Analyzer for determining dependency relationships between components and crypto assets
@@ -29,7 +28,6 @@ impl DependencyAnalyzer {
         _component_info: &ComponentInfo,
         algorithms: &[CryptoAsset],
         certificates: &[CryptoAsset],
-        cargo_dependencies: &[CargoDependency],
         findings: &[Finding],
     ) -> Result<Vec<Dependency>> {
         let mut dependencies = Vec::new();
@@ -46,28 +44,12 @@ impl DependencyAnalyzer {
         // Map findings to crypto assets to determine "uses" relationships
         let used_assets = self.map_findings_to_assets(findings, algorithms)?;
 
-        // Determine "implements" relationships from Cargo dependencies
-        let implemented_assets = self.map_cargo_deps_to_assets(cargo_dependencies, algorithms)?;
-
         // Create dependencies for "uses" relationships
         if !used_assets.is_empty() {
             dependencies.push(Dependency {
                 ref_: self.main_component_ref.clone(),
-                depends_on: used_assets.clone(),
+                depends_on: used_assets,
                 dependency_type: DependencyType::Uses,
-            });
-        }
-
-        // Create dependencies for "implements" relationships (excluding those already in "uses")
-        let implements_only: Vec<String> = implemented_assets.into_iter()
-            .filter(|asset_ref| !used_assets.contains(asset_ref))
-            .collect();
-
-        if !implements_only.is_empty() {
-            dependencies.push(Dependency {
-                ref_: self.main_component_ref.clone(),
-                depends_on: implements_only,
-                dependency_type: DependencyType::Implements,
             });
         }
 
@@ -118,33 +100,6 @@ impl DependencyAnalyzer {
         Ok(used_assets)
     }
 
-    /// Map Cargo dependencies to crypto asset references
-    fn map_cargo_deps_to_assets(&self, cargo_deps: &[CargoDependency], algorithms: &[CryptoAsset]) -> Result<Vec<String>> {
-        let mut implemented_assets = Vec::new();
-        let mut seen_assets = HashSet::new();
-
-        // Create a mapping from crate names to potential algorithms
-        let crate_to_algorithms = self.build_crate_algorithm_mapping();
-
-        for cargo_dep in cargo_deps {
-            if cargo_dep.is_crypto_related {
-                if let Some(algo_names) = crate_to_algorithms.get(&cargo_dep.name) {
-                    for algo_name in algo_names {
-                        // Find the corresponding asset
-                        if let Some(asset) = algorithms.iter().find(|a| {
-                            a.name.as_ref().map_or(false, |n| n.contains(algo_name))
-                        }) {
-                            if seen_assets.insert(asset.bom_ref.clone()) {
-                                implemented_assets.push(asset.bom_ref.clone());
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        Ok(implemented_assets)
-    }
 
     /// Create dependencies from certificates to their signature algorithms
     fn create_certificate_dependencies(&self, certificate: &CryptoAsset, algorithms: &[CryptoAsset]) -> Result<Option<Vec<Dependency>>> {
@@ -258,61 +213,6 @@ impl DependencyAnalyzer {
         algorithms
     }
 
-    /// Build a mapping from crate names to the algorithms they potentially implement
-    fn build_crate_algorithm_mapping(&self) -> HashMap<String, Vec<String>> {
-        let mut mapping = HashMap::new();
-
-        // RSA crates
-        mapping.insert("rsa".to_string(), vec!["RSA".to_string()]);
-
-        // ECC crates
-        mapping.insert("p256".to_string(), vec!["ECDSA".to_string(), "ECDH".to_string()]);
-        mapping.insert("p384".to_string(), vec!["ECDSA".to_string(), "ECDH".to_string()]);
-        mapping.insert("k256".to_string(), vec!["ECDSA".to_string()]);
-
-        // Ed25519/Curve25519
-        mapping.insert("ed25519-dalek".to_string(), vec!["Ed25519".to_string()]);
-        mapping.insert("curve25519-dalek".to_string(), vec!["X25519".to_string(), "Ed25519".to_string()]);
-
-        // Symmetric crypto
-        mapping.insert("aes".to_string(), vec!["AES-128".to_string(), "AES-192".to_string(), "AES-256".to_string()]);
-        mapping.insert("aes-gcm".to_string(), vec!["AES-128-GCM".to_string(), "AES-192-GCM".to_string(), "AES-256-GCM".to_string()]);
-        mapping.insert("chacha20".to_string(), vec!["ChaCha20".to_string()]);
-        mapping.insert("chacha20poly1305".to_string(), vec!["ChaCha20Poly1305".to_string()]);
-
-        // Hash functions
-        mapping.insert("sha2".to_string(), vec!["SHA-256".to_string(), "SHA-384".to_string(), "SHA-512".to_string()]);
-        mapping.insert("sha3".to_string(), vec!["SHA-3".to_string()]);
-        mapping.insert("blake2".to_string(), vec!["BLAKE2".to_string()]);
-        mapping.insert("blake3".to_string(), vec!["BLAKE3".to_string()]);
-
-        // High-level libraries
-        mapping.insert("ring".to_string(), vec![
-            "RSA".to_string(),
-            "ECDSA".to_string(),
-            "AES-256-GCM".to_string(),
-            "ChaCha20Poly1305".to_string(),
-            "SHA-256".to_string(),
-            "SHA-384".to_string(),
-            "SHA-512".to_string(),
-        ]);
-
-        mapping.insert("openssl".to_string(), vec![
-            "RSA".to_string(),
-            "ECDSA".to_string(),
-            "AES-256".to_string(),
-            "SHA-256".to_string(),
-            "SHA-384".to_string(),
-            "SHA-512".to_string(),
-        ]);
-
-        // Password hashing
-        mapping.insert("argon2".to_string(), vec!["Argon2".to_string()]);
-        mapping.insert("scrypt".to_string(), vec!["scrypt".to_string()]);
-        mapping.insert("bcrypt".to_string(), vec!["bcrypt".to_string()]);
-
-        mapping
-    }
 
     /// Get the main component bom-ref
     pub fn get_main_component_ref(&self) -> &str {
@@ -358,19 +258,7 @@ mod tests {
     }
 
     #[test]
-    fn test_crate_algorithm_mapping() {
-        let analyzer = DependencyAnalyzer::new();
-        let mapping = analyzer.build_crate_algorithm_mapping();
-        
-        assert!(mapping.contains_key("rsa"));
-        assert!(mapping.get("rsa").unwrap().contains(&"RSA".to_string()));
-        
-        assert!(mapping.contains_key("aes-gcm"));
-        assert!(mapping.get("aes-gcm").unwrap().contains(&"AES-256-GCM".to_string()));
-    }
-
-    #[test]
-    fn test_dependency_type_distinction() {
+    fn test_algorithm_extraction_from_finding() {
         let analyzer = DependencyAnalyzer::new();
         
         // Create a mock finding that would indicate "uses"
@@ -384,18 +272,8 @@ mod tests {
             detector_id: "detector-rust".to_string(),
         };
 
-        // Create a mock cargo dependency that would indicate "implements"
-        let cargo_dep = CargoDependency {
-            name: "rsa".to_string(),
-            version: Some("0.9.0".to_string()),
-            features: vec![],
-            is_crypto_related: true,
-        };
-
-        // The distinction should be that AES is "used" (found in code)
-        // while RSA is "implemented" (in Cargo.toml but not directly used)
+        // Test that AES is extracted from the finding
         let used_algos = analyzer.extract_algorithms_from_finding(&finding);
         assert!(used_algos.contains(&"AES-256-GCM".to_string()));
-        assert!(!used_algos.contains(&"RSA".to_string()));
     }
 }
