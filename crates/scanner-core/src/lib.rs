@@ -781,81 +781,79 @@ impl<'a> Scanner<'a> {
             true
         };
 
-        for root in roots {
-            // Fallback: parallel directory walk with ignore rules
-            let mut builder = WalkBuilder::new(root);
-            builder
-                .hidden(false) // preserve previous behavior: include hidden files/dirs
-                .git_ignore(true)
-                .git_exclude(true)
-                .ignore(true)
-                .parents(true)
-                .follow_links(false)
-                .same_file_system(false);
-
-            if let Ok(n) = std::thread::available_parallelism() {
-                builder.threads(n.get());
-            }
-
-            let out: Arc<Mutex<Vec<PathBuf>>> = Arc::new(Mutex::new(Vec::with_capacity(4096)));
-            let out_ref = out.clone();
-
-            builder.build_parallel().run(|| {
-                let out = out_ref.clone();
-                Box::new(move |res| {
-                    let entry = match res {
-                        Ok(e) => e,
-                        Err(_) => return ignore::WalkState::Continue,
-                    };
-
-                    // Quickly skip non-files using cheap file_type when available
-                    if let Some(ft) = entry.file_type() {
-                        if !ft.is_file() {
-                            return ignore::WalkState::Continue;
-                        }
-                    } else {
-                        // Fallback to metadata if file_type unavailable
-                        if let Ok(md) = entry.metadata() {
-                            if !md.is_file() {
-                                return ignore::WalkState::Continue;
-                            }
-                        } else {
-                            return ignore::WalkState::Continue;
-                        }
-                    }
-
-                    let path = entry.into_path();
-
-                    // Apply path-based filters first to avoid unnecessary metadata calls
-                    if !path_allowed(&path) {
-                        return ignore::WalkState::Continue;
-                    }
-
-                    // Size filter
-                    if let Ok(md) = fs::metadata(&path) {
-                        if (md.len() as usize) > self.config.max_file_size {
-                            return ignore::WalkState::Continue;
-                        }
-                    } else {
-                        return ignore::WalkState::Continue;
-                    }
-
-                    if let Ok(mut guard) = out.lock() {
-                        guard.push(path);
-                    }
-
-                    ignore::WalkState::Continue
-                })
-            });
-
-            let drained: Vec<PathBuf> = {
-                match out.lock() {
-                    Ok(mut guard) => guard.drain(..).collect(),
-                    Err(_) => Vec::new(),
-                }
-            };
-            discovered_paths.extend(drained);
+        if roots.is_empty() {
+            return discovered_paths;
         }
+
+        // Single parallel walker over all roots
+        let mut builder = WalkBuilder::new(&roots[0]);
+        for r in roots.iter().skip(1) {
+            builder.add(r);
+        }
+        builder
+            .hidden(false)
+            .git_ignore(true)
+            .git_exclude(true)
+            .ignore(true)
+            .parents(true)
+            .follow_links(false)
+            .same_file_system(false);
+
+        if let Ok(n) = std::thread::available_parallelism() {
+            builder.threads(n.get());
+        }
+
+        let out: Arc<Mutex<Vec<PathBuf>>> = Arc::new(Mutex::new(Vec::with_capacity(4096)));
+        let out_ref = out.clone();
+
+        builder.build_parallel().run(|| {
+            let out = out_ref.clone();
+            Box::new(move |res| {
+                let entry = match res {
+                    Ok(e) => e,
+                    Err(_) => return ignore::WalkState::Continue,
+                };
+
+                if let Some(ft) = entry.file_type() {
+                    if !ft.is_file() {
+                        return ignore::WalkState::Continue;
+                    }
+                } else if let Ok(md) = entry.metadata() {
+                    if !md.is_file() {
+                        return ignore::WalkState::Continue;
+                    }
+                } else {
+                    return ignore::WalkState::Continue;
+                }
+
+                let path = entry.into_path();
+                if !path_allowed(&path) {
+                    return ignore::WalkState::Continue;
+                }
+
+                if let Ok(md) = fs::metadata(&path) {
+                    if (md.len() as usize) > self.config.max_file_size {
+                        return ignore::WalkState::Continue;
+                    }
+                } else {
+                    return ignore::WalkState::Continue;
+                }
+
+                if let Ok(mut guard) = out.lock() {
+                    guard.push(path);
+                }
+
+                ignore::WalkState::Continue
+            })
+        });
+
+        let drained: Vec<PathBuf> = {
+            match out.lock() {
+                Ok(mut guard) => guard.drain(..).collect(),
+                Err(_) => Vec::new(),
+            }
+        };
+        discovered_paths.extend(drained);
         discovered_paths
     }
 
@@ -972,112 +970,120 @@ impl<'a> Scanner<'a> {
             true
         };
 
-        for root in roots {
-            let mut builder = WalkBuilder::new(root);
-            builder
-                .hidden(false)
-                .git_ignore(true)
-                .git_exclude(true)
-                .ignore(true)
-                .parents(true)
-                .follow_links(false)
-                .same_file_system(false);
-
-            if let Ok(n) = std::thread::available_parallelism() {
-                builder.threads(n.get());
-            }
-
-            let tx_ref = tx.clone();
-            let result_cb = self.config.result_callback.clone();
-            let detectors = &self.detectors;
-            let max_file_size = self.config.max_file_size;
-            let processed_ref = processed.clone();
-            let discovered_ref = discovered.clone();
-            let findings_cnt_ref = findings_cnt.clone();
-            let progress_cb_inner = self.config.progress_callback.clone();
-
-            builder.build_parallel().run(|| {
-                let tx = tx_ref.clone();
-                let result_cb = result_cb.clone();
-                let progress_cb_inner = progress_cb_inner.clone();
-                let processed_ref2 = processed_ref.clone();
-                let discovered_ref2 = discovered_ref.clone();
-                let findings_cnt_ref2 = findings_cnt_ref.clone();
-                Box::new(move |res| {
-                    let entry = match res {
-                        Ok(e) => e,
-                        Err(_) => return ignore::WalkState::Continue,
-                    };
-
-                    if let Some(ft) = entry.file_type() {
-                        if !ft.is_file() {
-                            return ignore::WalkState::Continue;
-                        }
-                    } else if let Ok(md) = entry.metadata() {
-                        if !md.is_file() {
-                            return ignore::WalkState::Continue;
-                        }
-                    } else {
-                        return ignore::WalkState::Continue;
-                    }
-
-                    let path = entry.into_path();
-                    if !path_allowed(&path) {
-                        return ignore::WalkState::Continue;
-                    }
-
-                    // Count as discovered candidate
-                    discovered_ref2.fetch_add(1, Ordering::Relaxed);
-
-                    // Size check
-                    if let Ok(md) = fs::metadata(&path) {
-                        if (md.len() as usize) > max_file_size {
-                            return ignore::WalkState::Continue;
-                        }
-                    } else {
-                        return ignore::WalkState::Continue;
-                    }
-
-                    if let Some(lang) = Scanner::detect_language(&path) {
-                        if let Ok(bytes) = Scanner::load_file(&path) {
-                            let unit = ScanUnit {
-                                path: path.clone(),
-                                lang,
-                                bytes: bytes.clone(),
-                            };
-                            let stripped = strip_comments(lang, &bytes);
-                            let stripped_s = String::from_utf8_lossy(&stripped);
-                            let index = LineIndex::new(stripped_s.as_bytes());
-
-                            // Create a minimal emitter that streams results via callback and sends to collector
-                            let (_dtx, dummy_rx) = bounded(0);
-                            let mut em = Emitter { tx: tx.clone(), rx: dummy_rx, on_result: result_cb.clone() };
-                            for det in detectors {
-                                if !det.languages().contains(&lang) {
-                                    continue;
-                                }
-                                if !prefilter_hit(det.as_ref(), &stripped) {
-                                    continue;
-                                }
-                                let _ = det.scan_optimized(&unit, &stripped_s, &index, &mut em);
-                            }
-                        }
-                    }
-
-                    // Mark processed and update progress
-                    let new_proc = processed_ref2.fetch_add(1, Ordering::Relaxed) + 1;
-                    if let Some(ref cb) = progress_cb_inner {
-                        cb(
-                            new_proc,
-                            discovered_ref2.load(Ordering::Relaxed),
-                            findings_cnt_ref2.load(Ordering::Relaxed),
-                        );
-                    }
-
-                    ignore::WalkState::Continue
-                })
-            });
+        if roots.is_empty() {
+            drop(tx);
+            let _ = collector.join();
+            return Ok(findings_vec.lock().unwrap().clone());
         }
+
+        // Single parallel walker over all roots
+        let mut builder = WalkBuilder::new(&roots[0]);
+        for r in roots.iter().skip(1) {
+            builder.add(r);
+        }
+        builder
+            .hidden(false)
+            .git_ignore(true)
+            .git_exclude(true)
+            .ignore(true)
+            .parents(true)
+            .follow_links(false)
+            .same_file_system(false);
+
+        if let Ok(n) = std::thread::available_parallelism() {
+            builder.threads(n.get());
+        }
+
+        let tx_ref = tx.clone();
+        let result_cb = self.config.result_callback.clone();
+        let detectors = &self.detectors;
+        let max_file_size = self.config.max_file_size;
+        let processed_ref = processed.clone();
+        let discovered_ref = discovered.clone();
+        let findings_cnt_ref = findings_cnt.clone();
+        let progress_cb_inner = self.config.progress_callback.clone();
+
+        builder.build_parallel().run(|| {
+            let tx = tx_ref.clone();
+            let result_cb = result_cb.clone();
+            let progress_cb_inner = progress_cb_inner.clone();
+            let processed_ref2 = processed_ref.clone();
+            let discovered_ref2 = discovered_ref.clone();
+            let findings_cnt_ref2 = findings_cnt_ref.clone();
+            Box::new(move |res| {
+                let entry = match res {
+                    Ok(e) => e,
+                    Err(_) => return ignore::WalkState::Continue,
+                };
+
+                if let Some(ft) = entry.file_type() {
+                    if !ft.is_file() {
+                        return ignore::WalkState::Continue;
+                    }
+                } else if let Ok(md) = entry.metadata() {
+                    if !md.is_file() {
+                        return ignore::WalkState::Continue;
+                    }
+                } else {
+                    return ignore::WalkState::Continue;
+                }
+
+                let path = entry.into_path();
+                if !path_allowed(&path) {
+                    return ignore::WalkState::Continue;
+                }
+
+                // Count as discovered candidate
+                discovered_ref2.fetch_add(1, Ordering::Relaxed);
+
+                // Size check
+                if let Ok(md) = fs::metadata(&path) {
+                    if (md.len() as usize) > max_file_size {
+                        return ignore::WalkState::Continue;
+                    }
+                } else {
+                    return ignore::WalkState::Continue;
+                }
+
+                if let Some(lang) = Scanner::detect_language(&path) {
+                    if let Ok(bytes) = Scanner::load_file(&path) {
+                        let unit = ScanUnit {
+                            path: path.clone(),
+                            lang,
+                            bytes: bytes.clone(),
+                        };
+                        let stripped = strip_comments(lang, &bytes);
+                        let stripped_s = String::from_utf8_lossy(&stripped);
+                        let index = LineIndex::new(stripped_s.as_bytes());
+
+                        // Create a minimal emitter that streams results via callback and sends to collector
+                        let (_dtx, dummy_rx) = bounded(0);
+                        let mut em = Emitter { tx: tx.clone(), rx: dummy_rx, on_result: result_cb.clone() };
+                        for det in detectors {
+                            if !det.languages().contains(&lang) {
+                                continue;
+                            }
+                            if !prefilter_hit(det.as_ref(), &stripped) {
+                                continue;
+                            }
+                            let _ = det.scan_optimized(&unit, &stripped_s, &index, &mut em);
+                        }
+                    }
+                }
+
+                // Mark processed and update progress
+                let new_proc = processed_ref2.fetch_add(1, Ordering::Relaxed) + 1;
+                if let Some(ref cb) = progress_cb_inner {
+                    cb(
+                        new_proc,
+                        discovered_ref2.load(Ordering::Relaxed),
+                        findings_cnt_ref2.load(Ordering::Relaxed),
+                    );
+                }
+
+                ignore::WalkState::Continue
+            })
+        });
 
         drop(tx);
         let _ = collector.join();
