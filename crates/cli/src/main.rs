@@ -155,7 +155,7 @@ fn main() -> Result<()> {
             ProgressStyle::default_bar()
                 .template("{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} files ({percent}%) | {msg}")
                 .unwrap()
-                .progress_chars("#>-"),
+                .progress_chars("#>-")
         );
         pb.set_message("Scanning files...");
 
@@ -163,6 +163,22 @@ fn main() -> Result<()> {
             pb.set_length(total as u64);
             pb.set_position(processed as u64);
             pb.set_message(format!("Found {} findings", findings));
+        }));
+    }
+
+    // Stream JSONL findings as they arrive
+    if args.json {
+        let stdout = std::io::stdout();
+        let lock = stdout.lock();
+        let write = std::sync::Mutex::new(lock);
+        cfg.result_callback = Some(Arc::new(move |f: &Finding| {
+            if let Ok(s) = serde_json::to_string(f) {
+                if let Ok(mut guard) = write.lock() {
+                    use std::io::Write;
+                    let _ = guard.write_all(s.as_bytes());
+                    let _ = guard.write_all(b"\n");
+                }
+            }
         }));
     }
 
@@ -183,9 +199,7 @@ fn main() -> Result<()> {
     }
 
     if args.json {
-        for f in &findings {
-            println!("{}", serde_json::to_string(f)?);
-        }
+        // Already streamed above
     } else {
         print_table(&findings);
     }

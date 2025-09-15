@@ -11,7 +11,7 @@ use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::sync::Mutex;
-use std::process::Command;
+// use std::process::Command; // removed: no git fast path
 
 // ---------------- Types ----------------
 
@@ -113,15 +113,19 @@ pub trait Detector: Send + Sync {
 pub struct Emitter {
     tx: Sender<Finding>,
     rx: Receiver<Finding>,
+    on_result: Option<Arc<dyn Fn(&Finding) + Send + Sync>>,
 }
 
 impl Emitter {
     pub fn new(bound: usize) -> Self {
         let (tx, rx) = bounded(bound);
-        Self { tx, rx }
+        Self { tx, rx, on_result: None }
     }
 
     pub fn send(&mut self, finding: Finding) -> Result<()> {
+        if let Some(ref cb) = self.on_result {
+            cb(&finding);
+        }
         self.tx
             .send(finding)
             .map_err(|e| anyhow!("emitter send failed: {e}"))
@@ -183,6 +187,8 @@ pub struct Config {
     pub deterministic: bool,
     #[serde(skip)]
     pub progress_callback: Option<ProgressCallback>,
+    #[serde(skip)]
+    pub result_callback: Option<Arc<dyn Fn(&Finding) + Send + Sync>>,
 }
 
 fn default_max_file_size() -> usize {
@@ -209,6 +215,7 @@ impl Clone for Config {
             exclude_globs: self.exclude_globs.clone(),
             deterministic: self.deterministic,
             progress_callback: self.progress_callback.clone(),
+            result_callback: self.result_callback.clone(),
         }
     }
 }
@@ -221,6 +228,7 @@ impl Default for Config {
             exclude_globs: Vec::new(),
             deterministic: false,
             progress_callback: None,
+            result_callback: None,
         }
     }
 }
@@ -771,25 +779,6 @@ impl<'a> Scanner<'a> {
         };
 
         for root in roots {
-            // Fast path: leverage git index if available
-            if root.join(".git").exists() {
-                if let Some(list) = git_list_files_fast(root) {
-                    for path in list {
-                        if !path_allowed(&path) {
-                            continue;
-                        }
-                        // Only then stat for size
-                        if let Ok(md) = fs::metadata(&path) {
-                            if md.is_file() && (md.len() as usize) <= self.config.max_file_size {
-                                discovered_paths.push(path);
-                            }
-                        }
-                    }
-                    // Move on to next root after using the git fast path
-                    continue;
-                }
-            }
-
             // Fallback: parallel directory walk with ignore rules
             let mut builder = WalkBuilder::new(root);
             builder
@@ -897,86 +886,193 @@ impl<'a> Scanner<'a> {
     }
 
     pub fn run(&self, roots: &[PathBuf]) -> Result<Vec<Finding>> {
-        let files = self.discover_files(roots);
-        let total_files = files.len();
-        let mut findings: Vec<Finding> = Vec::new();
+        use std::sync::atomic::{AtomicUsize, Ordering};
 
-        // Call progress callback with initial state
-        if let Some(ref callback) = self.config.progress_callback {
-            callback(0, total_files, 0);
+        let findings_vec: Arc<Mutex<Vec<Finding>>> = Arc::new(Mutex::new(Vec::new()));
+        let processed = Arc::new(AtomicUsize::new(0));
+        let discovered = Arc::new(AtomicUsize::new(0));
+        let findings_cnt = Arc::new(AtomicUsize::new(0));
+
+        // Initial progress callback (0 of 0)
+        if let Some(ref cb) = self.config.progress_callback {
+            cb(0, 0, 0);
         }
 
         let (tx, rx) = bounded::<Finding>(8192);
-        let (progress_tx, progress_rx) = bounded::<usize>(1000);
 
-        // Spawn a thread to collect progress updates
-        let progress_handle = if let Some(ref callback) = self.config.progress_callback {
-            let callback = callback.clone();
-            Some(std::thread::spawn(move || {
-                let mut processed = 0;
-                let findings_count = 0;
-
-                while progress_rx.recv().is_ok() {
-                    processed += 1;
-                    callback(processed, total_files, findings_count);
+        // Collector thread to drain findings as they arrive and keep count
+        let findings_vec_ref = findings_vec.clone();
+        let findings_cnt_ref = findings_cnt.clone();
+        let progress_cb = self.config.progress_callback.clone();
+        let processed_ref = processed.clone();
+        let discovered_ref = discovered.clone();
+        let collector = std::thread::spawn(move || {
+            for f in rx.iter() {
+                if let Ok(mut guard) = findings_vec_ref.lock() {
+                    guard.push(f);
                 }
-            }))
+                let new_cnt = findings_cnt_ref.fetch_add(1, Ordering::Relaxed) + 1;
+                if let Some(cb) = &progress_cb {
+                    cb(
+                        processed_ref.load(Ordering::Relaxed),
+                        discovered_ref.load(Ordering::Relaxed),
+                        new_cnt,
+                    );
+                }
+            }
+        });
+
+        // Prepare include/exclude matchers for filtering
+        let include_matcher: Option<globset::GlobSet> = if !self.config.include_globs.is_empty() {
+            let mut builder = globset::GlobSetBuilder::new();
+            for pattern in &self.config.include_globs {
+                if let Ok(glob) = globset::Glob::new(pattern) {
+                    builder.add(glob);
+                } else {
+                    return Ok(Vec::new());
+                }
+            }
+            builder.build().ok()
         } else {
             None
         };
 
-        files.par_iter().for_each_with(
-            (tx.clone(), progress_tx.clone()),
-            |(tx, progress_tx), path| {
-                if let Some(lang) = Self::detect_language(path) {
-                    if let Ok(bytes) = Self::load_file(path) {
-                        let unit = ScanUnit {
-                            path: path.clone(),
-                            lang,
-                            bytes: bytes.clone(),
-                        };
-                        // Strip comments once and reuse
-                        let stripped = strip_comments(lang, &bytes);
-                        let stripped_s = String::from_utf8_lossy(&stripped);
-                        let index = LineIndex::new(stripped_s.as_bytes());
+        let exclude_matcher: Option<globset::GlobSet> = if !self.config.exclude_globs.is_empty() {
+            let mut builder = globset::GlobSetBuilder::new();
+            for pattern in &self.config.exclude_globs {
+                if let Ok(glob) = globset::Glob::new(pattern) {
+                    builder.add(glob);
+                } else {
+                    return Ok(Vec::new());
+                }
+            }
+            builder.build().ok()
+        } else {
+            None
+        };
 
-                        let mut em = Emitter {
-                            tx: tx.clone(),
-                            rx: rx.clone(),
-                        };
-                        for det in &self.detectors {
-                            if !det.languages().contains(&lang) {
-                                continue;
+        let path_allowed = |p: &Path| -> bool {
+            if let Some(ref ex) = exclude_matcher {
+                if ex.is_match(p) {
+                    return false;
+                }
+            }
+            if let Some(ref inc) = include_matcher {
+                if !inc.is_match(p) {
+                    return false;
+                }
+            }
+            true
+        };
+
+        for root in roots {
+            let mut builder = WalkBuilder::new(root);
+            builder
+                .hidden(false)
+                .git_ignore(true)
+                .git_exclude(true)
+                .ignore(true)
+                .parents(true)
+                .follow_links(false)
+                .same_file_system(false);
+
+            if let Ok(n) = std::thread::available_parallelism() {
+                builder.threads(n.get());
+            }
+
+            let tx_ref = tx.clone();
+            let result_cb = self.config.result_callback.clone();
+            let detectors = &self.detectors;
+            let max_file_size = self.config.max_file_size;
+            let processed_ref = processed.clone();
+            let discovered_ref = discovered.clone();
+            let findings_cnt_ref = findings_cnt.clone();
+            let progress_cb_inner = self.config.progress_callback.clone();
+
+            builder.build_parallel().run(|| {
+                let tx = tx_ref.clone();
+                let result_cb = result_cb.clone();
+                let progress_cb_inner = progress_cb_inner.clone();
+                Box::new(move |res| {
+                    let entry = match res {
+                        Ok(e) => e,
+                        Err(_) => return ignore::WalkState::Continue,
+                    };
+
+                    if let Some(ft) = entry.file_type() {
+                        if !ft.is_file() {
+                            return ignore::WalkState::Continue;
+                        }
+                    } else if let Ok(md) = entry.metadata() {
+                        if !md.is_file() {
+                            return ignore::WalkState::Continue;
+                        }
+                    } else {
+                        return ignore::WalkState::Continue;
+                    }
+
+                    let path = entry.into_path();
+                    if !path_allowed(&path) {
+                        return ignore::WalkState::Continue;
+                    }
+
+                    // Count as discovered candidate
+                    discovered_ref.fetch_add(1, Ordering::Relaxed);
+
+                    // Size check
+                    if let Ok(md) = fs::metadata(&path) {
+                        if (md.len() as usize) > max_file_size {
+                            return ignore::WalkState::Continue;
+                        }
+                    } else {
+                        return ignore::WalkState::Continue;
+                    }
+
+                    if let Some(lang) = Scanner::detect_language(&path) {
+                        if let Ok(bytes) = Scanner::load_file(&path) {
+                            let unit = ScanUnit {
+                                path: path.clone(),
+                                lang,
+                                bytes: bytes.clone(),
+                            };
+                            let stripped = strip_comments(lang, &bytes);
+                            let stripped_s = String::from_utf8_lossy(&stripped);
+                            let index = LineIndex::new(stripped_s.as_bytes());
+
+                            // Create a minimal emitter that streams results via callback and sends to collector
+                            let (_dtx, dummy_rx) = bounded(0);
+                            let mut em = Emitter { tx: tx.clone(), rx: dummy_rx, on_result: result_cb.clone() };
+                            for det in detectors {
+                                if !det.languages().contains(&lang) {
+                                    continue;
+                                }
+                                if !prefilter_hit(det.as_ref(), &stripped) {
+                                    continue;
+                                }
+                                let _ = det.scan_optimized(&unit, &stripped_s, &index, &mut em);
                             }
-                            if !prefilter_hit(det.as_ref(), &stripped) {
-                                continue;
-                            }
-                            let _ = det.scan_optimized(&unit, &stripped_s, &index, &mut em);
                         }
                     }
-                }
-                // Signal that this file has been processed
-                let _ = progress_tx.send(1);
-            },
-        );
+
+                    // Mark processed and update progress
+                    let new_proc = processed_ref.fetch_add(1, Ordering::Relaxed) + 1;
+                    if let Some(ref cb) = progress_cb_inner {
+                        cb(
+                            new_proc,
+                            discovered_ref.load(Ordering::Relaxed),
+                            findings_cnt_ref.load(Ordering::Relaxed),
+                        );
+                    }
+
+                    ignore::WalkState::Continue
+                })
+            });
+        }
 
         drop(tx);
-        drop(progress_tx);
+        let _ = collector.join();
 
-        for f in rx.iter() {
-            findings.push(f);
-        }
-
-        // Wait for progress thread to finish
-        if let Some(handle) = progress_handle {
-            let _ = handle.join();
-        }
-
-        // Final progress update
-        if let Some(ref callback) = self.config.progress_callback {
-            callback(total_files, total_files, findings.len());
-        }
-
+        let mut findings = findings_vec.lock().unwrap().clone();
         if self.config.deterministic {
             findings.sort_by(|a, b| {
                 (
@@ -994,6 +1090,15 @@ impl<'a> Scanner<'a> {
                         &b.symbol,
                     ))
             });
+        }
+
+        // Final progress update
+        if let Some(ref cb) = self.config.progress_callback {
+            cb(
+                processed.load(Ordering::Relaxed),
+                discovered.load(Ordering::Relaxed),
+                findings_cnt.load(Ordering::Relaxed),
+            );
         }
 
         Ok(findings)
