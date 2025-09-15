@@ -11,6 +11,7 @@ use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::sync::Mutex;
+use std::process::Command;
 
 // ---------------- Types ----------------
 
@@ -722,19 +723,17 @@ impl<'a> Scanner<'a> {
     }
 
     pub fn discover_files(&self, roots: &[PathBuf]) -> Vec<PathBuf> {
-        let mut paths = Vec::new();
+        let mut discovered_paths = Vec::new();
 
-        // Build glob matcher for include patterns
+        // Compile include and exclude glob sets once
         let include_matcher: Option<globset::GlobSet> = if !self.config.include_globs.is_empty() {
             let mut builder = globset::GlobSetBuilder::new();
             for pattern in &self.config.include_globs {
-                match globset::Glob::new(pattern) {
-                    Ok(glob) => {
-                        builder.add(glob);
-                    }
-                    Err(_) => {
-                        return Vec::new(); // Return empty on pattern error
-                    }
+                if let Ok(glob) = globset::Glob::new(pattern) {
+                    builder.add(glob);
+                } else {
+                    // If any pattern is invalid, return empty to avoid expensive scan with bad filter
+                    return Vec::new();
                 }
             }
             builder.build().ok()
@@ -742,38 +741,126 @@ impl<'a> Scanner<'a> {
             None
         };
 
+        let exclude_matcher: Option<globset::GlobSet> = if !self.config.exclude_globs.is_empty() {
+            let mut builder = globset::GlobSetBuilder::new();
+            for pattern in &self.config.exclude_globs {
+                if let Ok(glob) = globset::Glob::new(pattern) {
+                    builder.add(glob);
+                } else {
+                    return Vec::new();
+                }
+            }
+            builder.build().ok()
+        } else {
+            None
+        };
+
+        // Helper to apply path-based filters early (before metadata calls when possible)
+        let path_allowed = |p: &Path| -> bool {
+            if let Some(ref ex) = exclude_matcher {
+                if ex.is_match(p) {
+                    return false;
+                }
+            }
+            if let Some(ref inc) = include_matcher {
+                if !inc.is_match(p) {
+                    return false;
+                }
+            }
+            true
+        };
+
         for root in roots {
+            // Fast path: leverage git index if available
+            if root.join(".git").exists() {
+                if let Some(list) = git_list_files_fast(root) {
+                    for path in list {
+                        if !path_allowed(&path) {
+                            continue;
+                        }
+                        // Only then stat for size
+                        if let Ok(md) = fs::metadata(&path) {
+                            if md.is_file() && (md.len() as usize) <= self.config.max_file_size {
+                                discovered_paths.push(path);
+                            }
+                        }
+                    }
+                    // Move on to next root after using the git fast path
+                    continue;
+                }
+            }
+
+            // Fallback: parallel directory walk with ignore rules
             let mut builder = WalkBuilder::new(root);
             builder
-                .hidden(false)
+                .hidden(false) // preserve previous behavior: include hidden files/dirs
                 .git_ignore(true)
                 .git_exclude(true)
-                .ignore(true);
+                .ignore(true)
+                .parents(true)
+                .follow_links(false)
+                .same_file_system(false);
 
-            for entry in builder.build().flatten() {
-                let md = match entry.metadata() {
-                    Ok(m) => m,
-                    Err(_) => continue,
-                };
-                if md.is_file() {
-                    if md.len() as usize > self.config.max_file_size {
-                        continue;
+            if let Ok(n) = std::thread::available_parallelism() {
+                builder.threads(n.get());
+            }
+
+            let out: Arc<Mutex<Vec<PathBuf>>> = Arc::new(Mutex::new(Vec::with_capacity(4096)));
+            let out_ref = out.clone();
+
+            builder.build_parallel().run(|| {
+                let out = out_ref.clone();
+                Box::new(move |res| {
+                    let entry = match res {
+                        Ok(e) => e,
+                        Err(_) => return ignore::WalkState::Continue,
+                    };
+
+                    // Quickly skip non-files using cheap file_type when available
+                    if let Some(ft) = entry.file_type() {
+                        if !ft.is_file() {
+                            return ignore::WalkState::Continue;
+                        }
+                    } else {
+                        // Fallback to metadata if file_type unavailable
+                        if let Ok(md) = entry.metadata() {
+                            if !md.is_file() {
+                                return ignore::WalkState::Continue;
+                            }
+                        } else {
+                            return ignore::WalkState::Continue;
+                        }
                     }
 
                     let path = entry.into_path();
 
-                    // Apply include glob filtering
-                    if let Some(ref matcher) = include_matcher {
-                        if !matcher.is_match(&path) {
-                            continue;
-                        }
+                    // Apply path-based filters first to avoid unnecessary metadata calls
+                    if !path_allowed(&path) {
+                        return ignore::WalkState::Continue;
                     }
 
-                    paths.push(path);
-                }
+                    // Size filter
+                    if let Ok(md) = fs::metadata(&path) {
+                        if (md.len() as usize) > self.config.max_file_size {
+                            return ignore::WalkState::Continue;
+                        }
+                    } else {
+                        return ignore::WalkState::Continue;
+                    }
+
+                    if let Ok(mut guard) = out.lock() {
+                        guard.push(path);
+                    }
+
+                    ignore::WalkState::Continue
+                })
+            });
+
+            if let Ok(mut guard) = out.lock() {
+                discovered_paths.append(&mut *guard);
             }
         }
-        paths
+        discovered_paths
     }
 
     pub fn detect_language(path: &Path) -> Option<Language> {
@@ -911,6 +998,38 @@ impl<'a> Scanner<'a> {
 
         Ok(findings)
     }
+}
+
+fn git_list_files_fast(root: &Path) -> Option<Vec<PathBuf>> {
+    // Use git index for fast listing of tracked and untracked (non-ignored) files
+    // Equivalent to: git -C <root> ls-files -z --cached --others --exclude-standard
+    let output = Command::new("git")
+        .arg("-C")
+        .arg(root)
+        .arg("ls-files")
+        .arg("-z")
+        .arg("--cached")
+        .arg("--others")
+        .arg("--exclude-standard")
+        .output()
+        .ok()?;
+    if !output.status.success() {
+        return None;
+    }
+    let bytes = output.stdout;
+    if bytes.is_empty() {
+        return Some(Vec::new());
+    }
+    let mut list = Vec::new();
+    for rel in bytes.split(|b| *b == 0) {
+        if rel.is_empty() {
+            continue;
+        }
+        if let Ok(rel_path) = std::str::from_utf8(rel) {
+            list.push(root.join(rel_path));
+        }
+    }
+    Some(list)
 }
 
 fn prefilter_hit(det: &dyn Detector, stripped: &[u8]) -> bool {
