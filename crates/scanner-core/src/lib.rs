@@ -2,7 +2,7 @@ use aho_corasick::AhoCorasickBuilder;
 use anyhow::{anyhow, Context, Result};
 use crossbeam_channel::{bounded, Receiver, Sender};
 use ignore::WalkBuilder;
-// use rayon::prelude::*; // no longer using rayon parallel iterators in run()
+// use rayon::prelude::*; // Using rayon for parallel processing of discovered files (imported locally where needed)
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeSet, HashMap};
@@ -903,29 +903,7 @@ impl<'a> Scanner<'a> {
             cb(0, 0, 0);
         }
 
-        let (tx, rx) = bounded::<Finding>(8192);
-
-        // Collector thread to drain findings as they arrive and keep count
-        let findings_vec_ref = findings_vec.clone();
-        let findings_cnt_ref = findings_cnt.clone();
-        let progress_cb = self.config.progress_callback.clone();
-        let processed_ref = processed.clone();
-        let discovered_ref = discovered.clone();
-        let collector = std::thread::spawn(move || {
-            for f in rx.iter() {
-                if let Ok(mut guard) = findings_vec_ref.lock() {
-                    guard.push(f);
-                }
-                let new_cnt = findings_cnt_ref.fetch_add(1, Ordering::Relaxed) + 1;
-                if let Some(cb) = &progress_cb {
-                    cb(
-                        processed_ref.load(Ordering::Relaxed),
-                        discovered_ref.load(Ordering::Relaxed),
-                        new_cnt,
-                    );
-                }
-            }
-        });
+        // Simplified approach: collect findings directly without a separate collector thread
 
         // Prepare include/exclude matchers for filtering
         let include_matcher: Option<globset::GlobSet> = if !self.config.include_globs.is_empty() {
@@ -971,8 +949,6 @@ impl<'a> Scanner<'a> {
         };
 
         if roots.is_empty() {
-            drop(tx);
-            let _ = collector.join();
             return Ok(findings_vec.lock().unwrap().clone());
         }
 
@@ -994,71 +970,77 @@ impl<'a> Scanner<'a> {
             builder.threads(n.get());
         }
 
-        let tx_ref = tx.clone();
         let result_cb = self.config.result_callback.clone();
         let detectors = &self.detectors;
         let max_file_size = self.config.max_file_size;
         let processed_ref = processed.clone();
         let discovered_ref = discovered.clone();
-        let findings_cnt_ref = findings_cnt.clone();
+        let _findings_cnt_ref = findings_cnt.clone();
         let progress_cb_inner = self.config.progress_callback.clone();
 
-        builder.build_parallel().run(|| {
-            let tx = tx_ref.clone();
-            let result_cb = result_cb.clone();
-            let progress_cb_inner = progress_cb_inner.clone();
-            let processed_ref2 = processed_ref.clone();
-            let discovered_ref2 = discovered_ref.clone();
-            let findings_cnt_ref2 = findings_cnt_ref.clone();
-            Box::new(move |res| {
-                let entry = match res {
-                    Ok(e) => e,
-                    Err(_) => return ignore::WalkState::Continue,
-                };
+        // Use sequential walker to collect all paths (this guarantees completion)
+        let mut all_paths = Vec::new();
+        
+        for result in builder.build() {
+            let entry = match result {
+                Ok(e) => e,
+                Err(_) => continue,
+            };
 
-                if let Some(ft) = entry.file_type() {
-                    if !ft.is_file() {
-                        return ignore::WalkState::Continue;
-                    }
-                } else if let Ok(md) = entry.metadata() {
-                    if !md.is_file() {
-                        return ignore::WalkState::Continue;
-                    }
-                } else {
-                    return ignore::WalkState::Continue;
+            if let Some(ft) = entry.file_type() {
+                if !ft.is_file() {
+                    continue;
                 }
-
-                let path = entry.into_path();
-                if !path_allowed(&path) {
-                    return ignore::WalkState::Continue;
+            } else if let Ok(md) = entry.metadata() {
+                if !md.is_file() {
+                    continue;
                 }
+            } else {
+                continue;
+            }
 
-                // Count as discovered candidate
-                discovered_ref2.fetch_add(1, Ordering::Relaxed);
+            let path = entry.into_path();
+            if !path_allowed(&path) {
+                continue;
+            }
 
-                // Size check
-                if let Ok(md) = fs::metadata(&path) {
-                    if (md.len() as usize) > max_file_size {
-                        return ignore::WalkState::Continue;
-                    }
-                } else {
-                    return ignore::WalkState::Continue;
+            // Size check
+            if let Ok(md) = fs::metadata(&path) {
+                if (md.len() as usize) > max_file_size {
+                    continue;
                 }
+            } else {
+                continue;
+            }
 
-                if let Some(lang) = Scanner::detect_language(&path) {
-                    if let Ok(bytes) = Scanner::load_file(&path) {
-                        let unit = ScanUnit {
-                            path: path.clone(),
-                            lang,
-                            bytes: bytes.clone(),
-                        };
-                        let stripped = strip_comments(lang, &bytes);
-                        let stripped_s = String::from_utf8_lossy(&stripped);
-                        let index = LineIndex::new(stripped_s.as_bytes());
+            all_paths.push(path);
+        }
 
-                        // Create a minimal emitter that streams results via callback and sends to collector
-                        let (_dtx, dummy_rx) = bounded(0);
-                        let mut em = Emitter { tx: tx.clone(), rx: dummy_rx, on_result: result_cb.clone() };
+        // Process all discovered paths using rayon for parallel processing
+        use rayon::prelude::*;
+        use std::sync::Mutex as StdMutex;
+        
+        let all_findings = Arc::new(StdMutex::new(Vec::new()));
+        
+        all_paths.par_iter().for_each(|path| {
+            // Count as discovered candidate
+            discovered_ref.fetch_add(1, Ordering::Relaxed);
+            
+            if let Some(lang) = Scanner::detect_language(path) {
+                if let Ok(bytes) = Scanner::load_file(path) {
+                    let unit = ScanUnit {
+                        path: path.clone(),
+                        lang,
+                        bytes: bytes.clone(),
+                    };
+                    let stripped = strip_comments(lang, &bytes);
+                    let stripped_s = String::from_utf8_lossy(&stripped);
+                    let index = LineIndex::new(stripped_s.as_bytes());
+
+                    // Collect findings locally first
+                    {
+                        let (local_tx, local_rx) = bounded(100);
+                        let mut em = Emitter { tx: local_tx, rx: local_rx, on_result: result_cb.clone() };
                         for det in detectors {
                             if !det.languages().contains(&lang) {
                                 continue;
@@ -1068,27 +1050,41 @@ impl<'a> Scanner<'a> {
                             }
                             let _ = det.scan_optimized(&unit, &stripped_s, &index, &mut em);
                         }
+                        // Collect all findings from this file and add to global collection
+                        let local_findings = em.drain();
+                        if !local_findings.is_empty() {
+                            if let Ok(mut guard) = all_findings.lock() {
+                                guard.extend(local_findings);
+                            }
+                        }
                     }
                 }
+            }
 
-                // Mark processed and update progress
-                let new_proc = processed_ref2.fetch_add(1, Ordering::Relaxed) + 1;
-                if let Some(ref cb) = progress_cb_inner {
-                    cb(
-                        new_proc,
-                        discovered_ref2.load(Ordering::Relaxed),
-                        findings_cnt_ref2.load(Ordering::Relaxed),
-                    );
-                }
-
-                ignore::WalkState::Continue
-            })
+            // Mark processed and update progress
+            let new_proc = processed_ref.fetch_add(1, Ordering::Relaxed) + 1;
+            if let Some(ref cb) = progress_cb_inner {
+                let current_findings = {
+                    let guard = all_findings.lock().unwrap();
+                    guard.len()
+                };
+                cb(
+                    new_proc,
+                    discovered_ref.load(Ordering::Relaxed),
+                    current_findings,
+                );
+            }
         });
-
-        drop(tx);
-        let _ = collector.join();
-
-        let mut findings = findings_vec.lock().unwrap().clone();
+        
+        // Extract all findings and add them to the main findings vector
+        let mut findings = {
+            let collected_findings = all_findings.lock().unwrap();
+            let mut findings_guard = findings_vec.lock().unwrap();
+            findings_guard.extend(collected_findings.clone());
+            findings_guard.clone()
+        };
+        
+        // All processing completed successfully
         if self.config.deterministic {
             findings.sort_by(|a, b| {
                 (
