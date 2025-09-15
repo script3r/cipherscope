@@ -1,7 +1,7 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:a0ba5ca1-20ab-4fe1-bc55-21d638c80952",
+  "serialNumber": "urn:uuid:b83acbd5-86a5-4a99-9c0f-5a943f7ac67f",
   "version": 1,
   "metadata": {
     "component": {
@@ -9,7 +9,7 @@
       "version": "0.1.0",
       "path": "/workspace/fixtures/rust/implements-vs-uses"
     },
-    "timestamp": "2025-09-15T19:35:58.302169577Z",
+    "timestamp": "2025-09-15T19:50:59.363038493Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -20,36 +20,42 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "d92b5487-9bb0-414c-9499-0bce67468506",
+      "bom-ref": "cefb04ac-d634-4dea-8563-d316a7f21269",
       "assetType": "algorithm",
       "name": "SHA-512",
       "assetProperties": {
         "primitive": "hash",
+        "parameterSet": {
+          "outputSize": 256
+        },
         "nistQuantumSecurityLevel": 3
       }
     },
     {
-      "bom-ref": "bd6a5fc7-4e73-489f-98c2-25c10fd3923b",
+      "bom-ref": "906d6279-f9d3-492e-8d91-5de1932b4b9f",
       "assetType": "algorithm",
       "name": "SHA-256",
       "assetProperties": {
         "primitive": "hash",
+        "parameterSet": {
+          "outputSize": 256
+        },
         "nistQuantumSecurityLevel": 3
       }
     }
   ],
   "dependencies": [
     {
-      "ref": "6961c034-4df0-491d-8a03-0873a5ef6829",
+      "ref": "f6db1584-757c-4950-8b95-12167b649ada",
       "dependsOn": [
-        "bd6a5fc7-4e73-489f-98c2-25c10fd3923b"
+        "906d6279-f9d3-492e-8d91-5de1932b4b9f"
       ],
       "dependencyType": "uses"
     },
     {
-      "ref": "6961c034-4df0-491d-8a03-0873a5ef6829",
+      "ref": "f6db1584-757c-4950-8b95-12167b649ada",
       "dependsOn": [
-        "d92b5487-9bb0-414c-9499-0bce67468506"
+        "cefb04ac-d634-4dea-8563-d316a7f21269"
       ],
       "dependencyType": "implements"
     }

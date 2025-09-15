@@ -1,7 +1,7 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:46bc555a-82c7-41b8-849f-14d057d77edd",
+  "serialNumber": "urn:uuid:4a02474a-ee08-485a-b786-ada3b54ad424",
   "version": 1,
   "metadata": {
     "component": {
@@ -9,7 +9,7 @@
       "version": "0.1.0",
       "path": "/workspace/fixtures/rust/rsa-vulnerable"
     },
-    "timestamp": "2025-09-15T19:42:44.990667207Z",
+    "timestamp": "2025-09-15T19:50:59.424392521Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -20,7 +20,7 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "47c154cc-3b7f-431d-96d9-3fd214558978",
+      "bom-ref": "66b77bf8-0311-4268-b29b-1b089cabff09",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {
@@ -34,9 +34,9 @@
   ],
   "dependencies": [
     {
-      "ref": "f1eb97dc-1961-4c69-9544-2b3ea6fd30f0",
+      "ref": "236098e8-f0b9-4abe-bed4-a38cc920ca92",
       "dependsOn": [
-        "47c154cc-3b7f-431d-96d9-3fd214558978"
+        "66b77bf8-0311-4268-b29b-1b089cabff09"
       ],
       "dependencyType": "implements"
     }

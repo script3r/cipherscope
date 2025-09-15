@@ -1,14 +1,14 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:7f2cf358-c11a-42e2-b5f9-cdc295da69a4",
+  "serialNumber": "urn:uuid:a9dc6c91-63c4-46b9-b340-7433a2b7c28c",
   "version": 1,
   "metadata": {
     "component": {
       "name": "pycryptodome-legacy",
       "path": "/workspace/fixtures/python/pycryptodome-legacy"
     },
-    "timestamp": "2025-09-15T19:35:58.579448185Z",
+    "timestamp": "2025-09-15T19:50:59.644853703Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -19,20 +19,42 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "e79afd10-25ab-4122-97a4-0ffd54ae1d5d",
+      "bom-ref": "8a26f095-0d72-454f-9b3e-94df37c9ae01",
+      "assetType": "algorithm",
+      "name": "SHA-256",
+      "assetProperties": {
+        "primitive": "hash",
+        "nistQuantumSecurityLevel": 3
+      }
+    },
+    {
+      "bom-ref": "45416059-89b1-41b1-9db5-c79c42e30ded",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {
         "primitive": "signature",
+        "parameterSet": {
+          "keySize": 2048
+        },
         "nistQuantumSecurityLevel": 0
+      }
+    },
+    {
+      "bom-ref": "c18460a2-56f2-403b-821d-ba2db85d894b",
+      "assetType": "algorithm",
+      "name": "AES",
+      "assetProperties": {
+        "primitive": "aead",
+        "nistQuantumSecurityLevel": 3
       }
     }
   ],
   "dependencies": [
     {
-      "ref": "4f3727c8-bb21-40e7-a710-a0b3fe1ef23a",
+      "ref": "59b9663b-c039-456a-a12e-637f60c8eeb3",
       "dependsOn": [
-        "e79afd10-25ab-4122-97a4-0ffd54ae1d5d"
+        "45416059-89b1-41b1-9db5-c79c42e30ded",
+        "c18460a2-56f2-403b-821d-ba2db85d894b"
       ],
       "dependencyType": "implements"
     }

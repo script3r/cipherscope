@@ -1,14 +1,14 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:0cea0e71-86ee-42e9-a297-f1298523c300",
+  "serialNumber": "urn:uuid:92bf1958-aa69-4a8e-b62d-4990131b8988",
   "version": 1,
   "metadata": {
     "component": {
       "name": "requirements-basic",
       "path": "/workspace/fixtures/python/requirements-basic"
     },
-    "timestamp": "2025-09-15T19:35:58.602734929Z",
+    "timestamp": "2025-09-15T19:50:59.683347757Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -17,6 +17,37 @@
       }
     ]
   },
-  "cryptoAssets": [],
+  "cryptoAssets": [
+    {
+      "bom-ref": "c2d37c7a-9d13-49f0-a3a3-ed929bfec604",
+      "assetType": "algorithm",
+      "name": "PBKDF2",
+      "assetProperties": {
+        "primitive": "kdf",
+        "nistQuantumSecurityLevel": 3
+      }
+    },
+    {
+      "bom-ref": "69ca7ab2-d812-4f8e-ac7f-f6244c2943a9",
+      "assetType": "algorithm",
+      "name": "Fernet",
+      "assetProperties": {
+        "primitive": "aead",
+        "parameterSet": {
+          "algorithm": "AES-128-CBC + HMAC-SHA256"
+        },
+        "nistQuantumSecurityLevel": 3
+      }
+    },
+    {
+      "bom-ref": "4534b377-3e4a-4ce2-8f04-15d3c779bb68",
+      "assetType": "algorithm",
+      "name": "SHA-256",
+      "assetProperties": {
+        "primitive": "hash",
+        "nistQuantumSecurityLevel": 3
+      }
+    }
+  ],
   "dependencies": []
 }

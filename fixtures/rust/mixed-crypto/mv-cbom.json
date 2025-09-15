@@ -1,7 +1,7 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:2a5aa7ad-48bb-4cbb-834b-9afb59dee5e6",
+  "serialNumber": "urn:uuid:bae3f75a-582e-49c4-8280-58b3ed5b76a6",
   "version": 1,
   "metadata": {
     "component": {
@@ -9,7 +9,7 @@
       "version": "0.2.0",
       "path": "/workspace/fixtures/rust/mixed-crypto"
     },
-    "timestamp": "2025-09-15T19:42:26.843143869Z",
+    "timestamp": "2025-09-15T19:50:59.394159985Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -20,40 +20,7 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "94b32726-6329-414c-930b-3d65c393457a",
-      "assetType": "algorithm",
-      "name": "RSA",
-      "assetProperties": {
-        "primitive": "signature",
-        "parameterSet": {
-          "keySize": 2048
-        },
-        "nistQuantumSecurityLevel": 0
-      }
-    },
-    {
-      "bom-ref": "e8839408-d218-4983-9526-229b25b51247",
-      "assetType": "algorithm",
-      "name": "Ed25519",
-      "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
-      }
-    },
-    {
-      "bom-ref": "d3e33114-914d-4d72-b425-a9d063dd2cbd",
-      "assetType": "algorithm",
-      "name": "SHA-256",
-      "assetProperties": {
-        "primitive": "hash",
-        "parameterSet": {
-          "outputSize": 256
-        },
-        "nistQuantumSecurityLevel": 3
-      }
-    },
-    {
-      "bom-ref": "7c7f3536-e939-413d-ac1c-fd0e07ec4352",
+      "bom-ref": "e76bd7f3-ff84-46e5-a31f-7adf391c115b",
       "assetType": "algorithm",
       "name": "SHA-512",
       "assetProperties": {
@@ -65,7 +32,19 @@
       }
     },
     {
-      "bom-ref": "177d321f-b235-4009-885a-90064c9d838e",
+      "bom-ref": "bdf18958-d148-4573-b3ad-6cbbdb5fe8b3",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "parameterSet": {
+          "keySize": 2048
+        },
+        "nistQuantumSecurityLevel": 0
+      }
+    },
+    {
+      "bom-ref": "c79cb029-05eb-4172-8398-10bd5f9d858e",
       "assetType": "algorithm",
       "name": "AES-GCM",
       "assetProperties": {
@@ -75,22 +54,49 @@
         },
         "nistQuantumSecurityLevel": 3
       }
+    },
+    {
+      "bom-ref": "255f3f10-0801-43f4-9b46-6578f2184d9b",
+      "assetType": "algorithm",
+      "name": "SHA-256",
+      "assetProperties": {
+        "primitive": "hash",
+        "nistQuantumSecurityLevel": 3
+      }
+    },
+    {
+      "bom-ref": "69d656e2-c4d0-4831-b89b-253b4ff93130",
+      "assetType": "algorithm",
+      "name": "AES",
+      "assetProperties": {
+        "primitive": "aead",
+        "nistQuantumSecurityLevel": 3
+      }
+    },
+    {
+      "bom-ref": "1a8cec9e-fe9d-4cc0-9d70-5532fa5ac662",
+      "assetType": "algorithm",
+      "name": "Ed25519",
+      "assetProperties": {
+        "primitive": "signature",
+        "nistQuantumSecurityLevel": 0
+      }
     }
   ],
   "dependencies": [
     {
-      "ref": "25bfd99b-6804-40a0-a5e0-a444b0da7da2",
+      "ref": "4f90e8b1-a3b1-4533-bfc1-d70354e63e11",
       "dependsOn": [
-        "d3e33114-914d-4d72-b425-a9d063dd2cbd",
-        "e8839408-d218-4983-9526-229b25b51247"
+        "255f3f10-0801-43f4-9b46-6578f2184d9b",
+        "1a8cec9e-fe9d-4cc0-9d70-5532fa5ac662"
       ],
       "dependencyType": "uses"
     },
     {
-      "ref": "25bfd99b-6804-40a0-a5e0-a444b0da7da2",
+      "ref": "4f90e8b1-a3b1-4533-bfc1-d70354e63e11",
       "dependsOn": [
-        "94b32726-6329-414c-930b-3d65c393457a",
-        "7c7f3536-e939-413d-ac1c-fd0e07ec4352"
+        "e76bd7f3-ff84-46e5-a31f-7adf391c115b",
+        "bdf18958-d148-4573-b3ad-6cbbdb5fe8b3"
       ],
       "dependencyType": "implements"
     }

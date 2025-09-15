@@ -1,7 +1,7 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:5579cdaa-a4fd-41f0-a26a-25e0a8057e26",
+  "serialNumber": "urn:uuid:545a4f7f-15c2-4cf5-b643-ca78ff859536",
   "version": 1,
   "metadata": {
     "component": {
@@ -9,7 +9,7 @@
       "version": "1.0.0",
       "path": "/workspace/fixtures/java/jca-standard"
     },
-    "timestamp": "2025-09-15T19:35:58.406192724Z",
+    "timestamp": "2025-09-15T19:50:59.491199140Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -20,25 +20,7 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "0225fb27-710c-4368-bce8-a47ba8248223",
-      "assetType": "algorithm",
-      "name": "SHA-256",
-      "assetProperties": {
-        "primitive": "hash",
-        "nistQuantumSecurityLevel": 3
-      }
-    },
-    {
-      "bom-ref": "39494935-6f18-4f17-a155-580f914632cc",
-      "assetType": "algorithm",
-      "name": "RSA",
-      "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
-      }
-    },
-    {
-      "bom-ref": "6fc0bb31-4b91-4fca-b693-83acf27bacb0",
+      "bom-ref": "9254f85d-7d19-4912-ab16-8c02c62b1e5a",
       "assetType": "algorithm",
       "name": "ECDSA",
       "assetProperties": {
@@ -47,9 +29,42 @@
       }
     },
     {
-      "bom-ref": "498697ad-f501-4063-a2f5-6094a1eb2925",
+      "bom-ref": "b4614456-6634-4e55-bb80-8b8ef4788f79",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "parameterSet": {
+          "keySize": 256
+        },
+        "nistQuantumSecurityLevel": 0
+      }
+    },
+    {
+      "bom-ref": "4409f539-1dbf-4cdf-ba33-a47d5c84cd1e",
+      "assetType": "algorithm",
+      "name": "SHA-256",
+      "assetProperties": {
+        "primitive": "hash",
+        "nistQuantumSecurityLevel": 3
+      }
+    },
+    {
+      "bom-ref": "6ae8bcd6-017a-4304-ac7a-72fd911efe51",
       "assetType": "algorithm",
       "name": "AES",
+      "assetProperties": {
+        "primitive": "aead",
+        "parameterSet": {
+          "keySize": 256
+        },
+        "nistQuantumSecurityLevel": 3
+      }
+    },
+    {
+      "bom-ref": "192150f4-02a2-4d1d-95f7-e54baba9ce60",
+      "assetType": "algorithm",
+      "name": "AES-GCM",
       "assetProperties": {
         "primitive": "aead",
         "nistQuantumSecurityLevel": 3

@@ -1,14 +1,14 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:4459de8d-acfe-47ba-8f99-977fd8daa779",
+  "serialNumber": "urn:uuid:64d03398-eee1-4ade-9581-6abeaf93c7b5",
   "version": 1,
   "metadata": {
     "component": {
       "name": "cryptography-mixed",
       "path": "/workspace/fixtures/python/cryptography-mixed"
     },
-    "timestamp": "2025-09-15T19:42:26.815527466Z",
+    "timestamp": "2025-09-15T19:50:59.616165470Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -19,16 +19,19 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "e8686445-7241-4b24-9eb0-980b9df6112f",
+      "bom-ref": "6e6cdfb5-c506-40e9-8e0a-955b1a43b14b",
       "assetType": "algorithm",
-      "name": "SHA-256",
+      "name": "RSA",
       "assetProperties": {
-        "primitive": "hash",
-        "nistQuantumSecurityLevel": 3
+        "primitive": "signature",
+        "parameterSet": {
+          "keySize": 2048
+        },
+        "nistQuantumSecurityLevel": 0
       }
     },
     {
-      "bom-ref": "f3501a5c-9bd7-42f4-9dc5-68ff81ab2419",
+      "bom-ref": "ebdbfa3f-a101-4786-81cb-23d24709650b",
       "assetType": "algorithm",
       "name": "Fernet",
       "assetProperties": {
@@ -40,23 +43,20 @@
       }
     },
     {
-      "bom-ref": "f31ea302-e352-4710-8aea-c1f96476b59a",
+      "bom-ref": "45e8e556-be31-4126-b237-9633d1beebba",
       "assetType": "algorithm",
-      "name": "RSA",
+      "name": "SHA-256",
       "assetProperties": {
-        "primitive": "signature",
-        "parameterSet": {
-          "keySize": 2048
-        },
-        "nistQuantumSecurityLevel": 0
+        "primitive": "hash",
+        "nistQuantumSecurityLevel": 3
       }
     }
   ],
   "dependencies": [
     {
-      "ref": "92ae53a8-9e99-40e6-8907-7ac816f6a1a9",
+      "ref": "c871f5e5-3368-41dc-89a3-c8767fe3e127",
       "dependsOn": [
-        "f31ea302-e352-4710-8aea-c1f96476b59a"
+        "6e6cdfb5-c506-40e9-8e0a-955b1a43b14b"
       ],
       "dependencyType": "implements"
     }

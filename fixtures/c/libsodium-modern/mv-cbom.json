@@ -1,14 +1,14 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:470fe928-c629-4bc7-963f-7a023373c518",
+  "serialNumber": "urn:uuid:960e88d2-5258-4c6d-af38-6f0b5b932643",
   "version": 1,
   "metadata": {
     "component": {
       "name": "libsodium-modern",
       "path": "/workspace/fixtures/c/libsodium-modern"
     },
-    "timestamp": "2025-09-15T19:35:58.450272085Z",
+    "timestamp": "2025-09-15T19:50:59.712591768Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -19,7 +19,7 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "16690765-56ee-4f2b-9e6e-fe748850c616",
+      "bom-ref": "199ec31d-3a90-4546-9696-e381fd599990",
       "assetType": "algorithm",
       "name": "X25519",
       "assetProperties": {
@@ -28,7 +28,7 @@
       }
     },
     {
-      "bom-ref": "623fb39a-2f53-441f-94ec-08e8b54ca424",
+      "bom-ref": "abea67d8-934b-48c3-8f79-0699f3ae6183",
       "assetType": "algorithm",
       "name": "BLAKE2b",
       "assetProperties": {
@@ -37,7 +37,16 @@
       }
     },
     {
-      "bom-ref": "1e732469-0895-4854-93d1-fce78ae23345",
+      "bom-ref": "ef3885be-7633-4691-b2d0-11daff941c59",
+      "assetType": "algorithm",
+      "name": "AES-GCM",
+      "assetProperties": {
+        "primitive": "aead",
+        "nistQuantumSecurityLevel": 3
+      }
+    },
+    {
+      "bom-ref": "371263e0-dd9f-4157-9c85-48def64c26ab",
       "assetType": "algorithm",
       "name": "ChaCha20Poly1305",
       "assetProperties": {
@@ -46,7 +55,7 @@
       }
     },
     {
-      "bom-ref": "0dd2d57e-101a-44c0-87cb-9027a2b7ac56",
+      "bom-ref": "3549b76a-6b37-4aa9-8922-131144507b31",
       "assetType": "algorithm",
       "name": "Ed25519",
       "assetProperties": {

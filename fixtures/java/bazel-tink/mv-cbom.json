@@ -1,14 +1,14 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:cf126f93-df7e-4c26-9709-fbb7fc47eb89",
+  "serialNumber": "urn:uuid:c20667fc-b9c5-455f-acf5-702755626679",
   "version": 1,
   "metadata": {
     "component": {
       "name": "bazel-tink",
       "path": "/workspace/fixtures/java/bazel-tink"
     },
-    "timestamp": "2025-09-15T19:42:59.046882117Z",
+    "timestamp": "2025-09-15T19:50:59.456956869Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -19,7 +19,7 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "55aa79a1-c3e2-4a8c-9191-4d6cf7021cf1",
+      "bom-ref": "1dc92845-a864-4273-864e-748c2e990065",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {
@@ -31,7 +31,7 @@
       }
     },
     {
-      "bom-ref": "1725feeb-2b2f-4db3-bdd6-32479824870f",
+      "bom-ref": "33f43bcb-fb9e-44fe-ad44-74606b54f48e",
       "assetType": "algorithm",
       "name": "AES-GCM",
       "assetProperties": {

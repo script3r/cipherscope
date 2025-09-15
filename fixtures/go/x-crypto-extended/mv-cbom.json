@@ -1,7 +1,7 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:ffe5c439-b50d-4360-9334-158997d78050",
+  "serialNumber": "urn:uuid:47c616c0-245a-41be-ab4a-86db4af28f7b",
   "version": 1,
   "metadata": {
     "component": {
@@ -9,7 +9,7 @@
       "version": "1.19",
       "path": "/workspace/fixtures/go/x-crypto-extended"
     },
-    "timestamp": "2025-09-15T19:35:58.536236278Z",
+    "timestamp": "2025-09-15T19:50:59.586387717Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -20,21 +20,42 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "35ea0ad6-c024-40ea-9575-e7f45024b7eb",
+      "bom-ref": "ad9c44bf-f150-42fd-b6a7-6a855c8a9b9b",
       "assetType": "algorithm",
-      "name": "ChaCha20Poly1305",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "parameterSet": {
+          "keySize": 2048
+        },
+        "nistQuantumSecurityLevel": 0
+      }
+    },
+    {
+      "bom-ref": "b3cb1649-4ea8-43e9-87d4-64110c0ec94d",
+      "assetType": "algorithm",
+      "name": "AES-GCM",
       "assetProperties": {
         "primitive": "aead",
         "nistQuantumSecurityLevel": 3
       }
     },
     {
-      "bom-ref": "cc0110bf-624e-4a89-a66b-ed0ac7bd9863",
+      "bom-ref": "b02cb27c-a6b9-429d-a8cc-146ed1238fc8",
       "assetType": "algorithm",
-      "name": "RSA",
+      "name": "SHA-256",
       "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
+        "primitive": "hash",
+        "nistQuantumSecurityLevel": 3
+      }
+    },
+    {
+      "bom-ref": "d13a0830-79ad-40ff-bd3c-84b00fda747a",
+      "assetType": "algorithm",
+      "name": "ChaCha20Poly1305",
+      "assetProperties": {
+        "primitive": "aead",
+        "nistQuantumSecurityLevel": 3
       }
     }
   ],

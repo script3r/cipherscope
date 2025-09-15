@@ -1,7 +1,7 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:2513f496-7739-45e4-b2c6-9e1d1eca832e",
+  "serialNumber": "urn:uuid:fb0aa43e-e90e-4cf9-b093-1cadae55552c",
   "version": 1,
   "metadata": {
     "component": {
@@ -9,7 +9,7 @@
       "version": "0.1.0",
       "path": "/workspace/fixtures/rust/aes-gcm-safe"
     },
-    "timestamp": "2025-09-15T19:35:58.274981140Z",
+    "timestamp": "2025-09-15T19:50:59.329909533Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -20,39 +20,54 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "26402de4-6230-4c0a-95f6-8a3b0f63b20b",
+      "bom-ref": "f06c001e-f1c7-4c64-9288-95202c5072d9",
       "assetType": "algorithm",
       "name": "ChaCha20Poly1305",
+      "assetProperties": {
+        "primitive": "aead",
+        "parameterSet": {
+          "keySize": 256
+        },
+        "nistQuantumSecurityLevel": 3
+      }
+    },
+    {
+      "bom-ref": "270366e6-6065-48b7-a1f9-5d425bad5a7b",
+      "assetType": "algorithm",
+      "name": "AES",
       "assetProperties": {
         "primitive": "aead",
         "nistQuantumSecurityLevel": 3
       }
     },
     {
-      "bom-ref": "2b90966d-a571-452f-9dd4-dd834662ed14",
+      "bom-ref": "029ada26-171d-453d-be4a-43810ef999bf",
+      "assetType": "algorithm",
+      "name": "AES-GCM",
+      "assetProperties": {
+        "primitive": "aead",
+        "parameterSet": {
+          "keySize": 256
+        },
+        "nistQuantumSecurityLevel": 3
+      }
+    },
+    {
+      "bom-ref": "d04f9d1f-b3cf-49ab-abf2-1606bbc93bea",
       "assetType": "algorithm",
       "name": "BLAKE3",
       "assetProperties": {
         "primitive": "hash",
         "nistQuantumSecurityLevel": 3
       }
-    },
-    {
-      "bom-ref": "25f81ac2-beac-4501-8c00-45574e3aed26",
-      "assetType": "algorithm",
-      "name": "AES-GCM",
-      "assetProperties": {
-        "primitive": "aead",
-        "nistQuantumSecurityLevel": 3
-      }
     }
   ],
   "dependencies": [
     {
-      "ref": "a681dce1-bd06-48cd-8624-fe1a599338fc",
+      "ref": "f190d3f8-4757-477a-b13b-fe4a601ffa3b",
       "dependsOn": [
-        "26402de4-6230-4c0a-95f6-8a3b0f63b20b",
-        "2b90966d-a571-452f-9dd4-dd834662ed14"
+        "f06c001e-f1c7-4c64-9288-95202c5072d9",
+        "d04f9d1f-b3cf-49ab-abf2-1606bbc93bea"
       ],
       "dependencyType": "uses"
     }
