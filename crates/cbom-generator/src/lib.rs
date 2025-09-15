@@ -13,14 +13,14 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use uuid::Uuid;
 
+pub mod algorithm_detector;
 pub mod certificate_parser;
 pub mod dependency_analyzer;
-pub mod algorithm_detector;
 pub mod project_parser;
 
+use algorithm_detector::AlgorithmDetector;
 use certificate_parser::CertificateParser;
 use dependency_analyzer::DependencyAnalyzer;
-use algorithm_detector::AlgorithmDetector;
 use project_parser::ProjectParser;
 
 /// The main MV-CBOM document structure
@@ -28,20 +28,20 @@ use project_parser::ProjectParser;
 pub struct MvCbom {
     #[serde(rename = "bomFormat")]
     pub bom_format: String, // Fixed value: "MV-CBOM"
-    
+
     #[serde(rename = "specVersion")]
     pub spec_version: String, // e.g., "1.0"
-    
+
     #[serde(rename = "serialNumber")]
     pub serial_number: String, // URN UUID format
-    
+
     pub version: u32, // Increments with each new version
-    
+
     pub metadata: CbomMetadata,
-    
+
     #[serde(rename = "cryptoAssets")]
     pub crypto_assets: Vec<CryptoAsset>,
-    
+
     pub dependencies: Vec<Dependency>,
 }
 
@@ -75,13 +75,13 @@ pub struct ToolInfo {
 pub struct CryptoAsset {
     #[serde(rename = "bom-ref")]
     pub bom_ref: String, // Locally unique identifier (UUID)
-    
+
     #[serde(rename = "assetType")]
     pub asset_type: AssetType,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>, // Human-readable name
-    
+
     #[serde(rename = "assetProperties")]
     pub asset_properties: AssetProperties,
 }
@@ -108,11 +108,11 @@ pub enum AssetProperties {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AlgorithmProperties {
     pub primitive: CryptographicPrimitive,
-    
+
     #[serde(rename = "parameterSet")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parameter_set: Option<serde_json::Value>, // Flexible parameter storage
-    
+
     #[serde(rename = "nistQuantumSecurityLevel")]
     pub nist_quantum_security_level: u8, // 0 for vulnerable, 1-5 for secure
 }
@@ -122,13 +122,13 @@ pub struct AlgorithmProperties {
 pub struct CertificateProperties {
     #[serde(rename = "subjectName")]
     pub subject_name: String,
-    
+
     #[serde(rename = "issuerName")]
     pub issuer_name: String,
-    
+
     #[serde(rename = "notValidAfter")]
     pub not_valid_after: DateTime<Utc>,
-    
+
     #[serde(rename = "signatureAlgorithmRef")]
     pub signature_algorithm_ref: String, // bom-ref to algorithm asset
 }
@@ -138,7 +138,7 @@ pub struct CertificateProperties {
 pub struct RelatedCryptoMaterialProperties {
     #[serde(rename = "materialType")]
     pub material_type: String,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
 }
@@ -168,10 +168,10 @@ pub enum CryptographicPrimitive {
 pub struct Dependency {
     #[serde(rename = "ref")]
     pub ref_: String, // bom-ref of the component that has the dependency
-    
+
     #[serde(rename = "dependsOn")]
     pub depends_on: Vec<String>, // bom-refs that the ref component depends on
-    
+
     #[serde(rename = "dependencyType")]
     pub dependency_type: DependencyType,
 }
@@ -213,25 +213,28 @@ impl CbomGenerator {
 
     /// Generate an MV-CBOM for the given directory (single project)
     pub fn generate_cbom(&self, scan_path: &Path, findings: &[Finding]) -> Result<MvCbom> {
-        let scan_path = scan_path.canonicalize()
+        let scan_path = scan_path
+            .canonicalize()
             .with_context(|| format!("Failed to canonicalize path: {}", scan_path.display()))?;
 
         // Parse project information and dependencies from various project files
         let (project_info, project_dependencies) = self.project_parser.parse_project(&scan_path)?;
-        
+
         // Create component info from parsed project information
         let component_info = ComponentInfo {
             name: project_info.name,
             version: project_info.version,
             path: scan_path.display().to_string(),
         };
-        
+
         // Parse certificates in the directory
         let certificates = self.certificate_parser.parse_certificates(&scan_path)?;
-        
+
         // Detect algorithms from findings and static analysis
-        let algorithms = self.algorithm_detector.detect_algorithms(&scan_path, findings)?;
-        
+        let algorithms = self
+            .algorithm_detector
+            .detect_algorithms(&scan_path, findings)?;
+
         // Analyze dependencies (uses vs implements) with project dependencies
         let dependencies = self.dependency_analyzer.analyze_dependencies(
             &component_info,
@@ -268,18 +271,24 @@ impl CbomGenerator {
     }
 
     /// Generate MV-CBOMs for all projects discovered recursively
-    pub fn generate_cboms_recursive(&self, scan_path: &Path, findings: &[Finding]) -> Result<Vec<(PathBuf, MvCbom)>> {
-        let scan_path = scan_path.canonicalize()
+    pub fn generate_cboms_recursive(
+        &self,
+        scan_path: &Path,
+        findings: &[Finding],
+    ) -> Result<Vec<(PathBuf, MvCbom)>> {
+        let scan_path = scan_path
+            .canonicalize()
             .with_context(|| format!("Failed to canonicalize path: {}", scan_path.display()))?;
 
         // Discover all projects recursively
         let discovered_projects = self.project_parser.discover_projects(&scan_path)?;
-        
+
         let mut cboms = Vec::new();
-        
+
         for (project_path, project_info, project_dependencies) in discovered_projects {
             // Filter findings relevant to this specific project
-            let project_findings: Vec<Finding> = findings.iter()
+            let project_findings: Vec<Finding> = findings
+                .iter()
                 .filter(|finding| {
                     // Check if the finding's file is within this project's directory
                     finding.file.starts_with(&project_path)
@@ -293,13 +302,15 @@ impl CbomGenerator {
                 version: project_info.version,
                 path: project_path.display().to_string(),
             };
-            
+
             // Parse certificates in this project directory
             let certificates = self.certificate_parser.parse_certificates(&project_path)?;
-            
+
             // Detect algorithms from findings and static analysis for this project
-            let algorithms = self.algorithm_detector.detect_algorithms(&project_path, &project_findings)?;
-            
+            let algorithms = self
+                .algorithm_detector
+                .detect_algorithms(&project_path, &project_findings)?;
+
             // Analyze dependencies for this project
             let dependencies = self.dependency_analyzer.analyze_dependencies(
                 &component_info,
@@ -340,25 +351,25 @@ impl CbomGenerator {
 
     /// Write the MV-CBOM to a JSON file
     pub fn write_cbom(&self, cbom: &MvCbom, output_path: &Path) -> Result<()> {
-        let json = serde_json::to_string_pretty(cbom)
-            .context("Failed to serialize MV-CBOM to JSON")?;
-        
+        let json =
+            serde_json::to_string_pretty(cbom).context("Failed to serialize MV-CBOM to JSON")?;
+
         fs::write(output_path, json)
             .with_context(|| format!("Failed to write MV-CBOM to {}", output_path.display()))?;
-        
+
         Ok(())
     }
 
     /// Write multiple MV-CBOMs to JSON files (one per project)
     pub fn write_cboms(&self, cboms: &[(PathBuf, MvCbom)]) -> Result<Vec<PathBuf>> {
         let mut written_files = Vec::new();
-        
+
         for (project_path, cbom) in cboms {
             let output_path = project_path.join("mv-cbom.json");
             self.write_cbom(cbom, &output_path)?;
             written_files.push(output_path);
         }
-        
+
         Ok(written_files)
     }
 }
@@ -372,7 +383,6 @@ impl Default for CbomGenerator {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::TempDir;
 
     #[test]
     fn test_cbom_serialization() {
@@ -400,7 +410,7 @@ mod tests {
 
         let json = serde_json::to_string_pretty(&cbom).unwrap();
         println!("{}", json);
-        
+
         // Verify it can be deserialized
         let _parsed: MvCbom = serde_json::from_str(&json).unwrap();
     }

@@ -6,8 +6,8 @@ use std::collections::{HashMap, HashSet};
 use uuid::Uuid;
 
 use crate::{
-    ComponentInfo, CryptoAsset, Dependency, DependencyType, AssetType,
-    project_parser::ProjectDependency,
+    project_parser::ProjectDependency, AssetType, ComponentInfo, CryptoAsset, Dependency,
+    DependencyType,
 };
 
 /// Analyzer for determining dependency relationships between components and crypto assets
@@ -35,19 +35,18 @@ impl DependencyAnalyzer {
         let mut dependencies = Vec::new();
 
         // Create sets for efficient lookup
-        let _algorithm_refs: HashSet<String> = algorithms.iter()
-            .map(|a| a.bom_ref.clone())
-            .collect();
-        
-        let certificate_refs: HashSet<String> = certificates.iter()
-            .map(|c| c.bom_ref.clone())
-            .collect();
+        let _algorithm_refs: HashSet<String> =
+            algorithms.iter().map(|a| a.bom_ref.clone()).collect();
+
+        let certificate_refs: HashSet<String> =
+            certificates.iter().map(|c| c.bom_ref.clone()).collect();
 
         // Map findings to crypto assets to determine "uses" relationships
         let used_assets = self.map_findings_to_assets(findings, algorithms)?;
 
         // Map project dependencies to crypto assets for "implements" relationships
-        let implemented_assets = self.map_project_deps_to_assets(project_dependencies, algorithms)?;
+        let implemented_assets =
+            self.map_project_deps_to_assets(project_dependencies, algorithms)?;
 
         // Create dependencies for "uses" relationships
         if !used_assets.is_empty() {
@@ -59,7 +58,8 @@ impl DependencyAnalyzer {
         }
 
         // Create dependencies for "implements" relationships (excluding those already in "uses")
-        let implements_only: Vec<String> = implemented_assets.into_iter()
+        let implements_only: Vec<String> = implemented_assets
+            .into_iter()
             .filter(|asset_ref| !used_assets.contains(asset_ref))
             .collect();
 
@@ -82,7 +82,9 @@ impl DependencyAnalyzer {
 
         // Create dependencies from certificates to their signature algorithms
         for certificate in certificates {
-            if let Some(cert_deps) = self.create_certificate_dependencies(certificate, algorithms)? {
+            if let Some(cert_deps) =
+                self.create_certificate_dependencies(certificate, algorithms)?
+            {
                 dependencies.extend(cert_deps);
             }
         }
@@ -91,21 +93,29 @@ impl DependencyAnalyzer {
     }
 
     /// Map scanner findings to crypto asset references
-    fn map_findings_to_assets(&self, findings: &[Finding], algorithms: &[CryptoAsset]) -> Result<Vec<String>> {
+    fn map_findings_to_assets(
+        &self,
+        findings: &[Finding],
+        algorithms: &[CryptoAsset],
+    ) -> Result<Vec<String>> {
         let mut used_assets = Vec::new();
         let mut seen_assets = HashSet::new();
 
         // Create a mapping from algorithm names to bom-refs
-        let algo_name_to_ref: HashMap<String, String> = algorithms.iter()
+        let algo_name_to_ref: HashMap<String, String> = algorithms
+            .iter()
             .filter_map(|asset| {
-                asset.name.as_ref().map(|name| (name.clone(), asset.bom_ref.clone()))
+                asset
+                    .name
+                    .as_ref()
+                    .map(|name| (name.clone(), asset.bom_ref.clone()))
             })
             .collect();
 
         for finding in findings {
             // Try to match findings to specific algorithms
             let potential_algorithms = self.extract_algorithms_from_finding(finding);
-            
+
             for algo_name in potential_algorithms {
                 if let Some(bom_ref) = algo_name_to_ref.get(&algo_name) {
                     if seen_assets.insert(bom_ref.clone()) {
@@ -119,7 +129,11 @@ impl DependencyAnalyzer {
     }
 
     /// Map project dependencies to crypto asset references
-    fn map_project_deps_to_assets(&self, project_deps: &[ProjectDependency], algorithms: &[CryptoAsset]) -> Result<Vec<String>> {
+    fn map_project_deps_to_assets(
+        &self,
+        project_deps: &[ProjectDependency],
+        algorithms: &[CryptoAsset],
+    ) -> Result<Vec<String>> {
         let mut implemented_assets = Vec::new();
         let mut seen_assets = HashSet::new();
 
@@ -132,9 +146,10 @@ impl DependencyAnalyzer {
                 if let Some(algo_names) = package_to_algorithms.get(&key) {
                     for algo_name in algo_names {
                         // Find the corresponding asset
-                        if let Some(asset) = algorithms.iter().find(|a| {
-                            a.name.as_ref().map_or(false, |n| n.contains(algo_name))
-                        }) {
+                        if let Some(asset) = algorithms
+                            .iter()
+                            .find(|a| a.name.as_ref().map_or(false, |n| n.contains(algo_name)))
+                        {
                             if seen_assets.insert(asset.bom_ref.clone()) {
                                 implemented_assets.push(asset.bom_ref.clone());
                             }
@@ -148,12 +163,19 @@ impl DependencyAnalyzer {
     }
 
     /// Create dependencies from certificates to their signature algorithms
-    fn create_certificate_dependencies(&self, certificate: &CryptoAsset, algorithms: &[CryptoAsset]) -> Result<Option<Vec<Dependency>>> {
+    fn create_certificate_dependencies(
+        &self,
+        certificate: &CryptoAsset,
+        algorithms: &[CryptoAsset],
+    ) -> Result<Option<Vec<Dependency>>> {
         if let AssetType::Certificate = certificate.asset_type {
             // Extract the signature algorithm reference from certificate properties
             if let crate::AssetProperties::Certificate(cert_props) = &certificate.asset_properties {
                 // Find the corresponding algorithm asset
-                if let Some(sig_algo) = algorithms.iter().find(|a| a.bom_ref == cert_props.signature_algorithm_ref) {
+                if let Some(sig_algo) = algorithms
+                    .iter()
+                    .find(|a| a.bom_ref == cert_props.signature_algorithm_ref)
+                {
                     return Ok(Some(vec![Dependency {
                         ref_: certificate.bom_ref.clone(),
                         depends_on: vec![sig_algo.bom_ref.clone()],
@@ -266,45 +288,57 @@ impl DependencyAnalyzer {
         // Rust packages
         mapping.insert("rsa:Rust".to_string(), vec!["RSA".to_string()]);
         mapping.insert("aes-gcm:Rust".to_string(), vec!["AES-256-GCM".to_string()]);
-        mapping.insert("sha2:Rust".to_string(), vec!["SHA-256".to_string(), "SHA-512".to_string()]);
+        mapping.insert(
+            "sha2:Rust".to_string(),
+            vec!["SHA-256".to_string(), "SHA-512".to_string()],
+        );
         mapping.insert("p256:Rust".to_string(), vec!["ECDSA".to_string()]);
 
         // Java packages
-        mapping.insert("org.bouncycastle:bcprov-jdk15on:Java".to_string(), vec![
-            "RSA".to_string(), "ECDSA".to_string(), "AES".to_string()
-        ]);
+        mapping.insert(
+            "org.bouncycastle:bcprov-jdk15on:Java".to_string(),
+            vec!["RSA".to_string(), "ECDSA".to_string(), "AES".to_string()],
+        );
 
         // Python packages
-        mapping.insert("cryptography:Python".to_string(), vec![
-            "RSA".to_string(), "ECDSA".to_string(), "AES".to_string()
-        ]);
-        mapping.insert("pycryptodome:Python".to_string(), vec![
-            "RSA".to_string(), "AES".to_string()
-        ]);
+        mapping.insert(
+            "cryptography:Python".to_string(),
+            vec!["RSA".to_string(), "ECDSA".to_string(), "AES".to_string()],
+        );
+        mapping.insert(
+            "pycryptodome:Python".to_string(),
+            vec!["RSA".to_string(), "AES".to_string()],
+        );
 
         // JavaScript packages
-        mapping.insert("crypto-js:JavaScript".to_string(), vec![
-            "AES".to_string(), "SHA-256".to_string()
-        ]);
+        mapping.insert(
+            "crypto-js:JavaScript".to_string(),
+            vec!["AES".to_string(), "SHA-256".to_string()],
+        );
 
         // C/C++ libraries
-        mapping.insert("ssl:C".to_string(), vec![
-            "RSA".to_string(), "ECDSA".to_string(), "AES".to_string()
-        ]);
-        mapping.insert("crypto:C".to_string(), vec![
-            "RSA".to_string(), "ECDSA".to_string(), "AES".to_string()
-        ]);
-        mapping.insert("ssl:Cpp".to_string(), vec![
-            "RSA".to_string(), "ECDSA".to_string(), "AES".to_string()
-        ]);
-        mapping.insert("crypto:Cpp".to_string(), vec![
-            "RSA".to_string(), "ECDSA".to_string(), "AES".to_string()
-        ]);
+        mapping.insert(
+            "ssl:C".to_string(),
+            vec!["RSA".to_string(), "ECDSA".to_string(), "AES".to_string()],
+        );
+        mapping.insert(
+            "crypto:C".to_string(),
+            vec!["RSA".to_string(), "ECDSA".to_string(), "AES".to_string()],
+        );
+        mapping.insert(
+            "ssl:Cpp".to_string(),
+            vec!["RSA".to_string(), "ECDSA".to_string(), "AES".to_string()],
+        );
+        mapping.insert(
+            "crypto:Cpp".to_string(),
+            vec!["RSA".to_string(), "ECDSA".to_string(), "AES".to_string()],
+        );
 
         // Go packages
-        mapping.insert("golang.org/x/crypto:Go".to_string(), vec![
-            "RSA".to_string(), "ECDSA".to_string(), "AES".to_string()
-        ]);
+        mapping.insert(
+            "golang.org/x/crypto:Go".to_string(),
+            vec!["RSA".to_string(), "ECDSA".to_string(), "AES".to_string()],
+        );
 
         mapping
     }
@@ -324,7 +358,6 @@ impl Default for DependencyAnalyzer {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{AlgorithmProperties, AssetProperties, CryptographicPrimitive};
     use scanner_core::{Finding, Language, Span};
     use std::path::PathBuf;
 
@@ -337,7 +370,7 @@ mod tests {
     #[test]
     fn test_algorithm_extraction_from_finding() {
         let analyzer = DependencyAnalyzer::new();
-        
+
         let finding = Finding {
             language: Language::Rust,
             library: "RustCrypto (common crates)".to_string(),
@@ -355,7 +388,7 @@ mod tests {
     #[test]
     fn test_detailed_algorithm_extraction() {
         let analyzer = DependencyAnalyzer::new();
-        
+
         // Create a mock finding that would indicate "uses"
         let finding = Finding {
             language: Language::Rust,

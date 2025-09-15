@@ -1,8 +1,7 @@
 //! Algorithm detection functionality for extracting cryptographic algorithms from source code
 
 use anyhow::{Context, Result};
-use regex::Regex;
-use scanner_core::{Finding, PatternRegistry, CompiledAlgorithm};
+use scanner_core::{CompiledAlgorithm, Finding, PatternRegistry};
 use serde_json::json;
 use std::collections::{HashMap, HashSet};
 use std::fs;
@@ -10,9 +9,7 @@ use std::path::Path;
 use uuid::Uuid;
 use walkdir::WalkDir;
 
-use crate::{
-    AlgorithmProperties, AssetProperties, AssetType, CryptographicPrimitive, CryptoAsset,
-};
+use crate::{AlgorithmProperties, AssetProperties, AssetType, CryptoAsset, CryptographicPrimitive};
 
 /// Detector for cryptographic algorithms in source code
 pub struct AlgorithmDetector {
@@ -22,9 +19,7 @@ pub struct AlgorithmDetector {
 
 impl AlgorithmDetector {
     pub fn new() -> Self {
-        Self {
-            registry: None,
-        }
+        Self { registry: None }
     }
 
     pub fn with_registry(registry: std::sync::Arc<PatternRegistry>) -> Self {
@@ -34,17 +29,26 @@ impl AlgorithmDetector {
     }
 
     /// Detect algorithms from scanner findings using pattern registry
-    pub fn detect_algorithms(&self, scan_path: &Path, findings: &[Finding]) -> Result<Vec<CryptoAsset>> {
+    pub fn detect_algorithms(
+        &self,
+        scan_path: &Path,
+        findings: &[Finding],
+    ) -> Result<Vec<CryptoAsset>> {
         let mut algorithms = Vec::new();
         let mut seen_algorithms = HashSet::new();
 
         if let Some(registry) = &self.registry {
             // Extract algorithms from findings using registry patterns
             for finding in findings {
-                if let Some(algorithm_assets) = self.extract_algorithms_from_finding_with_registry(finding, registry)? {
+                if let Some(algorithm_assets) =
+                    self.extract_algorithms_from_finding_with_registry(finding, registry)?
+                {
                     for asset in algorithm_assets {
-                        let key = format!("{}:{}", asset.name.as_ref().unwrap_or(&"unknown".to_string()), 
-                                        asset.bom_ref);
+                        let key = format!(
+                            "{}:{}",
+                            asset.name.as_ref().unwrap_or(&"unknown".to_string()),
+                            asset.bom_ref
+                        );
                         if seen_algorithms.insert(key) {
                             algorithms.push(asset);
                         }
@@ -53,10 +57,14 @@ impl AlgorithmDetector {
             }
 
             // Perform additional static analysis for parameter extraction
-            let additional_algorithms = self.perform_deep_static_analysis_with_registry(scan_path, registry)?;
+            let additional_algorithms =
+                self.perform_deep_static_analysis_with_registry(scan_path, registry)?;
             for asset in additional_algorithms {
-                let key = format!("{}:{}", asset.name.as_ref().unwrap_or(&"unknown".to_string()), 
-                                asset.bom_ref);
+                let key = format!(
+                    "{}:{}",
+                    asset.name.as_ref().unwrap_or(&"unknown".to_string()),
+                    asset.bom_ref
+                );
                 if seen_algorithms.insert(key) {
                     algorithms.push(asset);
                 }
@@ -64,10 +72,15 @@ impl AlgorithmDetector {
         } else {
             // Fallback to hardcoded detection if no registry available
             for finding in findings {
-                if let Some(algorithm_assets) = self.extract_algorithms_from_finding_fallback(finding)? {
+                if let Some(algorithm_assets) =
+                    self.extract_algorithms_from_finding_fallback(finding)?
+                {
                     for asset in algorithm_assets {
-                        let key = format!("{}:{}", asset.name.as_ref().unwrap_or(&"unknown".to_string()), 
-                                        asset.bom_ref);
+                        let key = format!(
+                            "{}:{}",
+                            asset.name.as_ref().unwrap_or(&"unknown".to_string()),
+                            asset.bom_ref
+                        );
                         if seen_algorithms.insert(key) {
                             algorithms.push(asset);
                         }
@@ -80,7 +93,11 @@ impl AlgorithmDetector {
     }
 
     /// Extract algorithms from finding using pattern registry
-    fn extract_algorithms_from_finding_with_registry(&self, finding: &Finding, registry: &PatternRegistry) -> Result<Option<Vec<CryptoAsset>>> {
+    fn extract_algorithms_from_finding_with_registry(
+        &self,
+        finding: &Finding,
+        registry: &PatternRegistry,
+    ) -> Result<Option<Vec<CryptoAsset>>> {
         let mut algorithms = Vec::new();
 
         // Find the library in the registry
@@ -91,7 +108,7 @@ impl AlgorithmDetector {
                 if self.symbol_matches_algorithm(&finding.symbol, algorithm) {
                     // Extract parameters from the finding
                     let parameters = self.extract_parameters_from_finding(finding, algorithm)?;
-                    
+
                     // Create the algorithm asset
                     let asset = self.create_algorithm_asset_from_spec(algorithm, parameters)?;
                     algorithms.push(asset);
@@ -107,7 +124,10 @@ impl AlgorithmDetector {
     }
 
     /// Fallback algorithm extraction for when no registry is available
-    fn extract_algorithms_from_finding_fallback(&self, finding: &Finding) -> Result<Option<Vec<CryptoAsset>>> {
+    fn extract_algorithms_from_finding_fallback(
+        &self,
+        finding: &Finding,
+    ) -> Result<Option<Vec<CryptoAsset>>> {
         // Simplified fallback logic
         let symbol = &finding.symbol.to_lowercase();
         let mut algorithms = Vec::new();
@@ -137,11 +157,18 @@ impl AlgorithmDetector {
         }
 
         // Check if symbol matches any of the algorithm's symbol patterns
-        algorithm.symbol_patterns.iter().any(|pattern| pattern.is_match(symbol))
+        algorithm
+            .symbol_patterns
+            .iter()
+            .any(|pattern| pattern.is_match(symbol))
     }
 
     /// Extract parameters from finding using algorithm's parameter patterns
-    fn extract_parameters_from_finding(&self, finding: &Finding, algorithm: &CompiledAlgorithm) -> Result<HashMap<String, serde_json::Value>> {
+    fn extract_parameters_from_finding(
+        &self,
+        finding: &Finding,
+        algorithm: &CompiledAlgorithm,
+    ) -> Result<HashMap<String, serde_json::Value>> {
         let mut parameters = HashMap::new();
 
         // Extract parameters from symbol
@@ -149,14 +176,14 @@ impl AlgorithmDetector {
             if let Some(captures) = param_pattern.pattern.captures(&finding.symbol) {
                 if let Some(value_match) = captures.get(1) {
                     let value_str = value_match.as_str();
-                    
+
                     // Try to parse as number first, then as string
                     let value = if let Ok(num) = value_str.parse::<u64>() {
                         json!(num)
                     } else {
                         json!(value_str)
                     };
-                    
+
                     parameters.insert(param_pattern.name.clone(), value);
                 }
             } else if let Some(default) = &param_pattern.default_value {
@@ -169,9 +196,13 @@ impl AlgorithmDetector {
     }
 
     /// Create algorithm asset from algorithm spec and extracted parameters
-    fn create_algorithm_asset_from_spec(&self, algorithm: &CompiledAlgorithm, parameters: HashMap<String, serde_json::Value>) -> Result<CryptoAsset> {
+    fn create_algorithm_asset_from_spec(
+        &self,
+        algorithm: &CompiledAlgorithm,
+        parameters: HashMap<String, serde_json::Value>,
+    ) -> Result<CryptoAsset> {
         let primitive = self.parse_primitive(&algorithm.primitive)?;
-        
+
         let parameter_set = if parameters.is_empty() {
             None
         } else {
@@ -206,7 +237,11 @@ impl AlgorithmDetector {
     }
 
     /// Perform deep static analysis using registry patterns
-    fn perform_deep_static_analysis_with_registry(&self, scan_path: &Path, registry: &PatternRegistry) -> Result<Vec<CryptoAsset>> {
+    fn perform_deep_static_analysis_with_registry(
+        &self,
+        scan_path: &Path,
+        registry: &PatternRegistry,
+    ) -> Result<Vec<CryptoAsset>> {
         let mut algorithms = Vec::new();
 
         // Walk through source files for parameter extraction
@@ -216,9 +251,12 @@ impl AlgorithmDetector {
             .filter(|e| e.file_type().is_file())
         {
             let path = entry.path();
-            
+
             if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
-                if matches!(ext, "rs" | "java" | "go" | "py" | "c" | "cpp" | "swift" | "js" | "php") {
+                if matches!(
+                    ext,
+                    "rs" | "java" | "go" | "py" | "c" | "cpp" | "swift" | "js" | "php"
+                ) {
                     if let Ok(mut extracted) = self.analyze_file_with_registry(path, registry) {
                         algorithms.append(&mut extracted);
                     }
@@ -230,7 +268,11 @@ impl AlgorithmDetector {
     }
 
     /// Analyze a source file using registry patterns
-    fn analyze_file_with_registry(&self, file_path: &Path, registry: &PatternRegistry) -> Result<Vec<CryptoAsset>> {
+    fn analyze_file_with_registry(
+        &self,
+        file_path: &Path,
+        registry: &PatternRegistry,
+    ) -> Result<Vec<CryptoAsset>> {
         let content = fs::read_to_string(file_path)
             .with_context(|| format!("Failed to read file: {}", file_path.display()))?;
 
@@ -243,7 +285,7 @@ impl AlgorithmDetector {
                 for symbol_pattern in &algorithm.symbol_patterns {
                     for symbol_match in symbol_pattern.find_iter(&content) {
                         let symbol = symbol_match.as_str();
-                        
+
                         // Extract parameters from the matched symbol
                         let mut parameters = HashMap::new();
                         for param_pattern in &algorithm.parameter_patterns {
@@ -347,16 +389,25 @@ mod tests {
     #[test]
     fn test_primitive_parsing() {
         let detector = AlgorithmDetector::new();
-        
-        assert!(matches!(detector.parse_primitive("signature").unwrap(), CryptographicPrimitive::Signature));
-        assert!(matches!(detector.parse_primitive("aead").unwrap(), CryptographicPrimitive::AuthenticatedEncryption));
-        assert!(matches!(detector.parse_primitive("hash").unwrap(), CryptographicPrimitive::Hash));
+
+        assert!(matches!(
+            detector.parse_primitive("signature").unwrap(),
+            CryptographicPrimitive::Signature
+        ));
+        assert!(matches!(
+            detector.parse_primitive("aead").unwrap(),
+            CryptographicPrimitive::AuthenticatedEncryption
+        ));
+        assert!(matches!(
+            detector.parse_primitive("hash").unwrap(),
+            CryptographicPrimitive::Hash
+        ));
     }
 
     #[test]
     fn test_fallback_algorithm_extraction() {
         let detector = AlgorithmDetector::new();
-        
+
         let finding = Finding {
             language: Language::Rust,
             library: "unknown".to_string(),
@@ -367,9 +418,11 @@ mod tests {
             detector_id: "detector-rust".to_string(),
         };
 
-        let algorithms = detector.extract_algorithms_from_finding_fallback(&finding).unwrap();
+        let algorithms = detector
+            .extract_algorithms_from_finding_fallback(&finding)
+            .unwrap();
         assert!(algorithms.is_some());
-        
+
         let algos = algorithms.unwrap();
         assert_eq!(algos.len(), 1);
         assert_eq!(algos[0].name, Some("RSA".to_string()));

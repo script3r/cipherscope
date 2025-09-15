@@ -215,7 +215,7 @@ pub struct AlgorithmSpec {
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct ParameterPattern {
-    pub name: String, // e.g., "keySize", "curve", "outputSize"
+    pub name: String,    // e.g., "keySize", "curve", "outputSize"
     pub pattern: String, // Regex pattern to extract the parameter value
     #[serde(default)]
     pub default_value: Option<serde_json::Value>, // Default value if not found
@@ -434,10 +434,13 @@ fn compile_regexes(srcs: &[String]) -> Result<Vec<Regex>> {
 }
 
 fn compile_algorithms(algorithms: &[AlgorithmSpec]) -> Result<Vec<CompiledAlgorithm>> {
-    algorithms.iter()
+    algorithms
+        .iter()
         .map(|algo| {
             let symbol_patterns = compile_regexes(&algo.symbol_patterns)?;
-            let parameter_patterns = algo.parameter_patterns.iter()
+            let parameter_patterns = algo
+                .parameter_patterns
+                .iter()
                 .map(|param| {
                     let pattern = Regex::new(&param.pattern)
                         .with_context(|| format!("bad parameter pattern: {}", param.pattern))?;
@@ -448,7 +451,7 @@ fn compile_algorithms(algorithms: &[AlgorithmSpec]) -> Result<Vec<CompiledAlgori
                     })
                 })
                 .collect::<Result<Vec<_>>>()?;
-            
+
             Ok(CompiledAlgorithm {
                 name: algo.name.clone(),
                 primitive: algo.primitive.clone(),

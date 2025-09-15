@@ -9,8 +9,8 @@ use walkdir::WalkDir;
 use x509_parser::prelude::*;
 
 use crate::{
-    AlgorithmProperties, AssetProperties, AssetType, CryptographicPrimitive, CryptoAsset,
-    CertificateProperties,
+    AlgorithmProperties, AssetProperties, AssetType, CertificateProperties, CryptoAsset,
+    CryptographicPrimitive,
 };
 
 /// Parser for X.509 certificates and related cryptographic material
@@ -24,7 +24,7 @@ impl CertificateParser {
     /// Parse all certificates found in the given directory
     pub fn parse_certificates(&self, scan_path: &Path) -> Result<Vec<CryptoAsset>> {
         let mut certificates = Vec::new();
-        
+
         // Define certificate file extensions to look for
         let cert_extensions = [
             "pem", "crt", "cer", "der", "p7b", "p7c", "pfx", "p12",
@@ -38,7 +38,7 @@ impl CertificateParser {
             .filter(|e| e.file_type().is_file())
         {
             let path = entry.path();
-            
+
             // Check if the file has a certificate extension
             if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
                 if cert_extensions.contains(&ext.to_lowercase().as_str()) {
@@ -75,10 +75,10 @@ impl CertificateParser {
     /// Parse PEM-encoded certificates
     fn parse_pem_certificates(&self, data: &[u8]) -> Result<Vec<CryptoAsset>> {
         let mut certificates = Vec::new();
-        
+
         // Convert to string for PEM parsing
         let pem_str = String::from_utf8_lossy(data);
-        
+
         // Look for PEM certificate blocks
         let mut current_pos = 0;
         while let Some(start) = pem_str[current_pos..].find("-----BEGIN CERTIFICATE-----") {
@@ -86,14 +86,14 @@ impl CertificateParser {
             if let Some(end) = pem_str[absolute_start..].find("-----END CERTIFICATE-----") {
                 let absolute_end = absolute_start + end + "-----END CERTIFICATE-----".len();
                 let pem_block = &pem_str[absolute_start..absolute_end];
-                
+
                 // Extract the base64 content
                 if let Ok(der_data) = self.pem_to_der(pem_block) {
                     if let Ok(cert) = self.parse_der_certificate(&der_data) {
                         certificates.push(cert);
                     }
                 }
-                
+
                 current_pos = absolute_end;
             } else {
                 break;
@@ -115,16 +115,15 @@ impl CertificateParser {
         }
 
         // Skip the BEGIN and END lines
-        let base64_content = lines[1..lines.len()-1].join("");
-        
-        base64::decode(&base64_content)
-            .context("Failed to decode base64 content")
+        let base64_content = lines[1..lines.len() - 1].join("");
+
+        base64::decode(&base64_content).context("Failed to decode base64 content")
     }
 
     /// Parse DER-encoded certificate
     fn parse_der_certificate(&self, der_data: &[u8]) -> Result<CryptoAsset> {
-        let (_, cert) = X509Certificate::from_der(der_data)
-            .context("Failed to parse DER certificate")?;
+        let (_, cert) =
+            X509Certificate::from_der(der_data).context("Failed to parse DER certificate")?;
 
         // Extract certificate properties
         let subject_name = cert.subject().to_string();
@@ -152,8 +151,13 @@ impl CertificateParser {
     }
 
     /// Create an algorithm asset for a certificate's signature algorithm
-    pub fn create_signature_algorithm_asset(&self, signature_algorithm_oid: &str, bom_ref: String) -> CryptoAsset {
-        let (name, primitive, nist_level, parameter_set) = self.map_signature_algorithm(signature_algorithm_oid);
+    pub fn create_signature_algorithm_asset(
+        &self,
+        signature_algorithm_oid: &str,
+        bom_ref: String,
+    ) -> CryptoAsset {
+        let (name, primitive, nist_level, parameter_set) =
+            self.map_signature_algorithm(signature_algorithm_oid);
 
         CryptoAsset {
             bom_ref,
@@ -168,33 +172,121 @@ impl CertificateParser {
     }
 
     /// Map signature algorithm OID to algorithm properties
-    fn map_signature_algorithm(&self, oid: &str) -> (String, CryptographicPrimitive, u8, Option<serde_json::Value>) {
+    fn map_signature_algorithm(
+        &self,
+        oid: &str,
+    ) -> (
+        String,
+        CryptographicPrimitive,
+        u8,
+        Option<serde_json::Value>,
+    ) {
         match oid {
             // RSA signature algorithms - all vulnerable to quantum attacks
-            "1.2.840.113549.1.1.1" => ("RSA".to_string(), CryptographicPrimitive::Signature, 0, None),
-            "1.2.840.113549.1.1.4" => ("RSA with MD5".to_string(), CryptographicPrimitive::Signature, 0, None),
-            "1.2.840.113549.1.1.5" => ("RSA with SHA-1".to_string(), CryptographicPrimitive::Signature, 0, None),
-            "1.2.840.113549.1.1.11" => ("RSA with SHA-256".to_string(), CryptographicPrimitive::Signature, 0, None),
-            "1.2.840.113549.1.1.12" => ("RSA with SHA-384".to_string(), CryptographicPrimitive::Signature, 0, None),
-            "1.2.840.113549.1.1.13" => ("RSA with SHA-512".to_string(), CryptographicPrimitive::Signature, 0, None),
-            
+            "1.2.840.113549.1.1.1" => (
+                "RSA".to_string(),
+                CryptographicPrimitive::Signature,
+                0,
+                None,
+            ),
+            "1.2.840.113549.1.1.4" => (
+                "RSA with MD5".to_string(),
+                CryptographicPrimitive::Signature,
+                0,
+                None,
+            ),
+            "1.2.840.113549.1.1.5" => (
+                "RSA with SHA-1".to_string(),
+                CryptographicPrimitive::Signature,
+                0,
+                None,
+            ),
+            "1.2.840.113549.1.1.11" => (
+                "RSA with SHA-256".to_string(),
+                CryptographicPrimitive::Signature,
+                0,
+                None,
+            ),
+            "1.2.840.113549.1.1.12" => (
+                "RSA with SHA-384".to_string(),
+                CryptographicPrimitive::Signature,
+                0,
+                None,
+            ),
+            "1.2.840.113549.1.1.13" => (
+                "RSA with SHA-512".to_string(),
+                CryptographicPrimitive::Signature,
+                0,
+                None,
+            ),
+
             // ECDSA signature algorithms - all vulnerable to quantum attacks
-            "1.2.840.10045.4.1" => ("ECDSA with SHA-1".to_string(), CryptographicPrimitive::Signature, 0, None),
-            "1.2.840.10045.4.3.1" => ("ECDSA with SHA-224".to_string(), CryptographicPrimitive::Signature, 0, None),
-            "1.2.840.10045.4.3.2" => ("ECDSA with SHA-256".to_string(), CryptographicPrimitive::Signature, 0, None),
-            "1.2.840.10045.4.3.3" => ("ECDSA with SHA-384".to_string(), CryptographicPrimitive::Signature, 0, None),
-            "1.2.840.10045.4.3.4" => ("ECDSA with SHA-512".to_string(), CryptographicPrimitive::Signature, 0, None),
-            
+            "1.2.840.10045.4.1" => (
+                "ECDSA with SHA-1".to_string(),
+                CryptographicPrimitive::Signature,
+                0,
+                None,
+            ),
+            "1.2.840.10045.4.3.1" => (
+                "ECDSA with SHA-224".to_string(),
+                CryptographicPrimitive::Signature,
+                0,
+                None,
+            ),
+            "1.2.840.10045.4.3.2" => (
+                "ECDSA with SHA-256".to_string(),
+                CryptographicPrimitive::Signature,
+                0,
+                None,
+            ),
+            "1.2.840.10045.4.3.3" => (
+                "ECDSA with SHA-384".to_string(),
+                CryptographicPrimitive::Signature,
+                0,
+                None,
+            ),
+            "1.2.840.10045.4.3.4" => (
+                "ECDSA with SHA-512".to_string(),
+                CryptographicPrimitive::Signature,
+                0,
+                None,
+            ),
+
             // EdDSA - also vulnerable to quantum attacks
-            "1.3.101.112" => ("Ed25519".to_string(), CryptographicPrimitive::Signature, 0, None),
-            "1.3.101.113" => ("Ed448".to_string(), CryptographicPrimitive::Signature, 0, None),
-            
+            "1.3.101.112" => (
+                "Ed25519".to_string(),
+                CryptographicPrimitive::Signature,
+                0,
+                None,
+            ),
+            "1.3.101.113" => (
+                "Ed448".to_string(),
+                CryptographicPrimitive::Signature,
+                0,
+                None,
+            ),
+
             // DSA - vulnerable to quantum attacks
-            "1.2.840.10040.4.1" => ("DSA".to_string(), CryptographicPrimitive::Signature, 0, None),
-            "1.2.840.10040.4.3" => ("DSA with SHA-1".to_string(), CryptographicPrimitive::Signature, 0, None),
-            
+            "1.2.840.10040.4.1" => (
+                "DSA".to_string(),
+                CryptographicPrimitive::Signature,
+                0,
+                None,
+            ),
+            "1.2.840.10040.4.3" => (
+                "DSA with SHA-1".to_string(),
+                CryptographicPrimitive::Signature,
+                0,
+                None,
+            ),
+
             // Default case for unknown algorithms
-            _ => (format!("Unknown Algorithm (OID: {})", oid), CryptographicPrimitive::Signature, 0, None),
+            _ => (
+                format!("Unknown Algorithm (OID: {})", oid),
+                CryptographicPrimitive::Signature,
+                0,
+                None,
+            ),
         }
     }
 
@@ -202,7 +294,7 @@ impl CertificateParser {
     fn asn1_time_to_chrono(&self, asn1_time: &ASN1Time) -> Result<DateTime<Utc>> {
         // Convert ASN1Time to Unix timestamp
         let timestamp = asn1_time.timestamp();
-        
+
         DateTime::from_timestamp(timestamp, 0)
             .ok_or_else(|| anyhow::anyhow!("Invalid timestamp: {}", timestamp))
     }
@@ -216,7 +308,7 @@ impl CertificateParser {
                 return component[3..].to_string();
             }
         }
-        
+
         // Fallback to the full DN if no CN found
         dn.to_string()
     }
@@ -236,35 +328,35 @@ mod base64 {
         // Simple base64 decoder - in a real implementation, you'd use the base64 crate
         // For now, we'll use a basic implementation
         use std::collections::HashMap;
-        
+
         let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
         let mut decode_table = HashMap::new();
-        
+
         for (i, c) in alphabet.chars().enumerate() {
             decode_table.insert(c, i as u8);
         }
-        
+
         let input = input.replace([' ', '\n', '\r', '\t'], "");
         let mut result = Vec::new();
         let mut buffer = 0u32;
         let mut bits_collected = 0;
-        
+
         for c in input.chars() {
             if c == '=' {
                 break; // Padding
             }
-            
+
             if let Some(&value) = decode_table.get(&c) {
                 buffer = (buffer << 6) | (value as u32);
                 bits_collected += 6;
-                
+
                 if bits_collected >= 8 {
                     bits_collected -= 8;
                     result.push(((buffer >> bits_collected) & 0xFF) as u8);
                 }
             }
         }
-        
+
         Ok(result)
     }
 }
@@ -272,7 +364,6 @@ mod base64 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::TempDir;
 
     #[test]
     fn test_certificate_parser_creation() {
@@ -284,13 +375,13 @@ mod tests {
     #[test]
     fn test_signature_algorithm_mapping() {
         let parser = CertificateParser::new();
-        
+
         // Test RSA mapping
         let (name, primitive, level, _) = parser.map_signature_algorithm("1.2.840.113549.1.1.11");
         assert_eq!(name, "RSA with SHA-256");
         assert!(matches!(primitive, CryptographicPrimitive::Signature));
         assert_eq!(level, 0); // Vulnerable to quantum attacks
-        
+
         // Test ECDSA mapping
         let (name, primitive, level, _) = parser.map_signature_algorithm("1.2.840.10045.4.3.2");
         assert_eq!(name, "ECDSA with SHA-256");
@@ -301,10 +392,10 @@ mod tests {
     #[test]
     fn test_common_name_extraction() {
         let parser = CertificateParser::new();
-        
+
         let dn = "CN=example.com,O=Example Corp,C=US";
         assert_eq!(parser.extract_common_name(dn), "example.com");
-        
+
         let dn_no_cn = "O=Example Corp,C=US";
         assert_eq!(parser.extract_common_name(dn_no_cn), "O=Example Corp,C=US");
     }
