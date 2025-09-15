@@ -171,24 +171,37 @@ impl AlgorithmDetector {
     ) -> Result<HashMap<String, serde_json::Value>> {
         let mut parameters = HashMap::new();
 
-        // Extract parameters from symbol
+        // Try to extract parameters from multiple sources
+        let sources = vec![&finding.symbol, &finding.snippet];
+
         for param_pattern in &algorithm.parameter_patterns {
-            if let Some(captures) = param_pattern.pattern.captures(&finding.symbol) {
-                if let Some(value_match) = captures.get(1) {
-                    let value_str = value_match.as_str();
+            let mut found_value = false;
 
-                    // Try to parse as number first, then as string
-                    let value = if let Ok(num) = value_str.parse::<u64>() {
-                        json!(num)
-                    } else {
-                        json!(value_str)
-                    };
+            // Try each source (symbol, snippet) for parameter extraction
+            for source in &sources {
+                if let Some(captures) = param_pattern.pattern.captures(source) {
+                    if let Some(value_match) = captures.get(1) {
+                        let value_str = value_match.as_str();
 
-                    parameters.insert(param_pattern.name.clone(), value);
+                        // Try to parse as number first, then as string
+                        let value = if let Ok(num) = value_str.parse::<u64>() {
+                            json!(num)
+                        } else {
+                            json!(value_str)
+                        };
+
+                        parameters.insert(param_pattern.name.clone(), value);
+                        found_value = true;
+                        break; // Found value, no need to check other sources
+                    }
                 }
-            } else if let Some(default) = &param_pattern.default_value {
-                // Use default value if pattern doesn't match
-                parameters.insert(param_pattern.name.clone(), default.clone());
+            }
+
+            // Use default value if pattern doesn't match any source
+            if !found_value {
+                if let Some(default) = &param_pattern.default_value {
+                    parameters.insert(param_pattern.name.clone(), default.clone());
+                }
             }
         }
 

@@ -1,7 +1,7 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:c98e21d5-2b8c-4e9b-b97b-bbe39d0d25ac",
+  "serialNumber": "urn:uuid:791a3953-6253-4538-aece-8cc31199a5ca",
   "version": 1,
   "metadata": {
     "component": {
@@ -9,7 +9,7 @@
       "version": "0.1.0",
       "path": "/workspace/fixtures/rust/rsa-vulnerable"
     },
-    "timestamp": "2025-09-15T18:58:37.460925384Z",
+    "timestamp": "2025-09-15T19:17:52.984384888Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -20,7 +20,7 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "2e4b77fb-1de2-4761-b9da-9a007efbb089",
+      "bom-ref": "c756d2ef-95d4-4534-a7ef-e7e8e7f505eb",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {
@@ -29,7 +29,7 @@
       }
     },
     {
-      "bom-ref": "e5492ffd-0ea9-47bc-8ef3-6aa2dfc95d71",
+      "bom-ref": "e890426e-ba05-4946-b841-485720f6cd5a",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {
@@ -38,7 +38,7 @@
       }
     },
     {
-      "bom-ref": "6edf4b41-c1f6-428e-bc40-c80b4d7aff56",
+      "bom-ref": "87948934-8659-4e99-a743-d86f4f34a08e",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {
@@ -47,7 +47,7 @@
       }
     },
     {
-      "bom-ref": "57cb35f6-998e-420b-8860-6b19555a21fd",
+      "bom-ref": "68f9246f-0eae-4f5d-aa0c-b9af67a80c55",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {
@@ -56,7 +56,25 @@
       }
     },
     {
-      "bom-ref": "3727cc74-9b89-47f2-81e5-17a3f035ebfd",
+      "bom-ref": "8bdcb637-3c7d-4b0c-b2f5-a4474ac4c7f1",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "nistQuantumSecurityLevel": 0
+      }
+    },
+    {
+      "bom-ref": "78970954-22d0-460a-9254-1ea0fad29b0a",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "nistQuantumSecurityLevel": 0
+      }
+    },
+    {
+      "bom-ref": "866977e7-0aa7-4993-a30a-c0f5f0b977b1",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {
@@ -67,9 +85,9 @@
   ],
   "dependencies": [
     {
-      "ref": "e61261d4-6cd0-4225-95bd-5ecaeb0eec88",
+      "ref": "6d58fd26-a420-4512-8c77-f86505de4d48",
       "dependsOn": [
-        "2e4b77fb-1de2-4761-b9da-9a007efbb089"
+        "c756d2ef-95d4-4534-a7ef-e7e8e7f505eb"
       ],
       "dependencyType": "implements"
     }

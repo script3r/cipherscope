@@ -155,6 +155,51 @@ apis = [
   "\\bKeyAgreement\\.getInstance\\s*\\(",
 ]
 
+# Algorithm definitions for JCA/JCE
+[[library.algorithms]]
+name = "RSA"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bKeyPairGenerator\\.getInstance\\s*\\(\\s*[\"']RSA[\"']",
+  "\\bRSA",
+]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "initialize\\s*\\(\\s*(\\d+)"
+default_value = 2048
+
+[[library.algorithms]]
+name = "AES"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCipher\\.getInstance\\s*\\(\\s*[\"']AES",
+  "\\bKeyGenerator\\.getInstance\\s*\\(\\s*[\"']AES[\"']",
+]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "init\\s*\\(\\s*(\\d+)"
+default_value = 256
+
+[[library.algorithms]]
+name = "ECDSA"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bSignature\\.getInstance\\s*\\([^)]*ECDSA",
+  "\\bKeyPairGenerator\\.getInstance\\s*\\(\\s*[\"']EC[\"']",
+]
+
+[[library.algorithms]]
+name = "SHA-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*SHA-?256",
+  "\\bSHA256with",
+]
+
 [[library]]
 name = "BouncyCastle"
 languages = ["Java"]
@@ -178,6 +223,20 @@ apis = [
   "\\bTinkConfig\\.register\\s*\\(",
   "\\b(?:Aead|Mac|HybridDecrypt|HybridEncrypt|PublicKeySign|PublicKeyVerify)\\b",
 ]
+
+# Algorithm definitions for Google Tink
+[[library.algorithms]]
+name = "AES-GCM"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bAeadKeyTemplates\\.AES\\d+_GCM",
+  "\\bAead",
+]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "AES(\\d+)_GCM"
+default_value = 256
 
 [[library]]
 name = "Conscrypt"
@@ -281,7 +340,7 @@ symbol_patterns = [
 ]
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
-pattern = "(?:new|generate).*?(\\d{4})"
+pattern = "(?:new|generate).*?(\\d{4})|RsaPrivateKey::new.*?(\\d{4})"
 default_value = 2048
 
 [[library.algorithms]]
