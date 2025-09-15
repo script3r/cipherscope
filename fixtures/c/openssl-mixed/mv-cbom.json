@@ -1,0 +1,58 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:f7699f6e-deb2-4df5-a35f-cdfc3e75fac2",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "name": "openssl-mixed",
+      "path": "/workspace/fixtures/c/openssl-mixed"
+    },
+    "timestamp": "2025-09-15T17:50:59.203450522Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [
+    {
+      "bom-ref": "8ec4b990-c242-4dce-b287-f03f5ad7d944",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "nistQuantumSecurityLevel": 0
+      }
+    },
+    {
+      "bom-ref": "b0eeb295-734e-4802-84a1-c10c77b8c84d",
+      "assetType": "algorithm",
+      "name": "ChaCha20Poly1305",
+      "assetProperties": {
+        "primitive": "aead",
+        "nistQuantumSecurityLevel": 3
+      }
+    },
+    {
+      "bom-ref": "618e2556-e493-4d3d-b7a3-e541ccaf533e",
+      "assetType": "algorithm",
+      "name": "ChaCha20Poly1305",
+      "assetProperties": {
+        "primitive": "aead",
+        "nistQuantumSecurityLevel": 3
+      }
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "7b79d53e-9174-40a2-ab0e-90ce576f0eea",
+      "dependsOn": [
+        "8ec4b990-c242-4dce-b287-f03f5ad7d944"
+      ],
+      "dependencyType": "implements"
+    }
+  ]
+}

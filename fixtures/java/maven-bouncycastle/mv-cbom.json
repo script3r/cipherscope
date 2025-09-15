@@ -1,0 +1,23 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:8f975a01-c294-4d77-baca-8cc524b1c0b3",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "name": "crypto-test",
+      "version": "1.0.0",
+      "path": "/workspace/fixtures/java/maven-bouncycastle"
+    },
+    "timestamp": "2025-09-15T17:50:59.179489895Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [],
+  "dependencies": []
+}

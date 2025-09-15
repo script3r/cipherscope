@@ -182,17 +182,24 @@ Each detector implements the `Detector` trait and can be extended independently.
 The MV-CBOM generation is implemented in the `cbom-generator` crate with modular components:
 
 - **cbom-generator**: Main CBOM generation and JSON serialization
-- **certificate-parser**: X.509 certificate parsing and signature algorithm extraction
-- **algorithm-detector**: Deep static analysis for algorithm parameter extraction
+- **certificate-parser**: X.509 certificate parsing and signature algorithm extraction  
+- **algorithm-detector**: **Pattern-driven** algorithm detection using `patterns.toml` definitions
 - **dependency-analyzer**: Intelligent "uses" vs "implements" relationship detection
-- **cargo-parser**: Rust project metadata and dependency analysis
+- **project-parser**: Multi-language project metadata and dependency analysis (Cargo, Maven, go.mod, requirements.txt, Makefile, Bazel, BUCK, etc.)
+
+**Key Innovation: Pattern-Driven Algorithm Detection**
+- Algorithm definitions moved from hardcoded Rust to configurable `patterns.toml`
+- Each library can define supported algorithms with NIST security levels
+- Parameter extraction patterns (key sizes, curves) defined declaratively
+- Extensible: new algorithms added by editing patterns, not code
 
 The MV-CBOM pipeline:
-1. **Static Analysis**: Scanner finds cryptographic usage patterns
-2. **Algorithm Detection**: Extracts specific algorithms and parameters from findings
+1. **Static Analysis**: Scanner finds cryptographic usage patterns using `patterns.toml`
+2. **Algorithm Detection**: **Pattern-driven** extraction of algorithms and parameters
 3. **Certificate Parsing**: Discovers and analyzes X.509 certificates in the project
-4. **Dependency Analysis**: Correlates Cargo.toml dependencies with actual code usage
-5. **CBOM Generation**: Produces standards-compliant JSON with NIST security levels
+4. **Project Analysis**: Multi-language dependency parsing (Cargo, Maven, go.mod, Makefile, Bazel, BUCK, etc.)
+5. **Dependency Analysis**: Correlates project dependencies with actual code usage
+6. **CBOM Generation**: Produces standards-compliant JSON with NIST security levels
 
 ### Tests & Benchmarks
 
@@ -202,20 +209,53 @@ Run unit tests and integration tests (fixtures):
 cargo test
 ```
 
-#### MV-CBOM Test Cases
+#### Comprehensive Fixtures for MV-CBOM Testing
 
-The `test-cases/` directory contains comprehensive test scenarios for MV-CBOM validation:
+The `fixtures/` directory contains rich, realistic examples for testing MV-CBOM generation across multiple languages and build systems:
 
-- **test-case-1-rsa-uses**: RSA 2048-bit usage (PQC vulnerable, "uses" relationship)
-- **test-case-2-implements-vs-uses**: SHA2 "uses" vs P256 "implements" distinction
-- **test-case-3-certificate**: X.509 certificate parsing with signature algorithm detection
-- **test-case-4-pqc-safe**: Quantum-safe algorithms (AES-256, ChaCha20Poly1305, SHA-3, BLAKE3)
+**Rust Fixtures:**
+- **`rust/rsa-vulnerable`**: RSA 2048-bit usage (PQC vulnerable, "uses" relationship)
+- **`rust/aes-gcm-safe`**: Quantum-safe algorithms (AES-256-GCM, ChaCha20Poly1305, SHA-3, BLAKE3)
+- **`rust/implements-vs-uses`**: SHA2 "uses" vs P256 "implements" distinction
+- **`rust/mixed-crypto`**: Complex multi-algorithm project (RSA, AES, SHA2, Ed25519, Ring)
 
-Run tests:
+**Java Fixtures:**
+- **`java/maven-bouncycastle`**: Maven project with BouncyCastle RSA/ECDSA
+- **`java/bazel-tink`**: Bazel project with Google Tink and BouncyCastle
+- **`java/jca-standard`**: Standard JCA/JCE without external dependencies
+
+**C/C++ Fixtures:**
+- **`c/openssl-mixed`**: OpenSSL + libsodium with RSA, ChaCha20Poly1305, AES
+- **`c/libsodium-modern`**: Modern libsodium with quantum-safe and vulnerable algorithms
+- **`c/makefile-crypto`**: Basic OpenSSL usage with Makefile dependency detection
+- **`cpp/botan-modern`**: Botan library with RSA, AES-GCM, SHA-3, BLAKE2b
+- **`cpp/cryptopp-legacy`**: Crypto++ library with RSA, AES-GCM, SHA-256/512
+
+**Go Fixtures:**
+- **`go/stdlib-crypto`**: Standard library crypto (RSA, ECDSA, AES-GCM, SHA-256/512)
+- **`go/x-crypto-extended`**: Extended crypto with golang.org/x/crypto dependencies
+
+**Python Fixtures:**
+- **`python/cryptography-mixed`**: PyCA Cryptography with RSA, AES, PBKDF2
+- **`python/pycryptodome-legacy`**: PyCryptodome with RSA signatures and AES
+- **`python/requirements-basic`**: Basic requirements.txt with Fernet and hashing
+
+**Certificate Fixtures:**
+- **`certificates/x509-rsa-ecdsa`**: X.509 certificates with RSA and ECDSA signatures
+
+Run fixture tests:
 ```bash
-cd test-cases/test-case-1-rsa-uses
-../../target/release/cipherscope . --cbom --patterns ../../patterns.toml
-cat mv-cbom.json | jq '.cryptoAssets[] | select(.assetProperties.nistQuantumSecurityLevel == 0)'
+# Test RSA vulnerability detection
+./target/release/cipherscope fixtures/rust/rsa-vulnerable --cbom
+cat fixtures/rust/rsa-vulnerable/mv-cbom.json | jq '.cryptoAssets[] | select(.assetProperties.nistQuantumSecurityLevel == 0)'
+
+# Test multi-language support
+./target/release/cipherscope fixtures/java/maven-bouncycastle --cbom
+./target/release/cipherscope fixtures/go/stdlib-crypto --cbom
+./target/release/cipherscope fixtures/python/cryptography-mixed --cbom
+
+# Test certificate parsing
+./target/release/cipherscope fixtures/certificates/x509-rsa-ecdsa --cbom
 ```
 
 Benchmark scan throughput on test fixtures:

@@ -1,0 +1,77 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:30620163-9660-42d9-a854-f8a330ca9fff",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "name": "test-rsa-uses",
+      "version": "0.1.0",
+      "path": "/workspace/fixtures/rust/rsa-vulnerable"
+    },
+    "timestamp": "2025-09-15T17:50:59.156789972Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [
+    {
+      "bom-ref": "b72c3419-5088-484c-8bd8-26cbbdc31025",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "nistQuantumSecurityLevel": 0
+      }
+    },
+    {
+      "bom-ref": "67d53894-29c7-4a92-bef2-38ecae5f9ae2",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "nistQuantumSecurityLevel": 0
+      }
+    },
+    {
+      "bom-ref": "ff742575-645e-4708-b42e-7019129b91c3",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "nistQuantumSecurityLevel": 0
+      }
+    },
+    {
+      "bom-ref": "dc5ca083-a022-412e-a876-b67fbc8fc848",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "nistQuantumSecurityLevel": 0
+      }
+    },
+    {
+      "bom-ref": "7efee67e-2367-4230-9101-4c52f3728375",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "nistQuantumSecurityLevel": 0
+      }
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "1ec13698-e270-4dc4-9f12-4a9cf86d8a17",
+      "dependsOn": [
+        "b72c3419-5088-484c-8bd8-26cbbdc31025"
+      ],
+      "dependencyType": "implements"
+    }
+  ]
+}

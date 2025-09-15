@@ -1,0 +1,54 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:7eba9f44-8183-4dce-b2bd-6f6fad1fd26a",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "name": "x509-rsa-ecdsa",
+      "path": "/workspace/fixtures/certificates/x509-rsa-ecdsa"
+    },
+    "timestamp": "2025-09-15T17:49:58.531299222Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [
+    {
+      "bom-ref": "7a29490d-27fa-4d82-aa39-27ab91a0a9bc",
+      "assetType": "certificate",
+      "name": "ecdsa-example.com",
+      "assetProperties": {
+        "subjectName": "C=US, ST=CA, L=San Francisco, O=Test Corp, CN=ecdsa-example.com",
+        "issuerName": "C=US, ST=CA, L=San Francisco, O=Test Corp, CN=ecdsa-example.com",
+        "notValidAfter": "2026-09-15T17:49:42Z",
+        "signatureAlgorithmRef": "903241ad-6fae-46f8-b395-fe93bd6f52c6"
+      }
+    },
+    {
+      "bom-ref": "1a7972ac-3422-4be1-a8d4-3fe8e41da29e",
+      "assetType": "certificate",
+      "name": "rsa-example.com",
+      "assetProperties": {
+        "subjectName": "C=US, ST=CA, L=San Francisco, O=Test Corp, CN=rsa-example.com",
+        "issuerName": "C=US, ST=CA, L=San Francisco, O=Test Corp, CN=rsa-example.com",
+        "notValidAfter": "2026-09-15T17:49:26Z",
+        "signatureAlgorithmRef": "a234cafc-99bb-4966-9f60-c38eca7bde88"
+      }
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "279603a2-45e4-4c9a-870d-4d03165ebb97",
+      "dependsOn": [
+        "7a29490d-27fa-4d82-aa39-27ab91a0a9bc",
+        "1a7972ac-3422-4be1-a8d4-3fe8e41da29e"
+      ],
+      "dependencyType": "uses"
+    }
+  ]
+}
