@@ -1,0 +1,105 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:b51bc2b2-08c4-4052-8423-6aa2addf50d8",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "name": "test-pqc-safe",
+      "version": "0.1.0",
+      "path": "/workspace/test-cases/test-case-4-pqc-safe"
+    },
+    "timestamp": "2025-09-15T17:01:54.743643493Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [
+    {
+      "bom-ref": "25051ae5-a0f3-428d-8f80-d8488b9019a8",
+      "assetType": "algorithm",
+      "name": "AES-256-GCM",
+      "assetProperties": {
+        "primitive": "aead",
+        "parameterSet": {
+          "keySize": 256,
+          "mode": "GCM"
+        },
+        "nistQuantumSecurityLevel": 3
+      }
+    },
+    {
+      "bom-ref": "ad41649c-561e-4cf6-9044-0b624299bc1c",
+      "assetType": "algorithm",
+      "name": "AES-256",
+      "assetProperties": {
+        "primitive": "aead",
+        "parameterSet": {
+          "keySize": 256
+        },
+        "nistQuantumSecurityLevel": 3
+      }
+    },
+    {
+      "bom-ref": "5b22c260-0036-4638-b068-c2824acdd8d0",
+      "assetType": "algorithm",
+      "name": "AES-256",
+      "assetProperties": {
+        "primitive": "aead",
+        "parameterSet": {
+          "keySize": 256
+        },
+        "nistQuantumSecurityLevel": 3
+      }
+    },
+    {
+      "bom-ref": "094a4c0d-43ca-4052-a362-a1a702775c02",
+      "assetType": "algorithm",
+      "name": "AES-256",
+      "assetProperties": {
+        "primitive": "aead",
+        "parameterSet": {
+          "keySize": 256
+        },
+        "nistQuantumSecurityLevel": 3
+      }
+    },
+    {
+      "bom-ref": "14c35d83-26c8-47e9-93ff-bd021a2e91ad",
+      "assetType": "algorithm",
+      "name": "AES-256",
+      "assetProperties": {
+        "primitive": "aead",
+        "parameterSet": {
+          "keySize": 256
+        },
+        "nistQuantumSecurityLevel": 3
+      }
+    },
+    {
+      "bom-ref": "ccc632a3-07ff-4ad4-adfb-0425804850fd",
+      "assetType": "algorithm",
+      "name": "AES-256",
+      "assetProperties": {
+        "primitive": "aead",
+        "parameterSet": {
+          "keySize": 256
+        },
+        "nistQuantumSecurityLevel": 3
+      }
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "8bc267ab-2f52-4429-ba09-b6d4b2b6905b",
+      "dependsOn": [
+        "25051ae5-a0f3-428d-8f80-d8488b9019a8"
+      ],
+      "dependencyType": "uses"
+    }
+  ]
+}

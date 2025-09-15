@@ -223,10 +223,12 @@ name = "RustCrypto (common crates)"
 languages = ["Rust"]
 [library.patterns]
 include = [
-  "\\buse\\s+(?:aes|aes_gcm|chacha20|chacha20poly1305|poly1305|sha1|sha2|sha3|blake2|blake3|ed25519_dalek|curve25519_dalek|argon2|scrypt)[A-Za-z0-9_:]*",
+  "\\buse\\s+(?:aes|aes_gcm|chacha20|chacha20poly1305|poly1305|sha1|sha2|sha3|blake2|blake3|ed25519_dalek|curve25519_dalek|argon2|scrypt|rsa|p256|p384|k256)[A-Za-z0-9_:]*",
 ]
 apis = [
-  "\\b(?:aes_gcm|chacha20poly1305|sha2|sha3|blake3|ed25519_dalek|curve25519_dalek)::[A-Za-z0-9_:]+\\b",
+  "\\b(?:aes_gcm|chacha20poly1305|sha2|sha3|blake3|ed25519_dalek|curve25519_dalek|rsa|p256|p384|k256)::[A-Za-z0-9_:]+\\b",
+  "\\b(?:RsaPrivateKey|RsaPublicKey|Pkcs1v15Encrypt)\\b",
+  "\\b(?:Sha256|Sha512|Digest)\\b",
 ]
 
 # =========================

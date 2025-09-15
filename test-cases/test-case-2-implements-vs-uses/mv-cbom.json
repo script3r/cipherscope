@@ -1,0 +1,45 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:3531239e-3ffc-4921-abf9-84a76e54bac6",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "name": "test-implements-vs-uses",
+      "version": "0.1.0",
+      "path": "/workspace/test-cases/test-case-2-implements-vs-uses"
+    },
+    "timestamp": "2025-09-15T17:01:30.134036204Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [
+    {
+      "bom-ref": "a40bfef4-3768-43f1-a764-031cf35b54a0",
+      "assetType": "algorithm",
+      "name": "AES-256-GCM",
+      "assetProperties": {
+        "primitive": "aead",
+        "parameterSet": {
+          "keySize": 256,
+          "mode": "GCM"
+        },
+        "nistQuantumSecurityLevel": 3
+      }
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "687ed460-a755-4d68-89e6-d361bcb4ba53",
+      "dependsOn": [
+        "a40bfef4-3768-43f1-a764-031cf35b54a0"
+      ],
+      "dependencyType": "uses"
+    }
+  ]
+}

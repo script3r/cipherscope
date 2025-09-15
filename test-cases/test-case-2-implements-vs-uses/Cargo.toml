@@ -1,0 +1,8 @@
+[package]
+name = "test-implements-vs-uses"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sha2 = "0.10"
+p256 = "0.13"  # This will be "implements" since not used in code

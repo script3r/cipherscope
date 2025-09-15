@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use cbom_generator::CbomGenerator;
 use clap::{ArgAction, Parser};
 use indicatif::{ProgressBar, ProgressStyle};
 use scanner_core::*;
@@ -21,6 +22,10 @@ struct Args {
     /// Write SARIF to file
     #[arg(long, value_name = "FILE")]
     sarif: Option<PathBuf>,
+
+    /// Generate MV-CBOM (Minimal Viable Cryptographic Bill of Materials)
+    #[arg(long, action = ArgAction::SetTrue)]
+    cbom: bool,
 
     /// Number of threads
     #[arg(long, value_name = "N")]
@@ -193,6 +198,36 @@ fn main() -> Result<()> {
     if let Some(sarif_path) = args.sarif.as_ref() {
         let sarif = to_sarif(&findings);
         fs::write(sarif_path, serde_json::to_vec_pretty(&sarif)?)?;
+    }
+
+    // Generate MV-CBOM if requested
+    if args.cbom {
+        let cbom_generator = CbomGenerator::new();
+        
+        // Use the first path as the scan root for CBOM generation
+        let default_path = PathBuf::from(".");
+        let scan_path = args.paths.first().unwrap_or(&default_path);
+        
+        match cbom_generator.generate_cbom(scan_path, &findings) {
+            Ok(cbom) => {
+                let output_path = scan_path.join("mv-cbom.json");
+                match cbom_generator.write_cbom(&cbom, &output_path) {
+                    Ok(()) => {
+                        if !args.json {
+                            println!("MV-CBOM written to: {}", output_path.display());
+                            println!("Found {} cryptographic assets", cbom.crypto_assets.len());
+                            println!("Created {} dependency relationships", cbom.dependencies.len());
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("Failed to write MV-CBOM: {}", e);
+                    }
+                }
+            }
+            Err(e) => {
+                eprintln!("Failed to generate MV-CBOM: {}", e);
+            }
+        }
     }
 
     Ok(())

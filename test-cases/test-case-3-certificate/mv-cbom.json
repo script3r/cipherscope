@@ -1,0 +1,43 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:e7bb2027-76bb-4248-983c-cd1286dd883b",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "name": "test-certificate",
+      "version": "0.1.0",
+      "path": "/workspace/test-cases/test-case-3-certificate"
+    },
+    "timestamp": "2025-09-15T17:01:42.737248727Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [
+    {
+      "bom-ref": "e08819ab-c5b5-4baf-9082-9de2b65cdf1b",
+      "assetType": "certificate",
+      "name": "example.com",
+      "assetProperties": {
+        "subjectName": "C=US, ST=CA, L=San Francisco, O=Test Corp, CN=example.com",
+        "issuerName": "C=US, ST=CA, L=San Francisco, O=Test Corp, CN=example.com",
+        "notValidAfter": "2026-09-15T16:59:08Z",
+        "signatureAlgorithmRef": "668183f9-8e3a-4626-b9cb-90ba926bec86"
+      }
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "7c4d3ec3-ec80-4661-b985-40dffe69a575",
+      "dependsOn": [
+        "e08819ab-c5b5-4baf-9082-9de2b65cdf1b"
+      ],
+      "dependencyType": "uses"
+    }
+  ]
+}

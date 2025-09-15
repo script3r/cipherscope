@@ -6,11 +6,19 @@
 
 Fast, low-false-positive static scanner that finds third-party cryptographic libraries and call sites across 11 programming languages: Go, Java, C, C++, Rust, Python, PHP, Swift, Objective-C, Kotlin, and Erlang.
 
+**NEW**: Now generates **Minimal Viable Cryptographic Bill of Materials (MV-CBOM)** for Post-Quantum Cryptography (PQC) readiness assessment.
+
 ### Install & Run
 
 ```bash
 cargo build --release
 ./target/release/cipherscope .
+```
+
+Generate MV-CBOM (Cryptographic Bill of Materials):
+
+```bash
+./target/release/cipherscope . --cbom
 ```
 
 JSONL and SARIF:
@@ -21,6 +29,7 @@ JSONL and SARIF:
 ```
 
 Key flags:
+- `--cbom`: generate MV-CBOM (Minimal Viable Cryptographic Bill of Materials)
 - `--threads N`: set thread pool size
 - `--max-file-size MB`: skip large files (default 2)
 - `--patterns PATH`: specify patterns file (default: `patterns.toml`)
@@ -32,7 +41,47 @@ Key flags:
 
 ### Output
 
-Pretty table to stdout (default) and optional JSONL/SARIF.
+Pretty table to stdout (default), optional JSONL/SARIF, and **MV-CBOM** for PQC readiness assessment.
+
+#### MV-CBOM (Minimal Viable Cryptographic Bill of Materials)
+
+CipherScope can generate a comprehensive cryptographic inventory in JSON format that follows the MV-CBOM specification. This enables:
+
+- **Post-Quantum Cryptography (PQC) Risk Assessment**: Identifies algorithms vulnerable to quantum attacks (NIST Quantum Security Level 0)
+- **Crypto-Agility Planning**: Provides detailed algorithm parameters and usage patterns
+- **Supply Chain Security**: Maps dependencies between components and cryptographic assets
+
+The MV-CBOM includes:
+- **Cryptographic Assets**: Algorithms, certificates, and related crypto material with NIST security levels
+- **Dependency Relationships**: Distinguishes between "uses" (actively called) vs "implements" (available but unused)
+- **Parameter Extraction**: Key sizes, curves, and other algorithm-specific parameters
+
+Example MV-CBOM snippet:
+```json
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "cryptoAssets": [
+    {
+      "bom-ref": "uuid-1234",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "parameterSet": {"keySize": 2048},
+        "nistQuantumSecurityLevel": 0
+      }
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "main-component",
+      "dependsOn": ["uuid-1234"],
+      "dependencyType": "uses"
+    }
+  ]
+}
+```
 
 Example table:
 
@@ -108,7 +157,9 @@ CipherScope uses a **producer-consumer model** inspired by ripgrep to achieve ma
 - Efficient memory usage through batched processing
 - Progress reporting accuracy: 100% (matches `find` command results)
 
-### Detector Architecture
+### Architecture
+
+#### Detector Architecture
 
 The scanner uses a modular detector architecture with dedicated crates for each language:
 
@@ -126,12 +177,45 @@ The scanner uses a modular detector architecture with dedicated crates for each 
 
 Each detector implements the `Detector` trait and can be extended independently. To add support for a new language, create a new detector crate under `crates/` or extend the `patterns.toml` to cover additional libraries. See `crates/scanner-core/src/lib.rs` for the trait definition and pattern-driven detector implementation.
 
+#### MV-CBOM Architecture
+
+The MV-CBOM generation is implemented in the `cbom-generator` crate with modular components:
+
+- **cbom-generator**: Main CBOM generation and JSON serialization
+- **certificate-parser**: X.509 certificate parsing and signature algorithm extraction
+- **algorithm-detector**: Deep static analysis for algorithm parameter extraction
+- **dependency-analyzer**: Intelligent "uses" vs "implements" relationship detection
+- **cargo-parser**: Rust project metadata and dependency analysis
+
+The MV-CBOM pipeline:
+1. **Static Analysis**: Scanner finds cryptographic usage patterns
+2. **Algorithm Detection**: Extracts specific algorithms and parameters from findings
+3. **Certificate Parsing**: Discovers and analyzes X.509 certificates in the project
+4. **Dependency Analysis**: Correlates Cargo.toml dependencies with actual code usage
+5. **CBOM Generation**: Produces standards-compliant JSON with NIST security levels
+
 ### Tests & Benchmarks
 
 Run unit tests and integration tests (fixtures):
 
 ```bash
 cargo test
+```
+
+#### MV-CBOM Test Cases
+
+The `test-cases/` directory contains comprehensive test scenarios for MV-CBOM validation:
+
+- **test-case-1-rsa-uses**: RSA 2048-bit usage (PQC vulnerable, "uses" relationship)
+- **test-case-2-implements-vs-uses**: SHA2 "uses" vs P256 "implements" distinction
+- **test-case-3-certificate**: X.509 certificate parsing with signature algorithm detection
+- **test-case-4-pqc-safe**: Quantum-safe algorithms (AES-256, ChaCha20Poly1305, SHA-3, BLAKE3)
+
+Run tests:
+```bash
+cd test-cases/test-case-1-rsa-uses
+../../target/release/cipherscope . --cbom --patterns ../../patterns.toml
+cat mv-cbom.json | jq '.cryptoAssets[] | select(.assetProperties.nistQuantumSecurityLevel == 0)'
 ```
 
 Benchmark scan throughput on test fixtures:
