@@ -803,57 +803,43 @@ impl<'a> Scanner<'a> {
             builder.threads(n.get());
         }
 
-        let out: Arc<Mutex<Vec<PathBuf>>> = Arc::new(Mutex::new(Vec::with_capacity(4096)));
-        let out_ref = out.clone();
+        // Use sequential walker to collect all paths (this guarantees completion)
+        let mut discovered_paths = Vec::new();
+        
+        for result in builder.build() {
+            let entry = match result {
+                Ok(e) => e,
+                Err(_) => continue,
+            };
 
-        builder.build_parallel().run(|| {
-            let out = out_ref.clone();
-            Box::new(move |res| {
-                let entry = match res {
-                    Ok(e) => e,
-                    Err(_) => return ignore::WalkState::Continue,
-                };
-
-                if let Some(ft) = entry.file_type() {
-                    if !ft.is_file() {
-                        return ignore::WalkState::Continue;
-                    }
-                } else if let Ok(md) = entry.metadata() {
-                    if !md.is_file() {
-                        return ignore::WalkState::Continue;
-                    }
-                } else {
-                    return ignore::WalkState::Continue;
+            if let Some(ft) = entry.file_type() {
+                if !ft.is_file() {
+                    continue;
                 }
-
-                let path = entry.into_path();
-                if !path_allowed(&path) {
-                    return ignore::WalkState::Continue;
+            } else if let Ok(md) = entry.metadata() {
+                if !md.is_file() {
+                    continue;
                 }
-
-                if let Ok(md) = fs::metadata(&path) {
-                    if (md.len() as usize) > self.config.max_file_size {
-                        return ignore::WalkState::Continue;
-                    }
-                } else {
-                    return ignore::WalkState::Continue;
-                }
-
-                if let Ok(mut guard) = out.lock() {
-                    guard.push(path);
-                }
-
-                ignore::WalkState::Continue
-            })
-        });
-
-        let drained: Vec<PathBuf> = {
-            match out.lock() {
-                Ok(mut guard) => guard.drain(..).collect(),
-                Err(_) => Vec::new(),
+            } else {
+                continue;
             }
-        };
-        discovered_paths.extend(drained);
+
+            let path = entry.into_path();
+            if !path_allowed(&path) {
+                continue;
+            }
+
+            if let Ok(md) = fs::metadata(&path) {
+                if (md.len() as usize) > self.config.max_file_size {
+                    continue;
+                }
+            } else {
+                continue;
+            }
+
+            discovered_paths.push(path);
+        }
+
         discovered_paths
     }
 
