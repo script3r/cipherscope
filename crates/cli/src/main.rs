@@ -202,7 +202,7 @@ fn main() -> Result<()> {
 
     // Generate MV-CBOM if requested
     if args.cbom {
-        let cbom_generator = CbomGenerator::new();
+        let cbom_generator = CbomGenerator::with_registry(reg.clone());
         
         // Use the first path as the scan root for CBOM generation
         let default_path = PathBuf::from(".");

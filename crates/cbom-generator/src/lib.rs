@@ -6,10 +6,11 @@
 
 use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use scanner_core::Finding;
+use scanner_core::{Finding, PatternRegistry};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
+use std::sync::Arc;
 use uuid::Uuid;
 
 pub mod certificate_parser;
@@ -197,6 +198,15 @@ impl CbomGenerator {
             certificate_parser: CertificateParser::new(),
             dependency_analyzer: DependencyAnalyzer::new(),
             algorithm_detector: AlgorithmDetector::new(),
+            project_parser: ProjectParser::new(),
+        }
+    }
+
+    pub fn with_registry(registry: Arc<PatternRegistry>) -> Self {
+        Self {
+            certificate_parser: CertificateParser::new(),
+            dependency_analyzer: DependencyAnalyzer::new(),
+            algorithm_detector: AlgorithmDetector::with_registry(registry),
             project_parser: ProjectParser::new(),
         }
     }

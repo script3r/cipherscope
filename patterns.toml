@@ -23,6 +23,46 @@ apis = [
   "\\bPKCS\\d_[A-Za-z0-9_]+\\s*\\(",
 ]
 
+# Algorithm definitions for OpenSSL
+[[library.algorithms]]
+name = "RSA"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bRSA_",
+  "\\bEVP_PKEY_RSA",
+]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "RSA_(\\d+)"
+default_value = 2048
+
+[[library.algorithms]]
+name = "ECDSA"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bECDSA_",
+  "\\bEC_KEY_",
+]
+[[library.algorithms.parameter_patterns]]
+name = "curve"
+pattern = ".*"
+default_value = "P-256"
+
+[[library.algorithms]]
+name = "AES"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bEVP_aes",
+  "\\bAES_",
+]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "aes_(\\d+)"
+default_value = 256
+
 [[library]]
 name = "libsodium"
 languages = ["C", "C++"]
@@ -230,6 +270,99 @@ apis = [
   "\\b(?:RsaPrivateKey|RsaPublicKey|Pkcs1v15Encrypt)\\b",
   "\\b(?:Sha256|Sha512|Digest)\\b",
 ]
+
+# Algorithm definitions for RustCrypto
+[[library.algorithms]]
+name = "RSA"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\b(?:rsa::|RsaPrivateKey|RsaPublicKey)",
+]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "(?:new|generate).*?(\\d{4})"
+default_value = 2048
+
+[[library.algorithms]]
+name = "AES-GCM"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\baes_gcm::|Aes\\d+Gcm",
+]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "Aes(\\d+)Gcm"
+default_value = 256
+
+[[library.algorithms]]
+name = "ChaCha20Poly1305"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bchacha20poly1305::|ChaCha20Poly1305",
+]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = ".*"
+default_value = 256
+
+[[library.algorithms]]
+name = "SHA-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bsha2::|Sha256",
+]
+[[library.algorithms.parameter_patterns]]
+name = "outputSize"
+pattern = "Sha(\\d+)"
+default_value = 256
+
+[[library.algorithms]]
+name = "SHA-512"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bsha2::|Sha512",
+]
+[[library.algorithms.parameter_patterns]]
+name = "outputSize"
+pattern = "Sha(\\d+)"
+default_value = 512
+
+[[library.algorithms]]
+name = "BLAKE3"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bblake3::|Blake3",
+]
+
+[[library.algorithms]]
+name = "Ed25519"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bed25519_dalek::|Ed25519",
+]
+[[library.algorithms.parameter_patterns]]
+name = "curve"
+pattern = ".*"
+default_value = "Curve25519"
+
+[[library.algorithms]]
+name = "ECDSA"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bp256::|p384::|k256::|Ecdsa",
+]
+[[library.algorithms.parameter_patterns]]
+name = "curve"
+pattern = "p(\\d+)"
+default_value = "P-256"
 
 # =========================
 # Swift

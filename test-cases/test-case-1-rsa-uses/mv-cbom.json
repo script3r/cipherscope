@@ -1,7 +1,7 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:1eb7780b-c620-4533-af49-b6ecde6b532d",
+  "serialNumber": "urn:uuid:a2194b88-40ae-488e-bea2-c1d0feccab8a",
   "version": 1,
   "metadata": {
     "component": {
@@ -9,7 +9,7 @@
       "version": "0.1.0",
       "path": "/workspace/test-cases/test-case-1-rsa-uses"
     },
-    "timestamp": "2025-09-15T17:20:55.563520627Z",
+    "timestamp": "2025-09-15T17:30:58.500387978Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -20,43 +20,56 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "9401744e-ca4e-45fe-9914-c46a7d739120",
-      "assetType": "algorithm",
-      "name": "AES-256-GCM",
-      "assetProperties": {
-        "primitive": "aead",
-        "parameterSet": {
-          "keySize": 256,
-          "mode": "GCM"
-        },
-        "nistQuantumSecurityLevel": 3
-      }
-    },
-    {
-      "bom-ref": "58f4da9a-a323-4fbf-887e-94689f8e67cf",
+      "bom-ref": "760f0d9d-01b2-494e-b660-7b73028b0a11",
       "assetType": "algorithm",
       "name": "RSA",
       "assetProperties": {
         "primitive": "signature",
-        "parameterSet": {
-          "keySize": 2048
-        },
+        "nistQuantumSecurityLevel": 0
+      }
+    },
+    {
+      "bom-ref": "fa69322d-3e2f-462d-a34c-9380713f2232",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "nistQuantumSecurityLevel": 0
+      }
+    },
+    {
+      "bom-ref": "80b57347-548b-4cce-848f-c7ba93174742",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "nistQuantumSecurityLevel": 0
+      }
+    },
+    {
+      "bom-ref": "09715785-37bc-4c54-a62e-ba84eda8fe7a",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "nistQuantumSecurityLevel": 0
+      }
+    },
+    {
+      "bom-ref": "930733f2-34ac-41a0-a24e-d27c57fc0df5",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
         "nistQuantumSecurityLevel": 0
       }
     }
   ],
   "dependencies": [
     {
-      "ref": "8184dc5d-d9ec-467c-8f47-42eb9d067718",
+      "ref": "93cf08e0-223d-41f4-bb85-b88dc435f99c",
       "dependsOn": [
-        "9401744e-ca4e-45fe-9914-c46a7d739120"
-      ],
-      "dependencyType": "uses"
-    },
-    {
-      "ref": "8184dc5d-d9ec-467c-8f47-42eb9d067718",
-      "dependsOn": [
-        "58f4da9a-a323-4fbf-887e-94689f8e67cf"
+        "760f0d9d-01b2-494e-b660-7b73028b0a11"
       ],
       "dependencyType": "implements"
     }

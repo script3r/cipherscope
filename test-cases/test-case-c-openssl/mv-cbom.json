@@ -1,14 +1,14 @@
 {
   "bomFormat": "MV-CBOM",
   "specVersion": "1.0",
-  "serialNumber": "urn:uuid:cdafcfb0-d868-4f0d-822e-5c86608ba5e2",
+  "serialNumber": "urn:uuid:61406d2a-33dd-4551-9bd8-b2e273503cad",
   "version": 1,
   "metadata": {
     "component": {
       "name": "test-case-c-openssl",
       "path": "/workspace/test-cases/test-case-c-openssl"
     },
-    "timestamp": "2025-09-15T17:15:42.696369468Z",
+    "timestamp": "2025-09-15T17:31:16.152158659Z",
     "tools": [
       {
         "name": "cipherscope",
@@ -17,6 +17,42 @@
       }
     ]
   },
-  "cryptoAssets": [],
-  "dependencies": []
+  "cryptoAssets": [
+    {
+      "bom-ref": "afa4ad33-07f0-4eaf-b26e-c08f508f6ab3",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "nistQuantumSecurityLevel": 0
+      }
+    },
+    {
+      "bom-ref": "a6539be2-7d5b-4c82-9e7f-17da0b8cb16e",
+      "assetType": "algorithm",
+      "name": "ChaCha20Poly1305",
+      "assetProperties": {
+        "primitive": "aead",
+        "nistQuantumSecurityLevel": 3
+      }
+    },
+    {
+      "bom-ref": "cc5afa71-5e0b-4c42-ad22-30d3ff17cdcf",
+      "assetType": "algorithm",
+      "name": "ChaCha20Poly1305",
+      "assetProperties": {
+        "primitive": "aead",
+        "nistQuantumSecurityLevel": 3
+      }
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "5f4e1435-94ed-4e02-bf51-1f2a864ebdf4",
+      "dependsOn": [
+        "afa4ad33-07f0-4eaf-b26e-c08f508f6ab3"
+      ],
+      "dependencyType": "implements"
+    }
+  ]
 }

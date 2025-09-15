@@ -185,6 +185,8 @@ pub struct LibrarySpec {
     pub languages: Vec<Language>,
     #[serde(default)]
     pub patterns: LibraryPatterns,
+    #[serde(default)]
+    pub algorithms: Vec<AlgorithmSpec>,
 }
 
 #[derive(Debug, Clone, Default, Deserialize)]
@@ -197,6 +199,26 @@ pub struct LibraryPatterns {
     pub namespace: Vec<String>,
     #[serde(default)]
     pub apis: Vec<String>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct AlgorithmSpec {
+    pub name: String,
+    pub primitive: String, // "signature", "aead", "hash", "kem", "pke", "mac", "kdf", "prng"
+    #[serde(default)]
+    pub parameter_patterns: Vec<ParameterPattern>,
+    #[serde(rename = "nistQuantumSecurityLevel")]
+    pub nist_quantum_security_level: u8,
+    #[serde(default)]
+    pub symbol_patterns: Vec<String>, // Regex patterns to match this algorithm in findings
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct ParameterPattern {
+    pub name: String, // e.g., "keySize", "curve", "outputSize"
+    pub pattern: String, // Regex pattern to extract the parameter value
+    #[serde(default)]
+    pub default_value: Option<serde_json::Value>, // Default value if not found
 }
 
 #[derive(Deserialize)]
@@ -309,6 +331,23 @@ pub struct CompiledLibrary {
     pub namespace: Vec<Regex>,
     pub apis: Vec<Regex>,
     pub prefilter_substrings: Vec<String>,
+    pub algorithms: Vec<CompiledAlgorithm>,
+}
+
+#[derive(Debug, Clone)]
+pub struct CompiledAlgorithm {
+    pub name: String,
+    pub primitive: String,
+    pub nist_quantum_security_level: u8,
+    pub symbol_patterns: Vec<Regex>,
+    pub parameter_patterns: Vec<CompiledParameterPattern>,
+}
+
+#[derive(Debug, Clone)]
+pub struct CompiledParameterPattern {
+    pub name: String,
+    pub pattern: Regex,
+    pub default_value: Option<serde_json::Value>,
 }
 
 #[derive(Debug)]
@@ -372,6 +411,7 @@ fn compile_library(lib: LibrarySpec) -> Result<CompiledLibrary> {
     let namespace = compile_regexes(&lib.patterns.namespace)?;
     let apis = compile_regexes(&lib.patterns.apis)?;
     let prefilter_substrings = derive_prefilter_substrings(&lib.patterns);
+    let algorithms = compile_algorithms(&lib.algorithms)?;
     Ok(CompiledLibrary {
         name: lib.name,
         languages: lib.languages.into_iter().collect(),
@@ -380,6 +420,7 @@ fn compile_library(lib: LibrarySpec) -> Result<CompiledLibrary> {
         namespace,
         apis,
         prefilter_substrings,
+        algorithms,
     })
 }
 
@@ -388,6 +429,33 @@ fn compile_regexes(srcs: &[String]) -> Result<Vec<Regex>> {
         .map(|s| {
             let pat = format!("(?m){}", s);
             Regex::new(&pat).with_context(|| format!("bad pattern: {s}"))
+        })
+        .collect()
+}
+
+fn compile_algorithms(algorithms: &[AlgorithmSpec]) -> Result<Vec<CompiledAlgorithm>> {
+    algorithms.iter()
+        .map(|algo| {
+            let symbol_patterns = compile_regexes(&algo.symbol_patterns)?;
+            let parameter_patterns = algo.parameter_patterns.iter()
+                .map(|param| {
+                    let pattern = Regex::new(&param.pattern)
+                        .with_context(|| format!("bad parameter pattern: {}", param.pattern))?;
+                    Ok(CompiledParameterPattern {
+                        name: param.name.clone(),
+                        pattern,
+                        default_value: param.default_value.clone(),
+                    })
+                })
+                .collect::<Result<Vec<_>>>()?;
+            
+            Ok(CompiledAlgorithm {
+                name: algo.name.clone(),
+                primitive: algo.primitive.clone(),
+                nist_quantum_security_level: algo.nist_quantum_security_level,
+                symbol_patterns,
+                parameter_patterns,
+            })
         })
         .collect()
 }
