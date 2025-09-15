@@ -849,13 +849,11 @@ impl<'a> Scanner<'a> {
                     }
 
                     // Update discovered files counter atomically (no lock!)
-                    let count = files_discovered.fetch_add(1, Ordering::Relaxed);
+                    files_discovered.fetch_add(1, Ordering::Relaxed);
                     
-                    // Send progress update every 1000 files to reduce channel overhead
+                    // Send discovery progress update (1 = discovery signal)
                     if let Some(ref progress_tx) = progress_sender {
-                        if count % 1000 == 0 {
-                            let _ = progress_tx.send(1000); // Send batch size
-                        }
+                        let _ = progress_tx.send(1);
                     }
 
                     ignore::WalkState::Continue
@@ -883,22 +881,36 @@ impl<'a> Scanner<'a> {
             batch.push(path);
             
             if batch.len() >= BATCH_SIZE {
-                _processed_count += self.process_batch(&batch, &findings_sender)?;
+                let (processed, findings) = self.process_batch(&batch, &findings_sender)?;
+                _processed_count += processed;
                 batch.clear();
                 
-                // Send progress update for the entire batch
+                // Send processing progress update (2 = processing signal, repeated for batch size)
                 if let Some(ref progress_tx) = progress_sender {
-                    let _ = progress_tx.send(BATCH_SIZE);
+                    for _ in 0..processed {
+                        let _ = progress_tx.send(2);
+                    }
+                    // Send findings progress updates (3 = findings signal)
+                    for _ in 0..findings {
+                        let _ = progress_tx.send(3);
+                    }
                 }
             }
         }
         
         // Process remaining files in the final batch
         if !batch.is_empty() {
-            _processed_count += self.process_batch(&batch, &findings_sender)?;
+            let (processed, findings) = self.process_batch(&batch, &findings_sender)?;
+            _processed_count += processed;
             
             if let Some(ref progress_tx) = progress_sender {
-                let _ = progress_tx.send(batch.len());
+                for _ in 0..processed {
+                    let _ = progress_tx.send(2);
+                }
+                // Send findings progress updates (3 = findings signal)
+                for _ in 0..findings {
+                    let _ = progress_tx.send(3);
+                }
             }
         }
 
@@ -910,27 +922,31 @@ impl<'a> Scanner<'a> {
         &self,
         batch: &[PathBuf], 
         findings_sender: &Sender<Finding>
-    ) -> Result<usize> {
+    ) -> Result<(usize, usize)> {
         // Process the batch in parallel using rayon
-        batch
+        let results: Vec<usize> = batch
             .par_iter()
             .map(|path| {
-                if let Err(e) = self.scan_file(path, findings_sender) {
-                    eprintln!("Error scanning file {:?}: {}", path, e);
+                match self.scan_file(path, findings_sender) {
+                    Ok(findings_count) => findings_count,
+                    Err(e) => {
+                        eprintln!("Error scanning file {:?}: {}", path, e);
+                        0
+                    }
                 }
-                1 // Return 1 for each processed file
             })
-            .sum::<usize>();
+            .collect();
             
-        Ok(batch.len())
+        let total_findings = results.iter().sum();
+        Ok((batch.len(), total_findings))
     }
 
     /// Core file scanning logic - processes a single file
-    fn scan_file(&self, path: &PathBuf, findings_sender: &Sender<Finding>) -> Result<()> {
+    fn scan_file(&self, path: &PathBuf, findings_sender: &Sender<Finding>) -> Result<usize> {
         // Detect language from file extension
         let lang = match Self::detect_language(path) {
             Some(lang) => lang,
-            None => return Ok(()), // Skip unsupported files
+            None => return Ok(0), // Skip unsupported files
         };
 
         // Load file contents
@@ -975,13 +991,15 @@ impl<'a> Scanner<'a> {
 
         // Drain emitter and forward findings to main channel
         drop(emitter.tx); // Close the emitter sender to stop receiving
+        let mut findings_count = 0;
         for finding in emitter.rx.iter() {
             if findings_sender.send(finding).is_err() {
                 break; // Main receiver has been dropped, stop sending
             }
+            findings_count += 1;
         }
 
-        Ok(())
+        Ok(findings_count)
     }
 
     /// Simple file discovery for dry-run functionality - doesn't use the full producer-consumer architecture
@@ -1112,25 +1130,39 @@ impl<'a> Scanner<'a> {
             Some(thread::spawn(move || {
                 let mut files_discovered = 0;
                 let mut files_processed = 0;
-                let findings_count = 0;
+                let mut findings_count = 0;
 
                 // Initial callback
                 callback(0, 0, 0);
 
-                for batch_size in progress_rx.iter() {
-                    if batch_size >= 1000 {
-                        // This is a discovery batch
-                        files_discovered += batch_size;
-                        // Update callback every 10k files discovered to reduce overhead
-                        if files_discovered % 10_000 == 0 {
-                            callback(files_processed, files_discovered, findings_count);
+                for signal in progress_rx.iter() {
+                    match signal {
+                        1 => {
+                            // File discovered
+                            files_discovered += 1;
+                            // Update callback every 1000 files discovered to reduce overhead
+                            if files_discovered % 1000 == 0 {
+                                callback(files_processed, files_discovered, findings_count);
+                            }
                         }
-                    } else {
-                        // This is a processing batch
-                        files_processed += batch_size;
-                        // Update callback every 5k files processed
-                        if files_processed % 5_000 == 0 {
-                            callback(files_processed, files_discovered, findings_count);
+                        2 => {
+                            // File processed
+                            files_processed += 1;
+                            // Update callback every 500 files processed
+                            if files_processed % 500 == 0 {
+                                callback(files_processed, files_discovered, findings_count);
+                            }
+                        }
+                        3 => {
+                            // Finding discovered
+                            findings_count += 1;
+                            // Update callback every 10 findings
+                            if findings_count % 10 == 0 {
+                                callback(files_processed, files_discovered, findings_count);
+                            }
+                        }
+                        _ => {
+                            // Unknown signal, ignore
                         }
                     }
                 }
