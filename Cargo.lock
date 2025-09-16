@@ -233,16 +233,11 @@ dependencies = [
 name = "cipherscope"
 version = "0.1.0"
 dependencies = [
- "aho-corasick",
  "anyhow",
  "cbom-generator",
  "clap",
- "crossbeam-channel",
- "ignore",
  "indicatif",
- "once_cell",
  "rayon",
- "regex",
  "scanner-core",
  "serde",
  "serde_json",
@@ -918,13 +913,11 @@ dependencies = [
  "globset",
  "ignore",
  "num_cpus",
- "once_cell",
  "rayon",
  "regex",
  "serde",
  "serde_json",
  "tempfile",
- "thiserror",
  "toml",
 ]
 

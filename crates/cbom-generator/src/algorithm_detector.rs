@@ -15,6 +15,7 @@ use crate::{
 };
 
 /// Detector for cryptographic algorithms in source code
+#[derive(Default)]
 pub struct AlgorithmDetector {
     /// Reference to the pattern registry for algorithm definitions
     registry: Option<std::sync::Arc<PatternRegistry>>,
@@ -24,10 +25,7 @@ pub struct AlgorithmDetector {
 
 impl AlgorithmDetector {
     pub fn new() -> Self {
-        Self {
-            registry: None,
-            deterministic: false,
-        }
+        Self::default()
     }
 
     pub fn with_registry(registry: std::sync::Arc<PatternRegistry>) -> Self {
@@ -425,12 +423,6 @@ impl AlgorithmDetector {
     }
 
     // Note: all algorithm assets are created via create_algorithm_asset_from_spec using patterns.
-}
-
-impl Default for AlgorithmDetector {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 #[cfg(test)]

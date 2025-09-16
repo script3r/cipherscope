@@ -16,13 +16,11 @@ repository = "https://example.com/cipherscope/repo"
 
 [workspace.dependencies]
 anyhow = "1"
-thiserror = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 toml = "0.8"
 regex = "1"
 aho-corasick = "1"
-once_cell = "1"
 rayon = "1"
 ignore = "0.4"
 clap = { version = "4", features = ["derive"] }

@@ -427,7 +427,7 @@ fn compile_library(lib: LibrarySpec) -> Result<CompiledLibrary> {
 fn compile_regexes(srcs: &[String]) -> Result<Vec<Regex>> {
     srcs.iter()
         .map(|s| {
-            let pat = format!("(?m){}", s);
+            let pat = format!("(?m){s}");
             Regex::new(&pat).with_context(|| format!("bad pattern: {s}"))
         })
         .collect()
@@ -1003,7 +1003,7 @@ impl<'a> Scanner<'a> {
             .map(|path| match self.scan_file(path, findings_sender) {
                 Ok(findings_count) => findings_count,
                 Err(e) => {
-                    eprintln!("Error scanning file {:?}: {}", path, e);
+                    eprintln!("Error scanning file {path:?}: {e}");
                     0
                 }
             })
@@ -1279,7 +1279,9 @@ impl<'a> Scanner<'a> {
             }
 
             // Wait for producer to complete
-            producer_handle.join().unwrap()?;
+            producer_handle
+                .join()
+                .map_err(|_| anyhow::anyhow!("Producer thread panicked"))??;
 
             // Check consumer result
             consumer_result?;

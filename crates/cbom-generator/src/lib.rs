@@ -123,8 +123,8 @@ pub struct CertificateProperties {
     #[serde(rename = "notValidAfter")]
     pub not_valid_after: DateTime<Utc>,
 
-    #[serde(rename = "signatureAlgorithmRef")]
-    pub signature_algorithm_ref: String, // bom-ref to algorithm asset
+    #[serde(rename = "signatureAlgorithm")]
+    pub signature_algorithm: String, // e.g., "RSA-SHA256", "ECDSA-P256"
 }
 
 /// Properties for related cryptographic material
@@ -167,6 +167,7 @@ pub enum CryptographicPrimitive {
 }
 
 /// Main generator for MV-CBOM documents
+#[derive(Default)]
 pub struct CbomGenerator {
     certificate_parser: CertificateParser,
     algorithm_detector: AlgorithmDetector,
@@ -175,16 +176,12 @@ pub struct CbomGenerator {
 
 impl CbomGenerator {
     pub fn new() -> Self {
-        Self {
-            certificate_parser: CertificateParser::new(),
-            algorithm_detector: AlgorithmDetector::new(),
-            deterministic: false,
-        }
+        Self::default()
     }
 
     pub fn with_registry(registry: Arc<PatternRegistry>) -> Self {
         Self {
-            certificate_parser: CertificateParser::new(),
+            certificate_parser: CertificateParser::default(),
             algorithm_detector: AlgorithmDetector::with_registry(registry),
             deterministic: false,
         }
@@ -238,7 +235,7 @@ impl CbomGenerator {
             version: 1,
             metadata: CbomMetadata {
                 timestamp: if self.deterministic {
-                    DateTime::from_timestamp(0, 0).unwrap()
+                    DateTime::from_timestamp(0, 0).unwrap_or(Utc::now())
                 } else {
                     Utc::now()
                 },
@@ -299,12 +296,6 @@ impl CbomGenerator {
     }
 }
 
-impl Default for CbomGenerator {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -327,10 +318,10 @@ mod tests {
             crypto_assets: vec![],
         };
 
-        let json = serde_json::to_string_pretty(&cbom).unwrap();
+        let json = serde_json::to_string_pretty(&cbom).expect("Failed to serialize test CBOM");
         println!("{}", json);
 
         // Verify it can be deserialized
-        let _parsed: MvCbom = serde_json::from_str(&json).unwrap();
+        let _parsed: MvCbom = serde_json::from_str(&json).expect("Failed to deserialize test CBOM");
     }
 }

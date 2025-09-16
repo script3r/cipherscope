@@ -8,21 +8,17 @@ use uuid::Uuid;
 use walkdir::WalkDir;
 use x509_parser::prelude::*;
 
-use crate::{
-    AlgorithmProperties, AssetProperties, AssetType, CertificateProperties, CryptoAsset,
-    CryptographicPrimitive,
-};
+use crate::{AssetProperties, AssetType, CertificateProperties, CryptoAsset};
 
 /// Parser for X.509 certificates and related cryptographic material
+#[derive(Default)]
 pub struct CertificateParser {
     deterministic: bool,
 }
 
 impl CertificateParser {
     pub fn new() -> Self {
-        Self {
-            deterministic: false,
-        }
+        Self::default()
     }
 
     pub fn with_mode(deterministic: bool) -> Self {
@@ -140,13 +136,9 @@ impl CertificateParser {
         let issuer_name = cert.issuer().to_string();
         let not_valid_after = self.asn1_time_to_chrono(&cert.validity().not_after)?;
 
-        // Extract signature algorithm
-        let _signature_algorithm = cert.signature_algorithm.algorithm.to_id_string();
-        let signature_algorithm_ref = if self.deterministic {
-            Uuid::new_v5(&Uuid::NAMESPACE_URL, b"cert:signature").to_string()
-        } else {
-            Uuid::new_v4().to_string()
-        };
+        // Extract signature algorithm and map to friendly name
+        let signature_algorithm_oid = cert.signature_algorithm.algorithm.to_id_string();
+        let signature_algorithm = self.get_signature_algorithm_name(&signature_algorithm_oid);
 
         // Create the certificate asset
         let cert_bom_ref = if self.deterministic {
@@ -163,7 +155,7 @@ impl CertificateParser {
                 subject_name,
                 issuer_name,
                 not_valid_after,
-                signature_algorithm_ref: signature_algorithm_ref.clone(),
+                signature_algorithm,
             }),
             source_library: None,
             evidence: None,
@@ -172,36 +164,41 @@ impl CertificateParser {
         Ok(cert_asset)
     }
 
-    /// Create an algorithm asset for a certificate's signature algorithm
-    pub fn create_signature_algorithm_asset(
-        &self,
-        signature_algorithm_oid: &str,
-        bom_ref: String,
-    ) -> CryptoAsset {
-        let (name, primitive, nist_level, parameter_set) =
-            self.map_signature_algorithm(signature_algorithm_oid);
+    /// Get a friendly name for the signature algorithm
+    fn get_signature_algorithm_name(&self, oid: &str) -> String {
+        match oid {
+            // RSA algorithms
+            "1.2.840.113549.1.1.11" => "RSA-SHA256".to_string(),
+            "1.2.840.113549.1.1.12" => "RSA-SHA384".to_string(),
+            "1.2.840.113549.1.1.13" => "RSA-SHA512".to_string(),
+            "1.2.840.113549.1.1.5" => "RSA-SHA1".to_string(),
+            "1.2.840.113549.1.1.4" => "RSA-MD5".to_string(),
 
-        CryptoAsset {
-            bom_ref,
-            asset_type: AssetType::Algorithm,
-            name: Some(name),
-            asset_properties: AssetProperties::Algorithm(AlgorithmProperties {
-                primitive,
-                parameter_set,
-                nist_quantum_security_level: nist_level,
-            }),
-            source_library: None,
-            evidence: None,
+            // ECDSA algorithms
+            "1.2.840.10045.4.3.2" => "ECDSA-SHA256".to_string(),
+            "1.2.840.10045.4.3.3" => "ECDSA-SHA384".to_string(),
+            "1.2.840.10045.4.3.4" => "ECDSA-SHA512".to_string(),
+            "1.2.840.10045.4.1" => "ECDSA-SHA1".to_string(),
+
+            // DSA algorithms
+            "1.2.840.10040.4.3" => "DSA-SHA1".to_string(),
+            "2.16.840.1.101.3.4.3.2" => "DSA-SHA256".to_string(),
+
+            // Ed25519
+            "1.3.101.112" => "Ed25519".to_string(),
+
+            _ => format!("Unknown ({oid})"),
         }
     }
 
     /// Map signature algorithm OID to algorithm properties
+    #[cfg(test)]
     fn map_signature_algorithm(
         &self,
         oid: &str,
     ) -> (
         String,
-        CryptographicPrimitive,
+        crate::CryptographicPrimitive,
         u8,
         Option<serde_json::Value>,
     ) {
@@ -209,37 +206,37 @@ impl CertificateParser {
             // RSA signature algorithms - all vulnerable to quantum attacks
             "1.2.840.113549.1.1.1" => (
                 "RSA".to_string(),
-                CryptographicPrimitive::Signature,
+                crate::CryptographicPrimitive::Signature,
                 0,
                 None,
             ),
             "1.2.840.113549.1.1.4" => (
                 "RSA with MD5".to_string(),
-                CryptographicPrimitive::Signature,
+                crate::CryptographicPrimitive::Signature,
                 0,
                 None,
             ),
             "1.2.840.113549.1.1.5" => (
                 "RSA with SHA-1".to_string(),
-                CryptographicPrimitive::Signature,
+                crate::CryptographicPrimitive::Signature,
                 0,
                 None,
             ),
             "1.2.840.113549.1.1.11" => (
                 "RSA with SHA-256".to_string(),
-                CryptographicPrimitive::Signature,
+                crate::CryptographicPrimitive::Signature,
                 0,
                 None,
             ),
             "1.2.840.113549.1.1.12" => (
                 "RSA with SHA-384".to_string(),
-                CryptographicPrimitive::Signature,
+                crate::CryptographicPrimitive::Signature,
                 0,
                 None,
             ),
             "1.2.840.113549.1.1.13" => (
                 "RSA with SHA-512".to_string(),
-                CryptographicPrimitive::Signature,
+                crate::CryptographicPrimitive::Signature,
                 0,
                 None,
             ),
@@ -247,31 +244,31 @@ impl CertificateParser {
             // ECDSA signature algorithms - all vulnerable to quantum attacks
             "1.2.840.10045.4.1" => (
                 "ECDSA with SHA-1".to_string(),
-                CryptographicPrimitive::Signature,
+                crate::CryptographicPrimitive::Signature,
                 0,
                 None,
             ),
             "1.2.840.10045.4.3.1" => (
                 "ECDSA with SHA-224".to_string(),
-                CryptographicPrimitive::Signature,
+                crate::CryptographicPrimitive::Signature,
                 0,
                 None,
             ),
             "1.2.840.10045.4.3.2" => (
                 "ECDSA with SHA-256".to_string(),
-                CryptographicPrimitive::Signature,
+                crate::CryptographicPrimitive::Signature,
                 0,
                 None,
             ),
             "1.2.840.10045.4.3.3" => (
                 "ECDSA with SHA-384".to_string(),
-                CryptographicPrimitive::Signature,
+                crate::CryptographicPrimitive::Signature,
                 0,
                 None,
             ),
             "1.2.840.10045.4.3.4" => (
                 "ECDSA with SHA-512".to_string(),
-                CryptographicPrimitive::Signature,
+                crate::CryptographicPrimitive::Signature,
                 0,
                 None,
             ),
@@ -279,13 +276,13 @@ impl CertificateParser {
             // EdDSA - also vulnerable to quantum attacks
             "1.3.101.112" => (
                 "Ed25519".to_string(),
-                CryptographicPrimitive::Signature,
+                crate::CryptographicPrimitive::Signature,
                 0,
                 None,
             ),
             "1.3.101.113" => (
                 "Ed448".to_string(),
-                CryptographicPrimitive::Signature,
+                crate::CryptographicPrimitive::Signature,
                 0,
                 None,
             ),
@@ -293,13 +290,13 @@ impl CertificateParser {
             // DSA - vulnerable to quantum attacks
             "1.2.840.10040.4.1" => (
                 "DSA".to_string(),
-                CryptographicPrimitive::Signature,
+                crate::CryptographicPrimitive::Signature,
                 0,
                 None,
             ),
             "1.2.840.10040.4.3" => (
                 "DSA with SHA-1".to_string(),
-                CryptographicPrimitive::Signature,
+                crate::CryptographicPrimitive::Signature,
                 0,
                 None,
             ),
@@ -307,7 +304,7 @@ impl CertificateParser {
             // Default case for unknown algorithms
             _ => (
                 format!("Unknown Algorithm (OID: {})", oid),
-                CryptographicPrimitive::Signature,
+                crate::CryptographicPrimitive::Signature,
                 0,
                 None,
             ),
@@ -335,12 +332,6 @@ impl CertificateParser {
 
         // Fallback to the full DN if no CN found
         dn.to_string()
-    }
-}
-
-impl Default for CertificateParser {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -388,6 +379,7 @@ mod base64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::CryptographicPrimitive;
 
     #[test]
     fn test_certificate_parser_creation() {
