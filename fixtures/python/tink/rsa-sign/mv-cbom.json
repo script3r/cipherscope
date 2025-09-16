@@ -1,0 +1,43 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:acafcce7-fc11-5530-bedb-4a99878f3eae",
+  "version": 1,
+  "metadata": {
+    "timestamp": "1970-01-01T00:00:00Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [
+    {
+      "bom-ref": "b5dc99a9-59bc-58e6-82c8-29de37994c73",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "parameterSet": {
+          "keySize": 2048
+        },
+        "nistQuantumSecurityLevel": 0
+      },
+      "sourceLibrary": "PyCA cryptography",
+      "evidence": {
+        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/python/tink/rsa-sign/main.py",
+        "detectorId": "algorithm-detector",
+        "line": 9,
+        "column": 39
+      }
+    }
+  ],
+  "libraries": [
+    {
+      "name": "PyCA cryptography",
+      "count": 1
+    }
+  ]
+}

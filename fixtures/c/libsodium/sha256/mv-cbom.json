@@ -1,0 +1,40 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:acafcce7-fc11-5530-bedb-4a99878f3eae",
+  "version": 1,
+  "metadata": {
+    "timestamp": "1970-01-01T00:00:00Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [
+    {
+      "bom-ref": "2898152c-e8b5-5e80-a53c-0b4d664e0443",
+      "assetType": "algorithm",
+      "name": "SHA-256",
+      "assetProperties": {
+        "primitive": "hash",
+        "nistQuantumSecurityLevel": 3
+      },
+      "sourceLibrary": "libsodium",
+      "evidence": {
+        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/c/libsodium/sha256/main.c",
+        "detectorId": "algorithm-detector",
+        "line": 7,
+        "column": 24
+      }
+    }
+  ],
+  "libraries": [
+    {
+      "name": "libsodium",
+      "count": 1
+    }
+  ]
+}

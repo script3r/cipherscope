@@ -1,0 +1,40 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:acafcce7-fc11-5530-bedb-4a99878f3eae",
+  "version": 1,
+  "metadata": {
+    "timestamp": "1970-01-01T00:00:00Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [
+    {
+      "bom-ref": "c26548de-7898-5c93-8f20-08d3d70a7488",
+      "assetType": "algorithm",
+      "name": "AES",
+      "assetProperties": {
+        "primitive": "aead",
+        "nistQuantumSecurityLevel": 3
+      },
+      "sourceLibrary": "Erlang/OTP crypto",
+      "evidence": {
+        "file": "fixtures/erlang/otp-crypto/aes-gcm/main.erl",
+        "detectorId": "detector-erlang",
+        "line": 10,
+        "column": 25
+      }
+    }
+  ],
+  "libraries": [
+    {
+      "name": "Erlang/OTP crypto",
+      "count": 1
+    }
+  ]
+}

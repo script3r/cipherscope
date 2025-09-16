@@ -15,7 +15,6 @@ aho-corasick = { workspace = true }
 once_cell = { workspace = true }
 rayon = { workspace = true }
 ignore = { workspace = true }
-memmap2 = { workspace = true }
 globset = { workspace = true }
 crossbeam-channel = { workspace = true }
 num_cpus = { workspace = true }

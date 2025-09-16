@@ -466,7 +466,11 @@ fn compile_algorithms(algorithms: &[AlgorithmSpec]) -> Result<Vec<CompiledAlgori
 fn derive_prefilter_substrings(p: &LibraryPatterns) -> Vec<String> {
     let mut set = BTreeSet::new();
     let mut push_tokens = |s: &str| {
-        for tok in s.split(|c: char| !c.is_alphanumeric() && c != '.' && c != '/' && c != '_') {
+        // Remove common regex anchors that pollute tokens
+        let cleaned = s.replace("\\b", "");
+        for tok in cleaned
+            .split(|c: char| !c.is_alphanumeric() && c != '.' && c != '/' && c != '_')
+        {
             let t = tok.trim();
             if t.len() >= 4 {
                 set.insert(t.to_ascii_lowercase());
@@ -1403,7 +1407,7 @@ impl PatternDetector {
                 if let Some(m) = re.find(stripped_s) {
                     matched_import = true;
                     first_span = index.to_line_col(m.start());
-                    first_symbol = re.as_str().to_string();
+                    first_symbol = m.as_str().to_string();
                     first_snippet = extract_line(stripped_s, m.start());
                     break;
                 }
@@ -1413,24 +1417,20 @@ impl PatternDetector {
             for re in &lib.apis {
                 if let Some(m) = re.find(stripped_s) {
                     api_hits += 1;
-                    last_api = Some((m.start(), re.as_str().to_string()));
+                    // store the actual matched source text, not the regex pattern
+                    last_api = Some((m.start(), m.as_str().to_string()));
                 }
             }
-            if api_hits > 0 && first_symbol.is_empty() {
-                if let Some((pos, sym)) = last_api.clone() {
-                    first_span = index.to_line_col(pos);
-                    first_symbol = sym;
-                    first_snippet = extract_line(stripped_s, pos);
-                }
+            // Prefer an API symbol if we saw any, so downstream algorithm matching works
+            if let Some((pos, sym)) = last_api.clone() {
+                first_span = index.to_line_col(pos);
+                first_symbol = sym;
+                first_snippet = extract_line(stripped_s, pos);
             }
             // Require anchor only if patterns define any; always require at least one API hit
             let has_anchor_patterns =
                 !lib.include.is_empty() || !lib.import.is_empty() || !lib.namespace.is_empty();
-            let anchor_satisfied = if has_anchor_patterns {
-                matched_import
-            } else {
-                true
-            };
+            let anchor_satisfied = if has_anchor_patterns { matched_import } else { true };
             let should_report = anchor_satisfied && api_hits > 0;
             if should_report {
                 let finding = Finding {

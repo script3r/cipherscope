@@ -1,0 +1,44 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:acafcce7-fc11-5530-bedb-4a99878f3eae",
+  "version": 1,
+  "metadata": {
+    "timestamp": "1970-01-01T00:00:00Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [
+    {
+      "bom-ref": "cff84d12-395c-5d01-a006-a96dd6984fd4",
+      "assetType": "algorithm",
+      "name": "AES",
+      "assetProperties": {
+        "primitive": "aead",
+        "parameterSet": {
+          "keySize": 256,
+          "mode": "cbc"
+        },
+        "nistQuantumSecurityLevel": 3
+      },
+      "sourceLibrary": "OpenSSL (PHP)",
+      "evidence": {
+        "file": "fixtures/php/openssl/aes-gcm/main.php",
+        "detectorId": "detector-php",
+        "line": 7,
+        "column": 15
+      }
+    }
+  ],
+  "libraries": [
+    {
+      "name": "OpenSSL (PHP)",
+      "count": 1
+    }
+  ]
+}

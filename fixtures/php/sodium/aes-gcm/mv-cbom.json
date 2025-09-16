@@ -1,0 +1,40 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:acafcce7-fc11-5530-bedb-4a99878f3eae",
+  "version": 1,
+  "metadata": {
+    "timestamp": "1970-01-01T00:00:00Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [
+    {
+      "bom-ref": "4402c389-c58f-505b-8fd0-59d776d2fbd4",
+      "assetType": "algorithm",
+      "name": "ChaCha20Poly1305",
+      "assetProperties": {
+        "primitive": "aead",
+        "nistQuantumSecurityLevel": 3
+      },
+      "sourceLibrary": "Sodium (PHP)",
+      "evidence": {
+        "file": "fixtures/php/sodium/aes-gcm/main.php",
+        "detectorId": "detector-php",
+        "line": 3,
+        "column": 8
+      }
+    }
+  ],
+  "libraries": [
+    {
+      "name": "Sodium (PHP)",
+      "count": 1
+    }
+  ]
+}

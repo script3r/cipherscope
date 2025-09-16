@@ -14,11 +14,19 @@ use crate::{
 };
 
 /// Parser for X.509 certificates and related cryptographic material
-pub struct CertificateParser;
+pub struct CertificateParser {
+    deterministic: bool,
+}
 
 impl CertificateParser {
     pub fn new() -> Self {
-        Self
+        Self {
+            deterministic: false,
+        }
+    }
+
+    pub fn with_mode(deterministic: bool) -> Self {
+        Self { deterministic }
     }
 
     /// Parse all certificates found in the given directory
@@ -132,11 +140,21 @@ impl CertificateParser {
 
         // Extract signature algorithm
         let _signature_algorithm = cert.signature_algorithm.algorithm.to_id_string();
-        let signature_algorithm_ref = Uuid::new_v4().to_string();
+        let signature_algorithm_ref = if self.deterministic {
+            Uuid::new_v5(&Uuid::NAMESPACE_URL, b"cert:signature").to_string()
+        } else {
+            Uuid::new_v4().to_string()
+        };
 
         // Create the certificate asset
+        let cert_bom_ref = if self.deterministic {
+            Uuid::new_v5(&Uuid::NAMESPACE_URL, b"cert:asset").to_string()
+        } else {
+            Uuid::new_v4().to_string()
+        };
+
         let cert_asset = CryptoAsset {
-            bom_ref: Uuid::new_v4().to_string(),
+            bom_ref: cert_bom_ref,
             asset_type: AssetType::Certificate,
             name: Some(self.extract_common_name(&subject_name)),
             asset_properties: AssetProperties::Certificate(CertificateProperties {
@@ -145,6 +163,8 @@ impl CertificateParser {
                 not_valid_after,
                 signature_algorithm_ref: signature_algorithm_ref.clone(),
             }),
+            source_library: None,
+            evidence: None,
         };
 
         Ok(cert_asset)
@@ -168,6 +188,8 @@ impl CertificateParser {
                 parameter_set,
                 nist_quantum_security_level: nist_level,
             }),
+            source_library: None,
+            evidence: None,
         }
     }
 
@@ -367,9 +389,8 @@ mod tests {
 
     #[test]
     fn test_certificate_parser_creation() {
-        let parser = CertificateParser::new();
-        // Just test that we can create the parser
-        assert_eq!(std::mem::size_of_val(&parser), 0); // Zero-sized struct
+        let _parser = CertificateParser::new();
+        // Creation should succeed without panicking
     }
 
     #[test]

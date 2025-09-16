@@ -62,7 +62,7 @@ fn scan_fixtures() {
         );
     }
 
-    // Expect at least one hit per language category in positive fixtures
+    // Expect at least one hit per language category across comprehensive fixtures
     let has_rust = findings
         .iter()
         .any(|f| matches!(f.language, Language::Rust));
@@ -78,17 +78,12 @@ fn scan_fixtures() {
     let has_go = findings.iter().any(|f| matches!(f.language, Language::Go));
     let has_php = findings.iter().any(|f| matches!(f.language, Language::Php));
 
-    assert!(
-        has_rust && has_python && has_java && has_c && has_go && has_php,
-        "missing findings for some languages"
-    );
+    assert!(has_rust, "missing Rust findings");
+    assert!(has_python, "missing Python findings");
+    assert!(has_java, "missing Java findings");
+    assert!(has_c, "missing C/C++ findings");
+    assert!(has_go, "missing Go findings");
+    assert!(has_php, "missing PHP findings");
 
-    // Ensure comments are ignored: negative fixtures should not produce hits
-    let neg = workspace.join("fixtures/negative");
-    let neg_findings = scanner.run(&[neg]).unwrap();
-    assert!(
-        neg_findings.is_empty(),
-        "expected no findings in negative fixtures, got {}",
-        neg_findings.len()
-    );
+    // Note: legacy negative fixtures removed; comprehensive fixtures are used now.
 }

@@ -15,14 +15,11 @@ use uuid::Uuid;
 
 pub mod algorithm_detector;
 pub mod certificate_parser;
-pub mod dependency_analyzer;
-pub mod project_parser;
+// project parsing removed
 
 use algorithm_detector::AlgorithmDetector;
 use certificate_parser::CertificateParser;
-use dependency_analyzer::DependencyAnalyzer;
-use project_parser::ProjectParser;
-
+ 
 /// The main MV-CBOM document structure
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MvCbom {
@@ -42,25 +39,18 @@ pub struct MvCbom {
     #[serde(rename = "cryptoAssets")]
     pub crypto_assets: Vec<CryptoAsset>,
 
-    pub dependencies: Vec<Dependency>,
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    pub libraries: Vec<LibrarySummary>,
 }
 
 /// Metadata about the BOM's creation
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CbomMetadata {
-    pub component: ComponentInfo,
     pub timestamp: DateTime<Utc>,
     pub tools: Vec<ToolInfo>,
 }
 
-/// Information about the software component being scanned
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ComponentInfo {
-    pub name: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub version: Option<String>,
-    pub path: String, // Absolute path that was scanned
-}
+// Component info removed to simplify schema
 
 /// Information about the tool that generated the BOM
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -84,6 +74,13 @@ pub struct CryptoAsset {
 
     #[serde(rename = "assetProperties")]
     pub asset_properties: AssetProperties,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "sourceLibrary")]
+    pub source_library: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub evidence: Option<AssetEvidence>,
 }
 
 /// The type classification of a cryptographic asset
@@ -143,6 +140,21 @@ pub struct RelatedCryptoMaterialProperties {
     pub description: Option<String>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AssetEvidence {
+    pub file: String,
+    #[serde(rename = "detectorId")]
+    pub detector_id: String,
+    pub line: usize,
+    pub column: usize,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LibrarySummary {
+    pub name: String,
+    pub count: usize,
+}
+
 /// Classification of cryptographic primitives
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -163,51 +175,35 @@ pub enum CryptographicPrimitive {
     PseudoRandomNumberGenerator,
 }
 
-/// Relationship between components and cryptographic assets
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Dependency {
-    #[serde(rename = "ref")]
-    pub ref_: String, // bom-ref of the component that has the dependency
-
-    #[serde(rename = "dependsOn")]
-    pub depends_on: Vec<String>, // bom-refs that the ref component depends on
-
-    #[serde(rename = "dependencyType")]
-    pub dependency_type: DependencyType,
-}
-
-/// The nature of the dependency relationship
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum DependencyType {
-    Uses,       // Direct invocation in source code or certificate usage
-    Implements, // Library is present but not directly called
-}
-
 /// Main generator for MV-CBOM documents
 pub struct CbomGenerator {
     certificate_parser: CertificateParser,
-    dependency_analyzer: DependencyAnalyzer,
     algorithm_detector: AlgorithmDetector,
-    project_parser: ProjectParser,
+    deterministic: bool,
 }
 
 impl CbomGenerator {
     pub fn new() -> Self {
         Self {
             certificate_parser: CertificateParser::new(),
-            dependency_analyzer: DependencyAnalyzer::new(),
             algorithm_detector: AlgorithmDetector::new(),
-            project_parser: ProjectParser::new(),
+            deterministic: false,
         }
     }
 
     pub fn with_registry(registry: Arc<PatternRegistry>) -> Self {
         Self {
             certificate_parser: CertificateParser::new(),
-            dependency_analyzer: DependencyAnalyzer::new(),
             algorithm_detector: AlgorithmDetector::with_registry(registry),
-            project_parser: ProjectParser::new(),
+            deterministic: false,
+        }
+    }
+
+    pub fn with_registry_mode(registry: Arc<PatternRegistry>, deterministic: bool) -> Self {
+        Self {
+            certificate_parser: CertificateParser::with_mode(deterministic),
+            algorithm_detector: AlgorithmDetector::with_registry_and_mode(registry, deterministic),
+            deterministic,
         }
     }
 
@@ -217,15 +213,7 @@ impl CbomGenerator {
             .canonicalize()
             .with_context(|| format!("Failed to canonicalize path: {}", scan_path.display()))?;
 
-        // Parse project information and dependencies from various project files
-        let (project_info, project_dependencies) = self.project_parser.parse_project(&scan_path)?;
-
-        // Create component info from parsed project information
-        let component_info = ComponentInfo {
-            name: project_info.name,
-            version: project_info.version,
-            path: scan_path.display().to_string(),
-        };
+        // Project parsing removed; no component information included
 
         // Parse certificates in the directory
         let certificates = self.certificate_parser.parse_certificates(&scan_path)?;
@@ -235,36 +223,49 @@ impl CbomGenerator {
             .algorithm_detector
             .detect_algorithms(&scan_path, findings)?;
 
-        // Analyze dependencies (uses vs implements) with project dependencies
-        let dependencies = self.dependency_analyzer.analyze_dependencies(
-            &component_info,
-            &algorithms,
-            &certificates,
-            &project_dependencies,
-            findings,
-        )?;
-
-        // Build crypto assets list
+        // Build crypto assets list and libraries summary
         let mut crypto_assets = Vec::new();
         crypto_assets.extend(algorithms);
         crypto_assets.extend(certificates);
 
+        let mut lib_counts: std::collections::BTreeMap<String, usize> =
+            std::collections::BTreeMap::new();
+        for asset in &crypto_assets {
+            if let Some(ref lib) = asset.source_library {
+                *lib_counts.entry(lib.clone()).or_insert(0) += 1;
+            }
+        }
+        let libraries: Vec<LibrarySummary> = lib_counts
+            .into_iter()
+            .map(|(name, count)| LibrarySummary { name, count })
+            .collect();
+
         let cbom = MvCbom {
             bom_format: "MV-CBOM".to_string(),
             spec_version: "1.0".to_string(),
-            serial_number: format!("urn:uuid:{}", Uuid::new_v4()),
+            serial_number: if self.deterministic {
+                format!(
+                    "urn:uuid:{}",
+                    Uuid::new_v5(&Uuid::NAMESPACE_URL, b"cbom:serial")
+                )
+            } else {
+                format!("urn:uuid:{}", Uuid::new_v4())
+            },
             version: 1,
             metadata: CbomMetadata {
-                component: component_info,
-                timestamp: Utc::now(),
+                timestamp: if self.deterministic {
+                    DateTime::from_timestamp(0, 0).unwrap()
+                } else {
+                    Utc::now()
+                },
                 tools: vec![ToolInfo {
                     name: "cipherscope".to_string(),
                     version: env!("CARGO_PKG_VERSION").to_string(),
                     vendor: "CipherScope Contributors".to_string(),
                 }],
             },
-            crypto_assets,
-            dependencies,
+            crypto_assets: { crypto_assets },
+            libraries,
         };
 
         Ok(cbom)
@@ -280,72 +281,9 @@ impl CbomGenerator {
             .canonicalize()
             .with_context(|| format!("Failed to canonicalize path: {}", scan_path.display()))?;
 
-        // Discover all projects recursively
-        let discovered_projects = self.project_parser.discover_projects(&scan_path)?;
-
+        // Project discovery removed; just generate one CBOM for the root
         let mut cboms = Vec::new();
-
-        for (project_path, project_info, project_dependencies) in discovered_projects {
-            // Filter findings relevant to this specific project
-            let project_findings: Vec<Finding> = findings
-                .iter()
-                .filter(|finding| {
-                    // Check if the finding's file is within this project's directory
-                    finding.file.starts_with(&project_path)
-                })
-                .cloned()
-                .collect();
-
-            // Create component info from parsed project information
-            let component_info = ComponentInfo {
-                name: project_info.name,
-                version: project_info.version,
-                path: project_path.display().to_string(),
-            };
-
-            // Parse certificates in this project directory
-            let certificates = self.certificate_parser.parse_certificates(&project_path)?;
-
-            // Detect algorithms from findings and static analysis for this project
-            let algorithms = self
-                .algorithm_detector
-                .detect_algorithms(&project_path, &project_findings)?;
-
-            // Analyze dependencies for this project
-            let dependencies = self.dependency_analyzer.analyze_dependencies(
-                &component_info,
-                &algorithms,
-                &certificates,
-                &project_dependencies,
-                &project_findings,
-            )?;
-
-            // Build crypto assets list
-            let mut crypto_assets = Vec::new();
-            crypto_assets.extend(algorithms);
-            crypto_assets.extend(certificates);
-
-            let cbom = MvCbom {
-                bom_format: "MV-CBOM".to_string(),
-                spec_version: "1.0".to_string(),
-                serial_number: format!("urn:uuid:{}", Uuid::new_v4()),
-                version: 1,
-                metadata: CbomMetadata {
-                    component: component_info,
-                    timestamp: Utc::now(),
-                    tools: vec![ToolInfo {
-                        name: "cipherscope".to_string(),
-                        version: env!("CARGO_PKG_VERSION").to_string(),
-                        vendor: "CipherScope Contributors".to_string(),
-                    }],
-                },
-                crypto_assets,
-                dependencies,
-            };
-
-            cboms.push((project_path, cbom));
-        }
-
+        cboms.push((scan_path.clone(), self.generate_cbom(&scan_path, findings)?));
         Ok(cboms)
     }
 
@@ -392,11 +330,6 @@ mod tests {
             serial_number: "urn:uuid:12345678-1234-1234-1234-123456789abc".to_string(),
             version: 1,
             metadata: CbomMetadata {
-                component: ComponentInfo {
-                    name: "test-project".to_string(),
-                    version: Some("0.1.0".to_string()),
-                    path: "/tmp/test".to_string(),
-                },
                 timestamp: Utc::now(),
                 tools: vec![ToolInfo {
                     name: "cipherscope".to_string(),
@@ -405,7 +338,7 @@ mod tests {
                 }],
             },
             crypto_assets: vec![],
-            dependencies: vec![],
+            libraries: vec![],
         };
 
         let json = serde_json::to_string_pretty(&cbom).unwrap();

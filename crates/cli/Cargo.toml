@@ -19,9 +19,6 @@ crossbeam-channel = { workspace = true }
 indicatif = "0.17"
 scanner-core = { path = "../scanner-core" }
 cbom-generator = { path = "../cbom-generator" }
-detector-swift = { path = "../detector-swift" }
-detector-objc = { path = "../detector-objc" }
-detector-kotlin = { path = "../detector-kotlin" }
 
 [[bin]]
 name = "cipherscope"

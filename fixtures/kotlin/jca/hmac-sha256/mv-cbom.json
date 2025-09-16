@@ -1,0 +1,40 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:acafcce7-fc11-5530-bedb-4a99878f3eae",
+  "version": 1,
+  "metadata": {
+    "timestamp": "1970-01-01T00:00:00Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [
+    {
+      "bom-ref": "8d87019b-2e9c-5335-8c36-37dffd06e3a5",
+      "assetType": "algorithm",
+      "name": "HMAC-SHA256",
+      "assetProperties": {
+        "primitive": "mac",
+        "nistQuantumSecurityLevel": 3
+      },
+      "sourceLibrary": "JCA/JCE (Kotlin)",
+      "evidence": {
+        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/kotlin/jca/hmac-sha256/Main.kt",
+        "detectorId": "algorithm-detector",
+        "line": 9,
+        "column": 15
+      }
+    }
+  ],
+  "libraries": [
+    {
+      "name": "JCA/JCE (Kotlin)",
+      "count": 1
+    }
+  ]
+}

@@ -50,6 +50,14 @@ struct Args {
     /// Show progress bar during scanning
     #[arg(long, action = ArgAction::SetTrue)]
     progress: bool,
+
+    /// Output file for single-project CBOM (default: stdout)
+    #[arg(long, value_name = "FILE")]
+    output: Option<PathBuf>,
+
+    /// Output directory for recursive CBOMs (default: stdout JSON array)
+    #[arg(long, value_name = "DIR")]
+    output_dir: Option<PathBuf>,
 }
 
 fn main() -> Result<()> {
@@ -168,46 +176,44 @@ fn main() -> Result<()> {
     }
 
     // Generate MV-CBOM (always - this is the primary functionality)
-    let cbom_generator = CbomGenerator::with_registry(reg.clone());
+    // Deterministic mode for tests/ground-truth when --deterministic is set
+    let cbom_generator = if args.deterministic {
+        CbomGenerator::with_registry_mode(reg.clone(), true)
+    } else {
+        CbomGenerator::with_registry(reg.clone())
+    };
 
     // Use the first path as the scan root for CBOM generation
     let default_path = PathBuf::from(".");
     let scan_path = args.paths.first().unwrap_or(&default_path);
 
     if args.recursive {
-        // Recursive CBOM generation for all discovered projects
+        // Simplified: generate a single CBOM for the root
         match cbom_generator.generate_cboms_recursive(scan_path, &findings) {
-            Ok(cboms) => match cbom_generator.write_cboms(&cboms) {
-                Ok(_written_files) => {
-                    println!(
-                        "Generated {} MV-CBOMs for discovered projects:",
-                        cboms.len()
-                    );
-                    let mut total_assets = 0;
-                    let mut total_dependencies = 0;
-
-                    for (i, (project_path, cbom)) in cboms.iter().enumerate() {
-                        total_assets += cbom.crypto_assets.len();
-                        total_dependencies += cbom.dependencies.len();
-                        println!(
-                            "  {}. {}: {} assets, {} dependencies",
-                            i + 1,
-                            project_path.display(),
-                            cbom.crypto_assets.len(),
-                            cbom.dependencies.len()
-                        );
+            Ok(cboms) => {
+                if let Some(dir) = &args.output_dir {
+                    // Write each CBOM into the specified directory
+                    if let Err(e) = fs::create_dir_all(dir) {
+                        eprintln!("Failed to create output directory {}: {}", dir.display(), e);
+                        std::process::exit(1);
                     }
-
-                    println!(
-                        "Total: {} cryptographic assets, {} dependency relationships",
-                        total_assets, total_dependencies
-                    );
+                    for (i, (_project_path, cbom)) in cboms.iter().enumerate() {
+                        let file = dir.join(format!("{:03}-mv-cbom.json", i + 1));
+                        if let Err(e) = cbom_generator.write_cbom(cbom, &file) {
+                            eprintln!("Failed to write MV-CBOM to {}: {}", file.display(), e);
+                            std::process::exit(1);
+                        }
+                    }
+                    println!("Generated {} MV-CBOMs to {}", cboms.len(), dir.display());
+                } else {
+                    // Print JSON array to stdout
+                    let only_cboms: Vec<&cbom_generator::MvCbom> =
+                        cboms.iter().map(|(_, c)| c).collect();
+                    let json = serde_json::to_string_pretty(&only_cboms)
+                        .expect("Failed to serialize MV-CBOMs to JSON");
+                    println!("{}", json);
                 }
-                Err(e) => {
-                    eprintln!("Failed to write MV-CBOMs: {}", e);
-                    std::process::exit(1);
-                }
-            },
+            }
             Err(e) => {
                 eprintln!("Failed to generate recursive MV-CBOMs: {}", e);
                 std::process::exit(1);
@@ -217,20 +223,23 @@ fn main() -> Result<()> {
         // Single CBOM generation
         match cbom_generator.generate_cbom(scan_path, &findings) {
             Ok(cbom) => {
-                let output_path = scan_path.join("mv-cbom.json");
-                match cbom_generator.write_cbom(&cbom, &output_path) {
-                    Ok(()) => {
-                        println!("MV-CBOM written to: {}", output_path.display());
-                        println!("Found {} cryptographic assets", cbom.crypto_assets.len());
-                        println!(
-                            "Created {} dependency relationships",
-                            cbom.dependencies.len()
-                        );
+                if let Some(path) = &args.output {
+                    match cbom_generator.write_cbom(&cbom, path) {
+                        Ok(()) => {
+                            println!("MV-CBOM written to: {}", path.display());
+                            println!("Found {} cryptographic assets", cbom.crypto_assets.len());
+                            // Dependencies removed
+                        }
+                        Err(e) => {
+                            eprintln!("Failed to write MV-CBOM: {}", e);
+                            std::process::exit(1);
+                        }
                     }
-                    Err(e) => {
-                        eprintln!("Failed to write MV-CBOM: {}", e);
-                        std::process::exit(1);
-                    }
+                } else {
+                    // Print JSON to stdout (no extra lines)
+                    let json = serde_json::to_string_pretty(&cbom)
+                        .expect("Failed to serialize MV-CBOM to JSON");
+                    println!("{}", json);
                 }
             }
             Err(e) => {

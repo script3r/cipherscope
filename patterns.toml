@@ -15,6 +15,7 @@ include = [
 ]
 apis = [
   "\\bEVP_[A-Za-z0-9_]+\\s*\\(",
+  "\\bHMAC\\s*\\(",
   "\\bRSA_[A-Za-z0-9_]+\\s*\\(",
   "\\bEC_KEY_[A-Za-z0-9_]+\\s*\\(",
   "\\bECDSA_[A-Za-z0-9_]+\\s*\\(",
@@ -47,21 +48,68 @@ symbol_patterns = [
 ]
 [[library.algorithms.parameter_patterns]]
 name = "curve"
-pattern = ".*"
+pattern = "EC_KEY_new_by_curve_name\\s*\\(\\s*(NID_(?:X9_62_prime256v1|secp384r1|secp521r1))"
 default_value = "P-256"
+
+[[library.algorithms]]
+name = "AES-GCM"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bEVP_aes_\\d+_gcm\\s*\\(",
+]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "EVP_aes_(\\d+)_gcm"
+default_value = 256
 
 [[library.algorithms]]
 name = "AES"
 primitive = "aead"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
-  "\\bEVP_aes",
+  "\\bEVP_aes_\\d+_(?:cbc|ctr|ofb|cfb|ecb)",
   "\\bAES_",
 ]
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
+pattern = "EVP_aes_(\\d+)"
+default_value = 256
+
+[[library.algorithms]]
+name = "RSA"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bEVP_PKEY_RSA",
+  "\\bRSA_",
+]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "RSA_generate_key_ex\\s*\\([^,]+,\\s*(\\d{4})"
+default_value = 2048
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
 pattern = "aes_(\\d+)"
 default_value = 256
+
+[[library.algorithms]]
+name = "SHA-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bEVP_sha256\\s*\\(",
+  "\\bEVP_DigestInit",
+  "\\bSHA256",
+]
+
+[[library.algorithms]]
+name = "HMAC-SHA256"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bHMAC\\s*\\(",
+]
 
 [[library]]
 name = "libsodium"
@@ -72,15 +120,28 @@ include = [
 ]
 apis = [
   "\\bcrypto_secretbox_(?:easy|open_easy)\\s*\\(",
+  "\\bcrypto_aead_aes256gcm_(?:encrypt|decrypt|keygen)\\s*\\(",
   "\\bcrypto_aead_chacha20poly1305_ietf_(?:encrypt|decrypt)\\s*\\(",
   "\\bcrypto_aead_xchacha20poly1305_ietf_(?:encrypt|decrypt)\\s*\\(",
   "\\bcrypto_auth(?:_verify)?\\s*\\(",
-  "\\bcrypto_sign_(?:detached|verify_detached)\\s*\\(",
+  "\\bcrypto_auth_hmacsha256(?:_keygen|_verify)?\\s*\\(",
+  "\\bcrypto_hash_sha256\\s*\\(",
+  "\\bcrypto_sign(?:_keypair|_detached|_verify_detached|_open)?\\s*\\(",
   "\\bcrypto_generichash\\s*\\(",
   "\\bcrypto_scalarmult\\s*\\(",
+  "\\bsodium_init\\s*\\(",
+  "\\brandombytes_buf\\s*\\(",
 ]
 
 # Algorithm definitions for libsodium
+[[library.algorithms]]
+name = "AES-GCM"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcrypto_aead_aes256gcm",
+]
+
 [[library.algorithms]]
 name = "ChaCha20Poly1305"
 primitive = "aead"
@@ -91,10 +152,27 @@ symbol_patterns = [
 ]
 
 [[library.algorithms]]
+name = "SHA-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcrypto_hash_sha256",
+]
+
+[[library.algorithms]]
+name = "HMAC-SHA256"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcrypto_auth_hmacsha256",
+]
+
+[[library.algorithms]]
 name = "Ed25519"
 primitive = "signature"
 nistQuantumSecurityLevel = 0
 symbol_patterns = [
+  "\\bcrypto_sign(?:_keypair|_open)?\\s*\\(",
   "\\bcrypto_sign_ed25519",
   "\\bed25519",
 ]
@@ -283,6 +361,15 @@ symbol_patterns = [
   "\\bSHA256::",
 ]
 
+[[library.algorithms]]
+name = "HMAC-SHA256"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bHMAC<SHA256>",
+  "\\bCryptoPP::HMAC",
+]
+
 [[library]]
 name = "Botan"
 languages = ["C++"]
@@ -349,9 +436,10 @@ include = [
   "^\\s*import\\s+java\\.security\\.",
 ]
 apis = [
-  "\\b(?:Cipher|MessageDigest|Signature|KeyPairGenerator)\\.getInstance\\s*\\(",
+  "\\b(?:Cipher|MessageDigest|Signature|KeyPairGenerator|Mac)\\.getInstance\\s*\\(",
   "\\bKeyFactory\\.getInstance\\s*\\(",
   "\\bKeyAgreement\\.getInstance\\s*\\(",
+  "\\bSecretKeySpec\\s*\\(",
 ]
 
 # Algorithm definitions for JCA/JCE
@@ -365,7 +453,7 @@ symbol_patterns = [
 ]
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
-pattern = "initialize\\s*\\(\\s*(\\d+)"
+pattern = "RSAKeyGenParameterSpec\\s*\\(\\s*(\\d+)"
 default_value = 2048
 
 [[library.algorithms]]
@@ -389,6 +477,10 @@ symbol_patterns = [
   "\\bSignature\\.getInstance\\s*\\([^)]*ECDSA",
   "\\bKeyPairGenerator\\.getInstance\\s*\\(\\s*[\"']EC[\"']",
 ]
+[[library.algorithms.parameter_patterns]]
+name = "curve"
+pattern = "initialize\\s*\\(\\s*(256|384|521)"
+default_value = "P-256"
 
 [[library.algorithms]]
 name = "SHA-256"
@@ -397,6 +489,14 @@ nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bMessageDigest\\.getInstance\\s*\\([^)]*SHA-?256",
   "\\bSHA256with",
+]
+
+[[library.algorithms]]
+name = "HMAC-SHA256"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMac\\.getInstance\\s*\\([^)]*HmacSHA256",
 ]
 
 [[library]]
@@ -442,6 +542,22 @@ symbol_patterns = [
   "\\bCipher\\.getInstance\\s*\\([^)]*AES[^)]*BC",
 ]
 
+[[library.algorithms]]
+name = "SHA-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*SHA-?256[^)]*BC",
+]
+
+[[library.algorithms]]
+name = "HMAC-SHA256"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMac\\.getInstance\\s*\\([^)]*HmacSHA256[^)]*BC",
+]
+
 [[library]]
 name = "Google Tink (Java)"
 languages = ["Java"]
@@ -451,7 +567,9 @@ include = [
 ]
 apis = [
   "\\bTinkConfig\\.register\\s*\\(",
+  "\\b(?:AeadConfig|MacConfig|SignatureConfig)\\.register\\s*\\(",
   "\\b(?:Aead|Mac|HybridDecrypt|HybridEncrypt|PublicKeySign|PublicKeyVerify)\\b",
+  "\\b(?:AeadKeyTemplates|MacKeyTemplates|SignatureKeyTemplates)\\b",
 ]
 
 # Algorithm definitions for Google Tink
@@ -467,6 +585,25 @@ symbol_patterns = [
 name = "keySize"
 pattern = "AES(\\d+)_GCM"
 default_value = 256
+
+[[library.algorithms]]
+name = "HMAC-SHA256"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMacKeyTemplates\\.HMAC_SHA256",
+  "\\bMac\\.class",
+]
+
+[[library.algorithms]]
+name = "SHA-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bSHA256",
+  "\\bPrfKeyTemplates\\.HMAC_SHA256_PRF",
+  "\\bPrf\\.class",
+]
 
 [[library]]
 name = "Conscrypt"
@@ -507,19 +644,54 @@ name = "Go std crypto"
 languages = ["Go"]
 [library.patterns]
 include = [
-  "^\\s*import\\s*(?:\\(.*\\)|)\\s*[\\s\\S]*?\"crypto/(?:aes|des|rc4|sha\\d*|md5|rsa|ecdsa|ed25519|x509|rand|tls)\"",
+  "^\\s*import\\s*(?:\\(.*\\)|)\\s*[\\s\\S]*?\"crypto/(?:aes|des|rc4|sha\\d*|md5|rsa|ecdsa|ed25519|x509|rand|tls|cipher|hmac)\"",
+  "^\\s*import\\s*(?:\\(.*\\)|)\\s*[\\s\\S]*?\"golang\\.org/x/crypto/",
 ]
 apis = [
-  "\\bcrypto\\.[A-Z][A-Za-z0-9_]*\\b",
+  "\\baes\\.NewCipher\\b",
+  "\\bcipher\\.New(?:GCM|CTR|CFB|OFB)\\b",
+  "\\bsha256\\.(?:Sum256|New)\\b",
+  "\\bhmac\\.(?:New|Equal)\\b",
+  "\\brsa\\.(?:GenerateKey|SignPKCS1v15|VerifyPKCS1v15|EncryptOAEP)\\b",
+  "\\becdsa\\.(?:GenerateKey|Sign|Verify)\\b",
+  "\\bed25519\\.(?:GenerateKey|Sign|Verify)\\b",
 ]
 
 # Algorithm definitions for Go std crypto
+[[library.algorithms]]
+name = "AES-GCM"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcipher\\.NewGCM",
+  "\\baes\\.NewCipher",
+]
+
+[[library.algorithms]]
+name = "SHA-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bsha256\\.Sum256",
+  "\\bsha256\\.New",
+]
+
+[[library.algorithms]]
+name = "HMAC-SHA256"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bhmac\\.New.*sha256",
+]
+
 [[library.algorithms]]
 name = "RSA"
 primitive = "signature"
 nistQuantumSecurityLevel = 0
 symbol_patterns = [
   "\\brsa\\.GenerateKey",
+  "\\brsa\\.SignPKCS1v15",
+  "\\brsa\\.VerifyPKCS1v15",
   "\\brsa\\.EncryptOAEP",
 ]
 [[library.algorithms.parameter_patterns]]
@@ -609,7 +781,10 @@ include = [
   "^\\s*import\\s*(?:\\(.*\\)|)\\s*[\\s\\S]*?\"github\\.com/google/tink/go/",
 ]
 apis = [
-  "\\btink\\/[A-Za-z0-9_/]+\\b",
+  "\\baead\\.(?:Init|New|AES256GCMKeyTemplate)\\s*\\(",
+  "\\bmac\\.(?:Init|New|HMACSHA256Tag256KeyTemplate)\\s*\\(",
+  "\\bsignature\\.(?:Init|NewSigner|NewVerifier|RSA_PSS_3072_SHA256_F4_KeyTemplate)\\s*\\(",
+  "\\bkeyset\\.NewHandle\\s*\\(",
 ]
 
 # Algorithm definitions for Google Tink (Go)
@@ -618,8 +793,26 @@ name = "AES-GCM"
 primitive = "aead"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
-  "\\baead\\.AES.*GCM",
-  "\\bAEAD",
+  "\\baead\\.AES256GCMKeyTemplate",
+  "\\baead\\.New",
+]
+
+[[library.algorithms]]
+name = "HMAC-SHA256"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bmac\\.HMACSHA256Tag256KeyTemplate",
+  "\\bmac\\.New",
+]
+
+[[library.algorithms]]
+name = "RSA"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bsignature\\.RSA_PSS_3072_SHA256_F4_KeyTemplate",
+  "\\bsignature\\.NewSigner",
 ]
 
 # =========================
@@ -657,6 +850,10 @@ symbol_patterns = [
   "\\bring::signature::ECDSA_",
   "\\bEcdsaKeyPair",
 ]
+[[library.algorithms.parameter_patterns]]
+name = "curve"
+pattern = "\\bp(256|384|521)"
+default_value = "P-256"
 
 [[library.algorithms]]
 name = "Ed25519"
@@ -674,6 +871,25 @@ nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bring::aead::AES_",
   "\\bUnboundKey",
+]
+
+[[library.algorithms]]
+name = "SHA-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bring::digest::SHA256",
+  "\\bdigest::digest",
+]
+
+[[library.algorithms]]
+name = "HMAC-SHA256"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bhmac::HMAC_SHA256",
+  "\\bhmac::sign",
+  "\\bhmac::Key::new",
 ]
 
 [[library.algorithms]]
@@ -846,6 +1062,29 @@ default_value = "P-256"
 # =========================
 
 [[library]]
+name = "Security.framework (Swift)"
+languages = ["Swift"]
+[library.patterns]
+include = [
+  "^\\s*import\\s+Security\\b",
+]
+apis = [
+  "\\bSec(?:Key|Certificate|Trust|Identity)[A-Za-z0-9_]*\\b",
+  "\\bkSec[A-Za-z0-9_]+\\b",
+]
+
+# Algorithm definitions for Security.framework (Swift)
+[[library.algorithms]]
+name = "RSA"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bkSecAttrKeyTypeRSA",
+  "\\bSecKeyCreateSignature",
+  "\\brsaSignatureMessagePSSSHA256",
+]
+
+[[library]]
 name = "CryptoKit"
 languages = ["Swift"]
 [library.patterns]
@@ -853,7 +1092,7 @@ include = [
   "^\\s*import\\s+CryptoKit\\b",
 ]
 apis = [
-  "\\b(SHA(?:256|384|512)|HMAC|ChaChaPoly|AES\\.GCM|Curve25519)\\b",
+  "\\b(SHA(?:256|384|512)|HMAC|ChaChaPoly|AES\\.GCM|Curve25519|P256|P384|P521)\\b",
 ]
 
 # Algorithm definitions for CryptoKit
@@ -882,6 +1121,30 @@ symbol_patterns = [
 ]
 
 [[library.algorithms]]
+name = "ECDSA-P256"
+primitive = "signature"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bP256\\.Signing",
+]
+
+[[library.algorithms]]
+name = "ECDSA-P384"
+primitive = "signature"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bP384\\.Signing",
+]
+
+[[library.algorithms]]
+name = "ECDSA-P521"
+primitive = "signature"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bP521\\.Signing",
+]
+
+[[library.algorithms]]
 name = "Ed25519"
 primitive = "signature"
 nistQuantumSecurityLevel = 0
@@ -905,7 +1168,25 @@ include = [
   "^\\s*import\\s+CommonCrypto\\b",
 ]
 apis = [
-  "\\bCC_(?:Crypt|SHA(?:1|224|256|384|512)|MD5|KeyDerivation|Random)[A-Za-z0-9_]*\\s*\\(",
+  "\\bCC_(?:Crypt|SHA(?:1|224|256|384|512)|MD5|KeyDerivation|Random|Hmac)[A-Za-z0-9_]*\\s*\\(",
+  "\\bCCHmac\\s*\\(",
+]
+
+# Algorithm definitions for CommonCrypto (Swift)
+[[library.algorithms]]
+name = "SHA-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCC_SHA256\\s*\\(",
+]
+
+[[library.algorithms]]
+name = "HMAC-SHA256"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCCHmac.*kCCHmacAlgSHA256",
 ]
 
 [[library]]
@@ -944,12 +1225,14 @@ name = "JCA/JCE (Kotlin)"
 languages = ["Kotlin"]
 [library.patterns]
 include = [
-  "^\\s*import\\s+(?:javax\\.crypto\\.|java\\.security\\.)",
+  "^\\s*import\\s+javax\\.crypto\\.",
+  "^\\s*import\\s+java\\.security\\.",
 ]
 apis = [
-  "\\b(?:Cipher|MessageDigest|Signature|KeyPairGenerator)\\.getInstance\\s*\\(",
+  "\\b(?:Cipher|MessageDigest|Signature|KeyPairGenerator|KeyGenerator|Mac)\\.getInstance\\s*\\(",
   "\\bKeyFactory\\.getInstance\\s*\\(",
   "\\bKeyAgreement\\.getInstance\\s*\\(",
+  "\\bSecretKeySpec\\s*\\(",
 ]
 
 # Algorithm definitions for JCA/JCE (Kotlin) - Same as Java
@@ -960,6 +1243,10 @@ nistQuantumSecurityLevel = 0
 symbol_patterns = [
   "\\bKeyPairGenerator\\.getInstance\\s*\\([^)]*RSA",
 ]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "RSAKeyGenParameterSpec\\s*\\(\\s*(\\d+)"
+default_value = 2048
 
 [[library.algorithms]]
 name = "AES"
@@ -967,7 +1254,12 @@ primitive = "aead"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bCipher\\.getInstance\\s*\\([^)]*AES",
+  "\\bKeyGenerator\\.getInstance\\s*\\([^)]*AES",
 ]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "init\\s*\\(\\s*(\\d+)"
+default_value = 256
 
 [[library.algorithms]]
 name = "ECDSA"
@@ -976,6 +1268,26 @@ nistQuantumSecurityLevel = 0
 symbol_patterns = [
   "\\bKeyPairGenerator\\.getInstance\\s*\\([^)]*EC",
   "\\bSignature\\.getInstance\\s*\\([^)]*ECDSA",
+]
+[[library.algorithms.parameter_patterns]]
+name = "curve"
+pattern = "initialize\\s*\\(\\s*(256|384|521)"
+default_value = "P-256"
+
+[[library.algorithms]]
+name = "SHA-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*SHA-?256",
+]
+
+[[library.algorithms]]
+name = "HMAC-SHA256"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMac\\.getInstance\\s*\\([^)]*HmacSHA256",
 ]
 
 [[library]]
@@ -1116,6 +1428,10 @@ symbol_patterns = [
   "\\bCrypto\\.Cipher\\.AES",
   "\\bAES\\.new",
 ]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "AES\\.new\\s*\\(\\s*['\"][A-Za-z0-9_-]*aes-(\\d+)[A-Za-z0-9_-]*['\"]"
+default_value = 256
 
 [[library.algorithms]]
 name = "SHA-256"
@@ -1194,6 +1510,14 @@ symbol_patterns = [
   "\\bblake2b",
 ]
 
+[[library.algorithms]]
+name = "SHA-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bnacl\\.hash\\.sha256",
+]
+
 # =========================
 # PHP
 # =========================
@@ -1224,6 +1548,30 @@ nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bopenssl_encrypt.*aes",
   "\\bopenssl_decrypt.*aes",
+]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "openssl_(?:encrypt|decrypt)\\s*\\(\\s*['\"][^'\"]*aes-(\\d+)"
+default_value = 256
+[[library.algorithms.parameter_patterns]]
+name = "mode"
+pattern = "openssl_(?:encrypt|decrypt)\\s*\\(\\s*['\"][^'\"]*aes-\\d+-(gcm|cbc|ctr|cfb|ofb)"
+default_value = "cbc"
+
+[[library.algorithms]]
+name = "SHA-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bopenssl_digest.*sha256",
+]
+
+[[library.algorithms]]
+name = "HMAC-SHA256"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bhash_hmac.*sha256",
 ]
 
 [[library]]
@@ -1262,6 +1610,14 @@ symbol_patterns = [
   "\\bsodium_crypto_generichash",
 ]
 
+[[library.algorithms]]
+name = "HMAC-SHA512-256"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bsodium_crypto_auth",
+]
+
 [[library]]
 name = "phpseclib"
 languages = ["PHP"]
@@ -1290,8 +1646,31 @@ apis = [
 # =========================
 
 [[library]]
+name = "Security.framework (Objective-C)"
+languages = ["ObjC"]
+[library.patterns]
+include = [
+  "^\\s*#\\s*import\\s*<Security/Security\\.h>",
+]
+apis = [
+  "\\bSec(?:Key|Certificate|Trust|Identity)[A-Za-z0-9_]*\\b",
+  "\\bkSec[A-Za-z0-9_]+\\b",
+]
+
+# Algorithm definitions for Security.framework
+[[library.algorithms]]
+name = "RSA"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bkSecAttrKeyTypeRSA",
+  "\\bkSecKeyAlgorithmRSA",
+  "\\bSecKeyCreateSignature",
+]
+
+[[library]]
 name = "CommonCrypto (Objective-C)"
-languages = ["Objective-C"]
+languages = ["ObjC"]
 [library.patterns]
 include = [
   "^\\s*#\\s*(?:import|include)\\s*<CommonCrypto\\/[A-Za-z0-9_]+\\.h>",
@@ -1316,6 +1695,10 @@ symbol_patterns = [
   "\\bCCCrypt.*kCCAlgorithmAES",
   "\\bkCCAlgorithmAES",
 ]
+[[library.algorithms.parameter_patterns]]
+name = "mode"
+pattern = "kCCOption[A-Za-z0-9_]*"
+default_value = "CBC"
 
 [[library.algorithms]]
 name = "SHA-256"
@@ -1341,30 +1724,13 @@ symbol_patterns = [
   "\\bCCKeyDerivationPBKDF",
 ]
 
-[[library]]
-name = "Security.framework (Objective-C)"
-languages = ["Objective-C"]
-[library.patterns]
-include = [
-  "^\\s*#\\s*(?:import|include)\\s*<Security\\/Security\\.h>",
-  "^\\s*@import\\s+Security\\b",
-]
-apis = [
-  "\\bSecKeyCreateRandomKey\\s*\\(",
-  "\\bSecKeyCreateEncryptedData\\s*\\(",
-  "\\bSecKeyCreateDecryptedData\\s*\\(",
-  "\\bSecKeyCreateSignature\\s*\\(",
-  "\\bSecKeyVerifySignature\\s*\\(",
-  "\\bSecRandomCopyBytes\\s*\\(",
-]
-
 # =========================
 # Objective-C: Third-party C libs used from Obj-C
 # =========================
 
 [[library]]
 name = "OpenSSL (Objective-C)"
-languages = ["Objective-C"]
+languages = ["ObjC"]
 [library.patterns]
 include = [
   "^\\s*#\\s*(?:import|include)\\s*<openssl/[A-Za-z0-9_./-]+>",
@@ -1378,9 +1744,63 @@ apis = [
   "\\bPKCS\\d_[A-Za-z0-9_]+\\s*\\(",
 ]
 
+# Algorithm definitions for OpenSSL (Objective-C)
+[[library.algorithms]]
+name = "SHA-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bEVP_sha256\\s*\\(",
+  "\\bEVP_Digest(?:Init|Update|Final)_ex\\s*\\(",
+]
+
+[[library.algorithms]]
+name = "AES-GCM"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bEVP_aes_\\d+_gcm\\s*\\(",
+]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "EVP_aes_(\\d+)_gcm"
+default_value = 256
+
+[[library.algorithms]]
+name = "AES"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bEVP_aes_\\d+_(?:cbc|ctr|ofb|cfb)",
+  "\\bEVP_CIPHER_CTX_",
+]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "EVP_aes_(\\d+)"
+default_value = 256
+
+[[library.algorithms]]
+name = "RSA"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bRSA_sign",
+  "\\bRSA_verify",
+  "\\bRSA_generate_key_ex",
+  "\\bRSA_new",
+]
+
+[[library.algorithms]]
+name = "HMAC-SHA256"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bHMAC\\s*\\(",
+]
+
 [[library]]
 name = "libsodium (Objective-C)"
-languages = ["Objective-C"]
+languages = ["ObjC"]
 [library.patterns]
 include = [
   "^\\s*#\\s*(?:import|include)\\s*<sodium(?:/[^>]+)?>",
@@ -1399,7 +1819,7 @@ apis = [
 
 [[library]]
 name = "Google Tink (Objective-C)"
-languages = ["Objective-C"]
+languages = ["ObjC"]
 [library.patterns]
 include = [
   "^\\s*@import\\s+Tink\\b",
@@ -1425,6 +1845,18 @@ apis = [
   "\\b(?:JsonKeysetReader|JsonKeysetWriter|cleartext_keyset_handle|KeysetHandle)\\b",
   "\\b(?:Aead|Mac|HybridEncrypt|HybridDecrypt|PublicKeySign|PublicKeyVerify)\\b",
   "\\btink\\.core\\.PrimitiveSet\\b",
+  "\\bmac_key_templates\\.HMAC_SHA256",
+  "\\btink\\.new_keyset_handle\\b",
+]
+
+# Algorithm definitions for Google Tink (Python)
+[[library.algorithms]]
+name = "HMAC-SHA256"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bmac_key_templates\\.HMAC_SHA256",
+  "\\bmac\\.Mac",
 ]
 
 # =========================
@@ -1435,10 +1867,8 @@ apis = [
 name = "Erlang/OTP crypto"
 languages = ["Erlang"]
 [library.patterns]
-# Detect explicit imports of the module (rare but possible)
-include = [
-  "^\\s*-import\\s*\\(\\s*crypto\\s*,\\s*\\[",
-]
+# Detect explicit imports of the module (rare but possible) or empty to allow API detection
+include = []
 # Detect canonical crypto primitives with module-qualified calls
 apis = [
   "\\bcrypto:(?:hash|hash_init|hash_update|hash_final)\\s*\\(",
@@ -1448,6 +1878,10 @@ apis = [
   "\\bcrypto:pbkdf2_hmac\\s*\\(",
   "\\bcrypto:rand_seed(?:_alg)?\\s*\\(",
   "\\bcrypto:hash_xof\\s*\\(",
+  "\\bcrypto:block_encrypt\\s*\\(",
+  "\\bcrypto:block_decrypt\\s*\\(",
+  "\\bcrypto:stream_encrypt\\s*\\(",
+  "\\bcrypto:stream_decrypt\\s*\\(",
 ]
 
 # Algorithm definitions for Erlang/OTP crypto
@@ -1458,6 +1892,8 @@ nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bcrypto:crypto_.*aes",
   "\\baes_gcm",
+  "\\baes_256_cbc",
+  "\\bcrypto:block_encrypt.*aes",
 ]
 
 [[library.algorithms]]
@@ -1467,6 +1903,7 @@ nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bcrypto:hash.*sha256",
   "\\bsha256",
+  "\\bcrypto:hash\\s*\\(\\s*sha256",
 ]
 
 [[library.algorithms]]
@@ -1484,7 +1921,6 @@ languages = ["Erlang"]
 # Record/include line commonly present when using PKI/ASN.1 records
 include = [
   "^\\s*-include_lib\\s*\\(\\s*\"public_key/include/public_key\\.hrl\"\\s*\\)",
-  "^\\s*-import\\s*\\(\\s*public_key\\s*,\\s*\\[",
 ]
 apis = [
   "\\bpublic_key:(?:sign|verify)\\s*\\(",
@@ -1501,9 +1937,7 @@ apis = [
 name = "enacl (libsodium/NaCl)"
 languages = ["Erlang"]
 [library.patterns]
-include = [
-  "^\\s*-import\\s*\\(\\s*enacl\\s*,\\s*\\[",
-]
+include = []
 apis = [
   "\\benacl:(?:secretbox|box(?:_open)?|box_(?:beforenm|afternm|keypair)|box_seal(?:_open)?)\\s*\\(",
   "\\benacl:aead_(?:x?chacha20poly1305_ietf)_(?:encrypt|decrypt)\\s*\\(",
@@ -1514,13 +1948,21 @@ apis = [
   "\\benacl:randombytes(?:_uniform|_uint32)?\\s*\\(",
 ]
 
+# Algorithm definitions for enacl
+[[library.algorithms]]
+name = "X25519"
+primitive = "kem"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\benacl:box_keypair",
+  "\\benacl:box\\s*\\(",
+]
+
 [[library]]
 name = "bcrypt (Erlang)"
 languages = ["Erlang"]
 [library.patterns]
-include = [
-  "^\\s*-import\\s*\\(\\s*bcrypt\\s*,\\s*\\[",
-]
+include = []
 apis = [
   "\\bbcrypt:(?:gen_salt|hashpw|checkpw)\\s*\\(",
 ]

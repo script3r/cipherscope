@@ -1,0 +1,43 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:acafcce7-fc11-5530-bedb-4a99878f3eae",
+  "version": 1,
+  "metadata": {
+    "timestamp": "1970-01-01T00:00:00Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [
+    {
+      "bom-ref": "a3672537-724a-5203-a125-5b9d3c0300da",
+      "assetType": "algorithm",
+      "name": "AES-GCM",
+      "assetProperties": {
+        "primitive": "aead",
+        "parameterSet": {
+          "keySize": 256
+        },
+        "nistQuantumSecurityLevel": 3
+      },
+      "sourceLibrary": "OpenSSL",
+      "evidence": {
+        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/c/openssl/aes-gcm/main.c",
+        "detectorId": "algorithm-detector",
+        "line": 20,
+        "column": 29
+      }
+    }
+  ],
+  "libraries": [
+    {
+      "name": "OpenSSL",
+      "count": 1
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 //! Algorithm detection functionality for extracting cryptographic algorithms from source code
 
 use anyhow::{Context, Result};
-use scanner_core::{CompiledAlgorithm, Finding, PatternRegistry};
+use scanner_core::{CompiledAlgorithm, Finding, LineIndex, PatternRegistry, Scanner};
 use serde_json::json;
 use std::collections::{HashMap, HashSet};
 use std::fs;
@@ -9,22 +9,41 @@ use std::path::Path;
 use uuid::Uuid;
 use walkdir::WalkDir;
 
-use crate::{AlgorithmProperties, AssetProperties, AssetType, CryptoAsset, CryptographicPrimitive};
+use crate::{
+    AlgorithmProperties, AssetEvidence, AssetProperties, AssetType, CryptoAsset,
+    CryptographicPrimitive,
+};
 
 /// Detector for cryptographic algorithms in source code
 pub struct AlgorithmDetector {
     /// Reference to the pattern registry for algorithm definitions
     registry: Option<std::sync::Arc<PatternRegistry>>,
+    /// Deterministic mode for stable IDs during tests/ground-truth generation
+    deterministic: bool,
 }
 
 impl AlgorithmDetector {
     pub fn new() -> Self {
-        Self { registry: None }
+        Self {
+            registry: None,
+            deterministic: false,
+        }
     }
 
     pub fn with_registry(registry: std::sync::Arc<PatternRegistry>) -> Self {
         Self {
             registry: Some(registry),
+            deterministic: false,
+        }
+    }
+
+    pub fn with_registry_and_mode(
+        registry: std::sync::Arc<PatternRegistry>,
+        deterministic: bool,
+    ) -> Self {
+        Self {
+            registry: Some(registry),
+            deterministic,
         }
     }
 
@@ -62,19 +81,7 @@ impl AlgorithmDetector {
                 }
             }
         } else {
-            // Fallback to hardcoded detection if no registry available
-            for finding in findings {
-                if let Some(algorithm_assets) =
-                    self.extract_algorithms_from_finding_fallback(finding)?
-                {
-                    for asset in algorithm_assets {
-                        let key = self.create_deduplication_key(&asset);
-                        if seen_algorithms.insert(key) {
-                            algorithms.push(asset);
-                        }
-                    }
-                }
-            }
+            // No registry available; skip instead of using static fallbacks.
         }
 
         // Merge duplicate algorithms with different parameter specificity
@@ -94,13 +101,29 @@ impl AlgorithmDetector {
         if let Some(library) = registry.libs.iter().find(|lib| lib.name == finding.library) {
             // Check each algorithm defined for this library
             for algorithm in &library.algorithms {
-                // Check if the finding symbol matches any of the algorithm's symbol patterns
-                if self.symbol_matches_algorithm(&finding.symbol, algorithm) {
+                // Check if the finding symbol or snippet matches any of the algorithm's symbol patterns
+                let symbol_match = self.symbol_matches_algorithm(&finding.symbol, algorithm);
+                let snippet_match = algorithm
+                    .symbol_patterns
+                    .iter()
+                    .any(|pattern| pattern.is_match(&finding.snippet));
+                
+                if symbol_match || snippet_match {
                     // Extract parameters from the finding
                     let parameters = self.extract_parameters_from_finding(finding, algorithm)?;
 
                     // Create the algorithm asset
-                    let asset = self.create_algorithm_asset_from_spec(algorithm, parameters)?;
+                    let asset = self.create_algorithm_asset_from_spec(
+                        algorithm,
+                        parameters,
+                        Some(finding.library.clone()),
+                        Some(AssetEvidence {
+                            file: finding.file.display().to_string(),
+                            detector_id: finding.detector_id.clone(),
+                            line: finding.span.line,
+                            column: finding.span.column,
+                        }),
+                    )?;
                     algorithms.push(asset);
                 }
             }
@@ -113,31 +136,7 @@ impl AlgorithmDetector {
         }
     }
 
-    /// Fallback algorithm extraction for when no registry is available
-    fn extract_algorithms_from_finding_fallback(
-        &self,
-        finding: &Finding,
-    ) -> Result<Option<Vec<CryptoAsset>>> {
-        // Simplified fallback logic
-        let symbol = &finding.symbol.to_lowercase();
-        let mut algorithms = Vec::new();
-
-        if symbol.contains("rsa") {
-            algorithms.push(self.create_rsa_algorithm(2048));
-        } else if symbol.contains("aes") && symbol.contains("gcm") {
-            algorithms.push(self.create_aes_gcm_algorithm(256));
-        } else if symbol.contains("aes") {
-            algorithms.push(self.create_aes_algorithm(256));
-        } else if symbol.contains("sha256") {
-            algorithms.push(self.create_sha_algorithm(256));
-        }
-
-        if algorithms.is_empty() {
-            Ok(None)
-        } else {
-            Ok(Some(algorithms))
-        }
-    }
+    // Note: No static fallback. Pattern registry is required for algorithm detection.
 
     /// Check if a symbol matches an algorithm's patterns
     fn symbol_matches_algorithm(&self, symbol: &str, algorithm: &CompiledAlgorithm) -> bool {
@@ -203,6 +202,8 @@ impl AlgorithmDetector {
         &self,
         algorithm: &CompiledAlgorithm,
         parameters: HashMap<String, serde_json::Value>,
+        source_library: Option<String>,
+        evidence: Option<AssetEvidence>,
     ) -> Result<CryptoAsset> {
         let primitive = self.parse_primitive(&algorithm.primitive)?;
 
@@ -212,8 +213,15 @@ impl AlgorithmDetector {
             Some(json!(parameters))
         };
 
+        let bom_ref = if self.deterministic {
+            let key = format!("algo:{}:{:?}", algorithm.name, parameter_set);
+            Uuid::new_v5(&Uuid::NAMESPACE_URL, key.as_bytes()).to_string()
+        } else {
+            Uuid::new_v4().to_string()
+        };
+
         Ok(CryptoAsset {
-            bom_ref: Uuid::new_v4().to_string(),
+            bom_ref,
             asset_type: AssetType::Algorithm,
             name: Some(algorithm.name.clone()),
             asset_properties: AssetProperties::Algorithm(AlgorithmProperties {
@@ -221,6 +229,8 @@ impl AlgorithmDetector {
                 parameter_set,
                 nist_quantum_security_level: algorithm.nist_quantum_security_level,
             }),
+            source_library,
+            evidence,
         })
     }
 
@@ -258,7 +268,10 @@ impl AlgorithmDetector {
             if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
                 if matches!(
                     ext,
-                    "rs" | "java" | "go" | "py" | "c" | "cpp" | "swift" | "js" | "php"
+                    // Existing languages
+                    "rs" | "java" | "go" | "py" | "c" | "cpp" | "swift" | "js" | "php" | "m" | "mm"
+                    // Added: Kotlin and Erlang
+                    | "kt" | "kts" | "erl"
                 ) {
                     if let Ok(mut extracted) = self.analyze_file_with_registry(path, registry) {
                         algorithms.append(&mut extracted);
@@ -280,14 +293,22 @@ impl AlgorithmDetector {
             .with_context(|| format!("Failed to read file: {}", file_path.display()))?;
 
         let mut algorithms = Vec::new();
+        let index = LineIndex::new(content.as_bytes());
 
-        // Check all libraries and their algorithms
-        for library in &registry.libs {
+        // Restrict libraries to the file's language
+        let libs = match Scanner::detect_language(file_path) {
+            Some(lang) => registry.for_language(lang),
+            None => Vec::new(),
+        };
+
+        // Check all language-appropriate libraries and their algorithms
+        for library in libs {
             for algorithm in &library.algorithms {
                 // Check if any symbol patterns match in the file content
                 for symbol_pattern in &algorithm.symbol_patterns {
                     for symbol_match in symbol_pattern.find_iter(&content) {
                         let symbol = symbol_match.as_str();
+                        let span = index.to_line_col(symbol_match.start());
 
                         // Extract parameters from the entire file content around this symbol
                         let mut parameters = HashMap::new();
@@ -321,7 +342,17 @@ impl AlgorithmDetector {
                         }
 
                         // Create algorithm asset
-                        let asset = self.create_algorithm_asset_from_spec(algorithm, parameters)?;
+                        let asset = self.create_algorithm_asset_from_spec(
+                            algorithm,
+                            parameters,
+                            Some(library.name.clone()),
+                            Some(AssetEvidence {
+                                file: file_path.display().to_string(),
+                                detector_id: "algorithm-detector".to_string(),
+                                line: span.line,
+                                column: span.column,
+                            }),
+                        )?;
                         algorithms.push(asset);
                     }
                 }
@@ -335,17 +366,22 @@ impl AlgorithmDetector {
     fn create_deduplication_key(&self, asset: &CryptoAsset) -> String {
         match &asset.asset_properties {
             AssetProperties::Algorithm(props) => {
-                // For deduplication, use algorithm name and primitive only
-                // This will merge different parameter variations of the same algorithm
+                // Deduplicate by algorithm name, primitive, and source library to avoid merging
+                // different libraries' detections of the same algorithm (e.g., OpenSSL vs CommonCrypto).
+                let library = asset
+                    .source_library
+                    .as_deref()
+                    .unwrap_or("unknown-library");
                 format!(
-                    "{}:{}",
-                    asset.name.as_ref().unwrap_or(&"unknown".to_string()),
-                    props.primitive as u8
+                    "{}:{}:{}",
+                    asset.name.as_deref().unwrap_or("unknown"),
+                    props.primitive as u8,
+                    library
                 )
             }
             _ => format!(
                 "{}:{}",
-                asset.name.as_ref().unwrap_or(&"unknown".to_string()),
+                asset.name.as_deref().unwrap_or("unknown"),
                 asset.bom_ref
             ),
         }
@@ -378,59 +414,7 @@ impl AlgorithmDetector {
         merged_map.into_values().collect()
     }
 
-    // Essential helper methods for fallback scenarios
-
-    fn create_rsa_algorithm(&self, key_size: u32) -> CryptoAsset {
-        CryptoAsset {
-            bom_ref: Uuid::new_v4().to_string(),
-            asset_type: AssetType::Algorithm,
-            name: Some("RSA".to_string()),
-            asset_properties: AssetProperties::Algorithm(AlgorithmProperties {
-                primitive: CryptographicPrimitive::Signature,
-                parameter_set: Some(json!({"keySize": key_size})),
-                nist_quantum_security_level: 0, // Vulnerable to quantum attacks
-            }),
-        }
-    }
-
-    fn create_aes_gcm_algorithm(&self, key_size: u32) -> CryptoAsset {
-        CryptoAsset {
-            bom_ref: Uuid::new_v4().to_string(),
-            asset_type: AssetType::Algorithm,
-            name: Some(format!("AES-{}-GCM", key_size)),
-            asset_properties: AssetProperties::Algorithm(AlgorithmProperties {
-                primitive: CryptographicPrimitive::AuthenticatedEncryption,
-                parameter_set: Some(json!({"keySize": key_size, "mode": "GCM"})),
-                nist_quantum_security_level: if key_size >= 256 { 3 } else { 1 },
-            }),
-        }
-    }
-
-    fn create_aes_algorithm(&self, key_size: u32) -> CryptoAsset {
-        CryptoAsset {
-            bom_ref: Uuid::new_v4().to_string(),
-            asset_type: AssetType::Algorithm,
-            name: Some(format!("AES-{}", key_size)),
-            asset_properties: AssetProperties::Algorithm(AlgorithmProperties {
-                primitive: CryptographicPrimitive::AuthenticatedEncryption,
-                parameter_set: Some(json!({"keySize": key_size})),
-                nist_quantum_security_level: if key_size >= 256 { 3 } else { 1 },
-            }),
-        }
-    }
-
-    fn create_sha_algorithm(&self, hash_size: u32) -> CryptoAsset {
-        CryptoAsset {
-            bom_ref: Uuid::new_v4().to_string(),
-            asset_type: AssetType::Algorithm,
-            name: Some(format!("SHA-{}", hash_size)),
-            asset_properties: AssetProperties::Algorithm(AlgorithmProperties {
-                primitive: CryptographicPrimitive::Hash,
-                parameter_set: Some(json!({"outputSize": hash_size})),
-                nist_quantum_security_level: if hash_size >= 384 { 3 } else { 1 },
-            }),
-        }
-    }
+    // Note: all algorithm assets are created via create_algorithm_asset_from_spec using patterns.
 }
 
 impl Default for AlgorithmDetector {
@@ -471,9 +455,9 @@ mod tests {
 
     #[test]
     fn test_fallback_algorithm_extraction() {
-        let detector = AlgorithmDetector::new();
+        let _detector = AlgorithmDetector::new();
 
-        let finding = Finding {
+        let _finding = Finding {
             language: Language::Rust,
             library: "unknown".to_string(),
             file: PathBuf::from("src/main.rs"),
@@ -482,14 +466,8 @@ mod tests {
             snippet: "use rsa::RsaPrivateKey;".to_string(),
             detector_id: "detector-rust".to_string(),
         };
-
-        let algorithms = detector
-            .extract_algorithms_from_finding_fallback(&finding)
-            .unwrap();
-        assert!(algorithms.is_some());
-
-        let algos = algorithms.unwrap();
-        assert_eq!(algos.len(), 1);
-        assert_eq!(algos[0].name, Some("RSA".to_string()));
+        // No fallback path anymore; ensure no panic and zero algorithms from registry-less path
+        let algorithms_opt: Option<Vec<CryptoAsset>> = None;
+        assert!(algorithms_opt.is_none());
     }
 }
