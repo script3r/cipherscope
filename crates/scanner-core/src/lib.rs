@@ -917,9 +917,21 @@ impl<'a> Scanner<'a> {
                         }
                     }
 
-                    // Send file to work queue
-                    if work_sender.send(path.to_path_buf()).is_err() {
-                        return ignore::WalkState::Quit;
+                    // Send file to work queue with blocking to handle backpressure
+                    // This ensures we don't drop files when the queue is full
+                    // The bounded channel will naturally throttle the producer when consumers are busy
+                    loop {
+                        match work_sender.try_send(path.to_path_buf()) {
+                            Ok(_) => break,
+                            Err(crossbeam_channel::TrySendError::Full(_)) => {
+                                // Channel is full, wait a bit for consumers to catch up
+                                std::thread::sleep(std::time::Duration::from_micros(100));
+                            }
+                            Err(crossbeam_channel::TrySendError::Disconnected(_)) => {
+                                // Receiver has been dropped, stop the walk
+                                return ignore::WalkState::Quit;
+                            }
+                        }
                     }
 
                     // Update discovered files counter atomically (no lock!)
