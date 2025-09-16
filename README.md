@@ -1,166 +1,100 @@
-## CipherScope
+# CipherScope
 
 <div align="center">
   <img src="cipherscope.png" alt="CipherScope Logo" width="350" height="350">
 </div>
 
-Fast, low-false-positive static scanner that finds third-party cryptographic libraries and call sites across 11 programming languages: Go, Java, C, C++, Rust, Python, PHP, Swift, Objective-C, Kotlin, and Erlang.
+Fast cryptographic inventory generator that creates Minimal Viable Cryptographic Bill of Materials (MV-CBOM) documents. Scans codebases to identify cryptographic algorithms, certificates, and assess post-quantum cryptography readiness.
 
-### Install & Run
+## Quick Start
 
 ```bash
 cargo build --release
-./target/release/cipherscope .
+./target/release/cipherscope --patterns patterns.toml --progress /path/to/scan [... paths]
 ```
 
-JSONL and SARIF:
+## What It Does
 
-```bash
-./target/release/cipherscope . --json > findings.jsonl
-./target/release/cipherscope . --sarif findings.sarif
-```
+- **Detects** cryptographic usage across 11 languages
+- **Identifies** many cryptographic algorithms (AES, SHA, RSA, ECDSA, ChaCha20, etc.)
+- **Outputs** JSON inventory with NIST quantum security levels
+- **Runs fast** - GiB/s throughput with parallel scanning
 
-Key flags:
-- `--threads N`: set thread pool size
-- `--max-file-size MB`: skip large files (default 2)
-- `--patterns PATH`: specify patterns file (default: `patterns.toml`)
-- `--progress`: show progress bar during scanning
-- `--include-glob GLOB` / `--exclude-glob GLOB`
-- `--deterministic`: stable output ordering
-- `--print-config`: print loaded `patterns.toml`
-- `--dry-run`: list files to be scanned
-
-### Output
-
-Pretty table to stdout (default) and optional JSONL/SARIF.
-
-Example table:
-
-```text
-Language | Library | Count | Example
----------|---------|-------|--------
-Rust | RustCrypto | 2 | src/main.rs:12 aes_gcm::Aes256Gcm
-```
-
-JSONL example:
+## Example Output
 
 ```json
-{"language":"Rust","library":"RustCrypto","file":"src/main.rs","span":{"line":12,"column":5},"symbol":"aes_gcm::Aes256Gcm","snippet":"use aes_gcm::Aes256Gcm;","detector_id":"detector-rust"}
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "cryptoAssets": [{
+    "name": "RSA",
+    "assetProperties": {
+      "primitive": "signature",
+      "parameterSet": {"keySize": 2048},
+      "nistQuantumSecurityLevel": 0
+    }
+  }]
+}
 ```
 
-SARIF snippet:
+## Options
 
-```json
-{"version":"2.1.0","runs":[{"tool":{"driver":{"name":"cipherscope"}},"results":[{"ruleId":"detector-rust","message":{"text":"RustCrypto in Rust"}}]}]}
-```
+### Core Options
+- `--patterns PATH` - Custom patterns file (default: `patterns.toml`)
+- `--progress` - Show progress bar during scanning
+- `--deterministic` - Reproducible output for testing/ground-truth generation
+- `--output FILE` - Output file for single-project CBOM (default: stdout)
+- `--recursive` - Generate MV-CBOMs for all discovered projects
+- `--output-dir DIR` - Output directory for recursive CBOMs
 
-### Configuration & Patterns
+### Filtering & Performance
+- `--threads N` - Number of processing threads
+- `--max-file-size MB` - Maximum file size to scan (default: 2MB)
+- `--include-glob GLOB` - Include files matching glob pattern(s)
+- `--exclude-glob GLOB` - Exclude files matching glob pattern(s)
 
-Patterns are loaded from `patterns.toml` (and optional `patterns.local.toml`, if you add it). The schema supports per-language `include`/`import`/`namespace`/`apis` anchored regexes. The engine strips comments and avoids string literals to reduce false positives.
+### Certificate Scanning
+- `--skip-certificates` - Skip certificate scanning during CBOM generation
 
-#### Supported Languages & File Extensions
+### Configuration
+- `--print-config` - Print merged patterns/config and exit
 
-The scanner automatically detects and processes files with these extensions:
+## Languages Supported
 
-- **C/C++**: `.c`, `.h`, `.cc`, `.cpp`, `.cxx`, `.c++`, `.hpp`, `.hxx`, `.h++`, `.hh`
-- **Java**: `.java`
-- **Go**: `.go`
-- **Rust**: `.rs`
-- **Python**: `.py`, `.pyw`, `.pyi`
-- **PHP**: `.php`, `.phtml`, `.php3`, `.php4`, `.php5`, `.phps`
-- **Swift**: `.swift`
-- **Objective-C**: `.m`, `.mm`, `.M`
-- **Kotlin**: `.kt`, `.kts`
-- **Erlang**: `.erl`, `.hrl`, `.beam`
+C, C++, Go, Java, Kotlin, Python, Rust, Swift, Objective-C, PHP, Erlang
 
-#### High-Performance Architecture
+## Configuration
 
-CipherScope uses a **producer-consumer model** inspired by ripgrep to achieve maximum throughput on large codebases:
+Edit `patterns.toml` to add new libraries or algorithms. No code changes needed.
 
-**Producer (Parallel Directory Walker)**:
-- Uses `ignore::WalkParallel` for parallel filesystem traversal
-- Automatically respects `.gitignore` files and skips hidden directories
-- Critical optimization: avoids descending into `node_modules`, `.git`, and other irrelevant directories
-- Language detection happens early to filter files before expensive operations
+## How It Works (High-Level)
 
-**Consumers (Parallel File Processors)**:
-- Uses `rayon` thread pools for parallel file processing
-- Batched processing (1000 files per batch) for better cache locality
-- Comment stripping and preprocessing shared across all detectors
-- Lockless atomic counters for progress tracking
+1. Workspace discovery and prefilter
+   - Walks files respecting .gitignore
+   - Cheap Aho-Corasick prefilter using language-specific substrings derived from patterns
+2. Language detection and comment stripping
+   - Detects language by extension; strips comments once for fast regex matching
+3. Library identification (anchors)
+   - Per-language detector loads compiled patterns for that language (from `patterns.toml`)
+   - Looks for include/import/namespace/API anchors to confirm a library is present in a file
+4. Algorithm matching
+   - For each identified library, matches algorithm `symbol_patterns` (regex) against the file
+   - Extracts parameters via `parameter_patterns` (e.g., key size, curve) with defaults when absent
+   - Emits findings with file, line/column, library, algorithm, primitive, and NIST quantum level
+5. Deep static analysis (fallback/enrichment)
+   - For small scans, analyzes files directly with the registry to find additional algorithms even if no library finding was produced
+6. CBOM generation
+   - Findings are deduplicated and merged
+   - Final MV-CBOM JSON is printed or written per CLI options
 
-**Key Optimizations**:
-- **Ultra-fast language detection**: Direct byte comparison, no string allocations
-- **Syscall reduction**: 90% fewer `metadata()` calls through early filtering  
-- **Aho-Corasick prefiltering**: Skip expensive regex matching when no keywords found
-- **Batched channel communication**: Reduces overhead between producer/consumer threads
-- **Optimal thread configuration**: Automatically uses `num_cpus` for directory traversal
+All behavior is driven by `patterns.toml` — adding new libraries/algorithms is a data-only change.
 
-#### Performance Benchmarks
-
-**File Discovery Performance**:
-- **5M file directory**: ~20-30 seconds (previously 90+ seconds)
-- **Throughput**: 150,000-250,000 files/second discovery rate
-- **Processing**: 4+ GiB/s content scanning throughput
-
-**Scalability**:
-- Linear scaling with CPU cores for file processing
-- Efficient memory usage through batched processing
-- Progress reporting accuracy: 100% (matches `find` command results)
-
-### Detector Architecture
-
-The scanner uses a modular detector architecture with dedicated crates for each language:
-
-- **detector-c**: C language support
-- **detector-cpp**: C++ language support  
-- **detector-go**: Go language support
-- **detector-java**: Java language support
-- **detector-rust**: Rust language support
-- **detector-python**: Python language support
-- **detector-php**: PHP language support
-- **detector-swift**: Swift language support
-- **detector-objc**: Objective-C language support
-- **detector-kotlin**: Kotlin language support
-- **detector-erlang**: Erlang language support
-
-Each detector implements the `Detector` trait and can be extended independently. To add support for a new language, create a new detector crate under `crates/` or extend the `patterns.toml` to cover additional libraries. See `crates/scanner-core/src/lib.rs` for the trait definition and pattern-driven detector implementation.
-
-### Tests & Benchmarks
-
-Run unit tests and integration tests (fixtures):
+## Testing
 
 ```bash
 cargo test
 ```
 
-Benchmark scan throughput on test fixtures:
+## License
 
-```bash
-cargo bench
-```
-
-**Expected benchmark results** (on modern hardware):
-- **Throughput**: ~4.2 GiB/s content processing
-- **File discovery**: 150K-250K files/second  
-- **Memory efficient**: Batched processing prevents memory spikes
-
-**Real-world performance** (5M file Java codebase):
-- **Discovery phase**: 20-30 seconds (down from 90+ seconds)
-- **Processing phase**: Depends on file content and pattern complexity
-- **Progress accuracy**: Exact match with `find` command results
-
-To test progress reporting accuracy on your codebase:
-
-```bash
-# Count files that match your glob patterns
-find /path/to/code -name "*.java" | wc -l
-
-# Run cipherscope with same pattern - numbers should match
-./target/release/cipherscope /path/to/code --include-glob "*.java" --progress
-```
-
-### Contributing
-
-See `CONTRIBUTING.md` for guidelines on adding languages, libraries, and improving performance.
-
+MIT

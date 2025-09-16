@@ -1,26 +1,23 @@
 use anyhow::{Context, Result};
+use cbom_generator::CbomGenerator;
 use clap::{ArgAction, Parser};
 use indicatif::{ProgressBar, ProgressStyle};
-use scanner_core::*;
+use scanner_core::{Config, Detector, Language, PatternDetector, PatternRegistry, Scanner};
 use std::fs;
 use std::path::PathBuf;
 use std::sync::Arc;
 
 #[derive(Parser, Debug)]
 #[command(name = "cipherscope")]
-#[command(version, about = "Fast static scanner for third-party crypto libraries", long_about = None)]
+#[command(version, about = "Generate Cryptographic Bill of Materials (MV-CBOM) for Post-Quantum Cryptography readiness assessment", long_about = None)]
 struct Args {
     /// Paths to scan
     #[arg(value_name = "PATH", default_value = ".")]
     paths: Vec<PathBuf>,
 
-    /// Emit JSONL to stdout
+    /// Generate MV-CBOMs recursively for all discovered projects (default: single project)
     #[arg(long, action = ArgAction::SetTrue)]
-    json: bool,
-
-    /// Write SARIF to file
-    #[arg(long, value_name = "FILE")]
-    sarif: Option<PathBuf>,
+    recursive: bool,
 
     /// Number of threads
     #[arg(long, value_name = "N")]
@@ -46,10 +43,6 @@ struct Args {
     #[arg(long, action = ArgAction::SetTrue)]
     print_config: bool,
 
-    /// Dry-run: list files that would be scanned
-    #[arg(long, action = ArgAction::SetTrue)]
-    dry_run: bool,
-
     /// Path to patterns file
     #[arg(long, value_name = "FILE", default_value = "patterns.toml")]
     patterns: PathBuf,
@@ -57,6 +50,18 @@ struct Args {
     /// Show progress bar during scanning
     #[arg(long, action = ArgAction::SetTrue)]
     progress: bool,
+
+    /// Output file for single-project CBOM (default: stdout)
+    #[arg(long, value_name = "FILE")]
+    output: Option<PathBuf>,
+
+    /// Output directory for recursive CBOMs (default: stdout JSON array)
+    #[arg(long, value_name = "DIR")]
+    output_dir: Option<PathBuf>,
+
+    /// Skip certificate scanning during CBOM generation
+    #[arg(long, action = ArgAction::SetTrue)]
+    skip_certificates: bool,
 }
 
 fn main() -> Result<()> {
@@ -167,14 +172,6 @@ fn main() -> Result<()> {
     }
 
     let scanner = Scanner::new(&reg, dets, cfg);
-    if args.dry_run {
-        let files = scanner.discover_files(&args.paths);
-        for p in files {
-            println!("{}", p.display());
-        }
-        return Ok(());
-    }
-
     let findings = scanner.run(&args.paths)?;
 
     // Clear progress bar if it was shown
@@ -182,124 +179,79 @@ fn main() -> Result<()> {
         println!(); // Move to next line after progress bar
     }
 
-    if args.json {
-        for f in &findings {
-            println!("{}", serde_json::to_string(f)?);
+    // Generate MV-CBOM (always - this is the primary functionality)
+    // Deterministic mode for tests/ground-truth when --deterministic is set
+    let cbom_generator = if args.deterministic {
+        CbomGenerator::with_registry_mode_and_options(reg.clone(), true, args.skip_certificates)
+    } else {
+        CbomGenerator::with_registry_and_options(reg.clone(), args.skip_certificates)
+    };
+
+    // Use the first path as the scan root for CBOM generation
+    let default_path = PathBuf::from(".");
+    let scan_path = args.paths.first().unwrap_or(&default_path);
+
+    if args.recursive {
+        // Simplified: generate a single CBOM for the root
+        match cbom_generator.generate_cboms_recursive(scan_path, &findings) {
+            Ok(cboms) => {
+                if let Some(dir) = &args.output_dir {
+                    // Write each CBOM into the specified directory
+                    if let Err(e) = fs::create_dir_all(dir) {
+                        eprintln!("Failed to create output directory {}: {}", dir.display(), e);
+                        std::process::exit(1);
+                    }
+                    for (i, (_project_path, cbom)) in cboms.iter().enumerate() {
+                        let file = dir.join(format!("{:03}-mv-cbom.json", i + 1));
+                        if let Err(e) = cbom_generator.write_cbom(cbom, &file) {
+                            eprintln!("Failed to write MV-CBOM to {}: {}", file.display(), e);
+                            std::process::exit(1);
+                        }
+                    }
+                    println!("Generated {} MV-CBOMs to {}", cboms.len(), dir.display());
+                } else {
+                    // Print JSON array to stdout
+                    let only_cboms: Vec<&cbom_generator::MvCbom> =
+                        cboms.iter().map(|(_, c)| c).collect();
+                    let json = serde_json::to_string_pretty(&only_cboms)
+                        .expect("Failed to serialize MV-CBOMs to JSON");
+                    println!("{}", json);
+                }
+            }
+            Err(e) => {
+                eprintln!("Failed to generate recursive MV-CBOMs: {}", e);
+                std::process::exit(1);
+            }
         }
     } else {
-        print_table(&findings);
-    }
-
-    if let Some(sarif_path) = args.sarif.as_ref() {
-        let sarif = to_sarif(&findings);
-        fs::write(sarif_path, serde_json::to_vec_pretty(&sarif)?)?;
+        // Single CBOM generation
+        match cbom_generator.generate_cbom(scan_path, &findings) {
+            Ok(cbom) => {
+                if let Some(path) = &args.output {
+                    match cbom_generator.write_cbom(&cbom, path) {
+                        Ok(()) => {
+                            println!("MV-CBOM written to: {}", path.display());
+                            println!("Found {} cryptographic assets", cbom.crypto_assets.len());
+                            // Dependencies removed
+                        }
+                        Err(e) => {
+                            eprintln!("Failed to write MV-CBOM: {}", e);
+                            std::process::exit(1);
+                        }
+                    }
+                } else {
+                    // Print JSON to stdout (no extra lines)
+                    let json = serde_json::to_string_pretty(&cbom)
+                        .expect("Failed to serialize MV-CBOM to JSON");
+                    println!("{}", json);
+                }
+            }
+            Err(e) => {
+                eprintln!("Failed to generate MV-CBOM: {}", e);
+                std::process::exit(1);
+            }
+        }
     }
 
     Ok(())
-}
-
-fn print_table(findings: &[Finding]) {
-    use std::collections::BTreeMap;
-    let mut map: BTreeMap<(Language, String), Vec<&Finding>> = BTreeMap::new();
-    for f in findings {
-        map.entry((f.language, f.library.clone()))
-            .or_default()
-            .push(f);
-    }
-    println!("Language | Library | Count | Example");
-    println!("---------|---------|-------|--------");
-    for ((lang, lib), list) in map {
-        let ex = list
-            .first()
-            .map(|f| format!("{}:{} {}", f.file.display(), f.span.line, f.symbol))
-            .unwrap_or_default();
-        println!("{:?} | {} | {} | {}", lang, lib, list.len(), ex);
-    }
-}
-
-#[derive(serde::Serialize)]
-struct SarifLog {
-    version: String,
-    #[serde(rename = "$schema")]
-    schema: String,
-    runs: Vec<SarifRun>,
-}
-#[derive(serde::Serialize)]
-struct SarifRun {
-    tool: SarifTool,
-    results: Vec<SarifResult>,
-}
-#[derive(serde::Serialize)]
-struct SarifTool {
-    driver: SarifDriver,
-}
-#[derive(serde::Serialize)]
-struct SarifDriver {
-    name: String,
-    version: String,
-}
-#[derive(serde::Serialize)]
-struct SarifResult {
-    rule_id: String,
-    level: String,
-    message: SarifMessage,
-    locations: Vec<SarifLocation>,
-}
-#[derive(serde::Serialize)]
-struct SarifMessage {
-    text: String,
-}
-#[derive(serde::Serialize)]
-struct SarifLocation {
-    physical_location: SarifPhysicalLocation,
-}
-#[derive(serde::Serialize)]
-struct SarifPhysicalLocation {
-    artifact_location: SarifArtifactLocation,
-    region: SarifRegion,
-}
-#[derive(serde::Serialize)]
-struct SarifArtifactLocation {
-    uri: String,
-}
-#[derive(serde::Serialize)]
-struct SarifRegion {
-    start_line: usize,
-    start_column: usize,
-}
-
-fn to_sarif(findings: &[Finding]) -> SarifLog {
-    SarifLog {
-        version: "2.1.0".into(),
-        schema: "https://json.schemastore.org/sarif-2.1.0.json".into(),
-        runs: vec![SarifRun {
-            tool: SarifTool {
-                driver: SarifDriver {
-                    name: "cipherscope".into(),
-                    version: env!("CARGO_PKG_VERSION").into(),
-                },
-            },
-            results: findings
-                .iter()
-                .map(|f| SarifResult {
-                    rule_id: f.detector_id.clone(),
-                    level: "note".into(),
-                    message: SarifMessage {
-                        text: format!("{} in {:?}", f.library, f.language),
-                    },
-                    locations: vec![SarifLocation {
-                        physical_location: SarifPhysicalLocation {
-                            artifact_location: SarifArtifactLocation {
-                                uri: f.file.display().to_string(),
-                            },
-                            region: SarifRegion {
-                                start_line: f.span.line,
-                                start_column: f.span.column,
-                            },
-                        },
-                    }],
-                })
-                .collect(),
-        }],
-    }
 }

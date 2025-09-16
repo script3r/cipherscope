@@ -1,17 +1,7 @@
 [workspace]
 members = [
     "crates/scanner-core",
-    "crates/detector-go",
-    "crates/detector-java",
-    "crates/detector-c",
-    "crates/detector-cpp",
-    "crates/detector-rust",
-    "crates/detector-python",
-    "crates/detector-php",
-    "crates/detector-swift",
-    "crates/detector-objc",
-    "crates/detector-kotlin",
-    "crates/detector-erlang",
+    "crates/cbom-generator",
     "crates/cli",
 ]
 resolver = "2"
@@ -26,20 +16,20 @@ repository = "https://example.com/cipherscope/repo"
 
 [workspace.dependencies]
 anyhow = "1"
-thiserror = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 toml = "0.8"
 regex = "1"
 aho-corasick = "1"
-once_cell = "1"
 rayon = "1"
 ignore = "0.4"
-memmap2 = "0.9"
 clap = { version = "4", features = ["derive"] }
-humantime = "2"
 globset = "0.4"
 crossbeam-channel = "0.5"
 walkdir = "2"
 num_cpus = "1"
+uuid = { version = "1", features = ["v4", "v5", "serde"] }
+x509-parser = "0.15"
+chrono = { version = "0.4", features = ["serde"] }
+tempfile = "3"
 

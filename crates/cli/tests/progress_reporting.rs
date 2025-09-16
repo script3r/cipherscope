@@ -83,7 +83,7 @@ apis = ["printf", "println", "print", "main"]
     let detectors = vec![];
     let scanner = Scanner::new(&registry, detectors, config);
 
-    // Scan the fixtures directory
+    // Scan the fixtures directory (comprehensive fixtures layout)
     let fixtures_path = PathBuf::from("../../fixtures");
     let roots = vec![fixtures_path];
 
@@ -239,7 +239,7 @@ apis = ["main"]
     let rust_scanner = Scanner::new(&registry, detectors1, rust_config);
     let fixtures_path = PathBuf::from("../../fixtures");
     let _rust_findings = rust_scanner
-        .run(&[fixtures_path.clone()])
+        .run(std::slice::from_ref(&fixtures_path))
         .expect("Rust scan failed");
 
     // Scan 2: All supported file types

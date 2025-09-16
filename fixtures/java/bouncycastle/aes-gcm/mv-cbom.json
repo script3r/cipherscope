@@ -1,0 +1,88 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:acafcce7-fc11-5530-bedb-4a99878f3eae",
+  "version": 1,
+  "metadata": {
+    "timestamp": "1970-01-01T00:00:00Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [
+    {
+      "bom-ref": "94b13c81-438e-5c40-8ba6-69a3415fc269",
+      "assetType": "algorithm",
+      "name": "AES",
+      "assetProperties": {
+        "primitive": "aead",
+        "parameterSet": {
+          "keySize": 256
+        },
+        "nistQuantumSecurityLevel": 3
+      },
+      "sourceLibrary": "Java JCA/JCE",
+      "evidence": {
+        "file": "fixtures/java/bouncycastle/aes-gcm/Main.java",
+        "detectorId": "detector-java",
+        "line": 23,
+        "column": 25
+      }
+    },
+    {
+      "bom-ref": "c26548de-7898-5c93-8f20-08d3d70a7488",
+      "assetType": "algorithm",
+      "name": "AES",
+      "assetProperties": {
+        "primitive": "aead",
+        "nistQuantumSecurityLevel": 3
+      },
+      "sourceLibrary": "BouncyCastle",
+      "evidence": {
+        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/java/bouncycastle/aes-gcm/Main.java",
+        "detectorId": "algorithm-detector",
+        "line": 23,
+        "column": 25
+      }
+    },
+    {
+      "bom-ref": "fbe00a14-7b9d-5aba-9e91-8f9b29fee66c",
+      "assetType": "algorithm",
+      "name": "AES-GCM",
+      "assetProperties": {
+        "primitive": "aead",
+        "nistQuantumSecurityLevel": 3
+      },
+      "sourceLibrary": "Conscrypt",
+      "evidence": {
+        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/java/bouncycastle/aes-gcm/Main.java",
+        "detectorId": "algorithm-detector",
+        "line": 23,
+        "column": 25
+      }
+    },
+    {
+      "bom-ref": "b5dc99a9-59bc-58e6-82c8-29de37994c73",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "parameterSet": {
+          "keySize": 2048
+        },
+        "nistQuantumSecurityLevel": 0
+      },
+      "sourceLibrary": "BouncyCastle",
+      "evidence": {
+        "file": "fixtures/java/bouncycastle/aes-gcm/Main.java",
+        "detectorId": "detector-java",
+        "line": 1,
+        "column": 8
+      }
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "bomFormat": "MV-CBOM",
+  "specVersion": "1.0",
+  "serialNumber": "urn:uuid:acafcce7-fc11-5530-bedb-4a99878f3eae",
+  "version": 1,
+  "metadata": {
+    "timestamp": "1970-01-01T00:00:00Z",
+    "tools": [
+      {
+        "name": "cipherscope",
+        "version": "0.1.0",
+        "vendor": "CipherScope Contributors"
+      }
+    ]
+  },
+  "cryptoAssets": [
+    {
+      "bom-ref": "fbe00a14-7b9d-5aba-9e91-8f9b29fee66c",
+      "assetType": "algorithm",
+      "name": "AES-GCM",
+      "assetProperties": {
+        "primitive": "aead",
+        "nistQuantumSecurityLevel": 3
+      },
+      "sourceLibrary": "Conscrypt",
+      "evidence": {
+        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/java/jca/aes-gcm/Main.java",
+        "detectorId": "algorithm-detector",
+        "line": 20,
+        "column": 25
+      }
+    },
+    {
+      "bom-ref": "94b13c81-438e-5c40-8ba6-69a3415fc269",
+      "assetType": "algorithm",
+      "name": "AES",
+      "assetProperties": {
+        "primitive": "aead",
+        "parameterSet": {
+          "keySize": 256
+        },
+        "nistQuantumSecurityLevel": 3
+      },
+      "sourceLibrary": "Java JCA/JCE",
+      "evidence": {
+        "file": "fixtures/java/jca/aes-gcm/Main.java",
+        "detectorId": "detector-java",
+        "line": 20,
+        "column": 25
+      }
+    }
+  ]
+}
