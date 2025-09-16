@@ -10,7 +10,7 @@ Fast cryptographic inventory generator. Scans codebases to identify cryptographi
 
 ```bash
 cargo build --release
-./target/release/cipherscope /path/to/scan
+./target/release/cipherscope --patterns patterns.toml --progress /path/to/scan [... paths]
 ```
 
 ## What It Does
@@ -50,6 +50,28 @@ C, C++, Go, Java, Kotlin, Python, Rust, Swift, Objective-C, PHP, Erlang
 ## Configuration
 
 Edit `patterns.toml` to add new libraries or algorithms. No code changes needed.
+
+## How It Works (High-Level)
+
+1. Workspace discovery and prefilter
+   - Walks files respecting .gitignore
+   - Cheap Aho-Corasick prefilter using language-specific substrings derived from patterns
+2. Language detection and comment stripping
+   - Detects language by extension; strips comments once for fast regex matching
+3. Library identification (anchors)
+   - Per-language detector loads compiled patterns for that language (from `patterns.toml`)
+   - Looks for include/import/namespace/API anchors to confirm a library is present in a file
+4. Algorithm matching
+   - For each identified library, matches algorithm `symbol_patterns` (regex) against the file
+   - Extracts parameters via `parameter_patterns` (e.g., key size, curve) with defaults when absent
+   - Emits findings with file, line/column, library, algorithm, primitive, and NIST quantum level
+5. Deep static analysis (fallback/enrichment)
+   - For small scans, analyzes files directly with the registry to find additional algorithms even if no library finding was produced
+6. CBOM generation
+   - Findings are deduplicated and merged
+   - Final MV-CBOM JSON is printed or written per CLI options
+
+All behavior is driven by `patterns.toml` — adding new libraries/algorithms is a data-only change.
 
 ## Testing
 

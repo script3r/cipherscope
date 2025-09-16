@@ -279,7 +279,7 @@ impl AlgorithmDetector {
                 if matches!(
                     ext,
                     // Existing languages
-                    "rs" | "java" | "go" | "py" | "c" | "cpp" | "swift" | "js" | "php" | "m" | "mm"
+                    "rs" | "java" | "go" | "py" | "c" | "cpp" | "cxx" | "cc" | "hpp" | "hxx" | "swift" | "js" | "php" | "m" | "mm"
                     // Added: Kotlin and Erlang
                     | "kt" | "kts" | "erl"
                 ) {
