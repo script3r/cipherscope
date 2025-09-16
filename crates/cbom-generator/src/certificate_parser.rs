@@ -40,7 +40,9 @@ impl CertificateParser {
         ];
 
         // Walk through the directory looking for certificate files
+        // Limit depth to avoid scanning too deep in large repos
         for entry in WalkDir::new(scan_path)
+            .max_depth(10) // Limit depth to avoid excessive scanning
             .into_iter()
             .filter_map(|e| e.ok())
             .filter(|e| e.file_type().is_file())

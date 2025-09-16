@@ -200,9 +200,14 @@ impl CbomGenerator {
 
     /// Generate an MV-CBOM for the given directory (single project)
     pub fn generate_cbom(&self, scan_path: &Path, findings: &[Finding]) -> Result<MvCbom> {
-        let scan_path = scan_path
-            .canonicalize()
-            .with_context(|| format!("Failed to canonicalize path: {}", scan_path.display()))?;
+        // Skip canonicalization if the path doesn't exist or is too large
+        let scan_path = if scan_path.exists() {
+            scan_path
+                .canonicalize()
+                .unwrap_or_else(|_| scan_path.to_path_buf())
+        } else {
+            scan_path.to_path_buf()
+        };
 
         // Project parsing removed; no component information included
 
@@ -255,9 +260,14 @@ impl CbomGenerator {
         scan_path: &Path,
         findings: &[Finding],
     ) -> Result<Vec<(PathBuf, MvCbom)>> {
-        let scan_path = scan_path
-            .canonicalize()
-            .with_context(|| format!("Failed to canonicalize path: {}", scan_path.display()))?;
+        // Skip canonicalization if the path doesn't exist or is too large
+        let scan_path = if scan_path.exists() {
+            scan_path
+                .canonicalize()
+                .unwrap_or_else(|_| scan_path.to_path_buf())
+        } else {
+            scan_path.to_path_buf()
+        };
 
         // Project discovery removed; just generate one CBOM for the root
         let cboms = vec![(scan_path.clone(), self.generate_cbom(&scan_path, findings)?)];

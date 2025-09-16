@@ -187,6 +187,10 @@ fn main() -> Result<()> {
     let default_path = PathBuf::from(".");
     let scan_path = args.paths.first().unwrap_or(&default_path);
 
+    if args.progress {
+        eprintln!("Generating CBOM for {} findings...", findings.len());
+    }
+
     if args.recursive {
         // Simplified: generate a single CBOM for the root
         match cbom_generator.generate_cboms_recursive(scan_path, &findings) {
