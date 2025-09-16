@@ -71,13 +71,16 @@ impl AlgorithmDetector {
                 }
             }
 
-            // Perform additional static analysis for parameter extraction
-            let additional_algorithms =
-                self.perform_deep_static_analysis_with_registry(scan_path, registry)?;
-            for asset in additional_algorithms {
-                let key = self.create_deduplication_key(&asset);
-                if seen_algorithms.insert(key) {
-                    algorithms.push(asset);
+            // Only perform deep static analysis if we have a reasonable number of findings
+            // Skip for large codebases to avoid performance issues
+            if findings.len() < 1000 {
+                let additional_algorithms =
+                    self.perform_deep_static_analysis_with_registry(scan_path, registry)?;
+                for asset in additional_algorithms {
+                    let key = self.create_deduplication_key(&asset);
+                    if seen_algorithms.insert(key) {
+                        algorithms.push(asset);
+                    }
                 }
             }
         } else {
@@ -257,12 +260,21 @@ impl AlgorithmDetector {
     ) -> Result<Vec<CryptoAsset>> {
         let mut algorithms = Vec::new();
 
+        // Only analyze a limited number of files to avoid performance issues
+        const MAX_FILES_TO_ANALYZE: usize = 100;
+        let mut files_analyzed = 0;
+
         // Walk through source files for parameter extraction
         for entry in WalkDir::new(scan_path)
+            .max_depth(5) // Limit depth to avoid deep recursion
             .into_iter()
             .filter_map(|e| e.ok())
             .filter(|e| e.file_type().is_file())
         {
+            if files_analyzed >= MAX_FILES_TO_ANALYZE {
+                break; // Stop after analyzing enough files
+            }
+
             let path = entry.path();
 
             if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
@@ -275,6 +287,7 @@ impl AlgorithmDetector {
                 ) {
                     if let Ok(mut extracted) = self.analyze_file_with_registry(path, registry) {
                         algorithms.append(&mut extracted);
+                        files_analyzed += 1;
                     }
                 }
             }
