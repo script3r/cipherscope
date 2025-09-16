@@ -30,11 +30,5 @@
         "column": 17
       }
     }
-  ],
-  "libraries": [
-    {
-      "name": "Google Tink (Python)",
-      "count": 1
-    }
   ]
 }

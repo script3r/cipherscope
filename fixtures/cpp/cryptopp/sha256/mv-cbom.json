@@ -22,7 +22,7 @@
         "primitive": "hash",
         "nistQuantumSecurityLevel": 3
       },
-      "sourceLibrary": "OpenSSL",
+      "sourceLibrary": "Crypto++",
       "evidence": {
         "file": "/Users/ielbaz/Projects/cipherscope/fixtures/cpp/cryptopp/sha256/main.cpp",
         "detectorId": "algorithm-detector",
@@ -38,23 +38,13 @@
         "primitive": "hash",
         "nistQuantumSecurityLevel": 3
       },
-      "sourceLibrary": "Crypto++",
+      "sourceLibrary": "OpenSSL",
       "evidence": {
         "file": "/Users/ielbaz/Projects/cipherscope/fixtures/cpp/cryptopp/sha256/main.cpp",
         "detectorId": "algorithm-detector",
         "line": 9,
         "column": 17
       }
-    }
-  ],
-  "libraries": [
-    {
-      "name": "Crypto++",
-      "count": 1
-    },
-    {
-      "name": "OpenSSL",
-      "count": 1
     }
   ]
 }

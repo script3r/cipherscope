@@ -30,11 +30,5 @@
         "column": 15
       }
     }
-  ],
-  "libraries": [
-    {
-      "name": "Go std crypto",
-      "count": 1
-    }
   ]
 }

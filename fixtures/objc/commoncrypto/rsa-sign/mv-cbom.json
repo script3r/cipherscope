@@ -30,11 +30,5 @@
         "column": 26
       }
     }
-  ],
-  "libraries": [
-    {
-      "name": "Security.framework (Objective-C)",
-      "count": 1
-    }
   ]
 }

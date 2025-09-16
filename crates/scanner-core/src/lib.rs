@@ -468,8 +468,7 @@ fn derive_prefilter_substrings(p: &LibraryPatterns) -> Vec<String> {
     let mut push_tokens = |s: &str| {
         // Remove common regex anchors that pollute tokens
         let cleaned = s.replace("\\b", "");
-        for tok in cleaned
-            .split(|c: char| !c.is_alphanumeric() && c != '.' && c != '/' && c != '_')
+        for tok in cleaned.split(|c: char| !c.is_alphanumeric() && c != '.' && c != '/' && c != '_')
         {
             let t = tok.trim();
             if t.len() >= 4 {
@@ -1430,7 +1429,11 @@ impl PatternDetector {
             // Require anchor only if patterns define any; always require at least one API hit
             let has_anchor_patterns =
                 !lib.include.is_empty() || !lib.import.is_empty() || !lib.namespace.is_empty();
-            let anchor_satisfied = if has_anchor_patterns { matched_import } else { true };
+            let anchor_satisfied = if has_anchor_patterns {
+                matched_import
+            } else {
+                true
+            };
             let should_report = anchor_satisfied && api_hits > 0;
             if should_report {
                 let finding = Finding {

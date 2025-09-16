@@ -15,25 +15,6 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "b5dc99a9-59bc-58e6-82c8-29de37994c73",
-      "assetType": "algorithm",
-      "name": "RSA",
-      "assetProperties": {
-        "primitive": "signature",
-        "parameterSet": {
-          "keySize": 2048
-        },
-        "nistQuantumSecurityLevel": 0
-      },
-      "sourceLibrary": "RustCrypto (common crates)",
-      "evidence": {
-        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/rust/rust-crypto/rsa-sign/main.rs",
-        "detectorId": "algorithm-detector",
-        "line": 1,
-        "column": 5
-      }
-    },
-    {
       "bom-ref": "97066213-4cad-521a-8efe-586ce966af31",
       "assetType": "algorithm",
       "name": "SHA-512",
@@ -70,12 +51,25 @@
         "line": 3,
         "column": 11
       }
-    }
-  ],
-  "libraries": [
+    },
     {
-      "name": "RustCrypto (common crates)",
-      "count": 3
+      "bom-ref": "b5dc99a9-59bc-58e6-82c8-29de37994c73",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "parameterSet": {
+          "keySize": 2048
+        },
+        "nistQuantumSecurityLevel": 0
+      },
+      "sourceLibrary": "RustCrypto (common crates)",
+      "evidence": {
+        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/rust/rust-crypto/rsa-sign/main.rs",
+        "detectorId": "algorithm-detector",
+        "line": 1,
+        "column": 5
+      }
     }
   ]
 }

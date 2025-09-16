@@ -49,11 +49,5 @@
         "column": 22
       }
     }
-  ],
-  "libraries": [
-    {
-      "name": "Go std crypto",
-      "count": 2
-    }
   ]
 }

@@ -49,15 +49,5 @@
         "column": 25
       }
     }
-  ],
-  "libraries": [
-    {
-      "name": "Conscrypt",
-      "count": 1
-    },
-    {
-      "name": "Java JCA/JCE",
-      "count": 1
-    }
   ]
 }

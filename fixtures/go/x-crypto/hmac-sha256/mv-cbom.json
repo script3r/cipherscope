@@ -15,22 +15,6 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "8d87019b-2e9c-5335-8c36-37dffd06e3a5",
-      "assetType": "algorithm",
-      "name": "HMAC-SHA256",
-      "assetProperties": {
-        "primitive": "mac",
-        "nistQuantumSecurityLevel": 3
-      },
-      "sourceLibrary": "Go std crypto",
-      "evidence": {
-        "file": "fixtures/go/x-crypto/hmac-sha256/main.go",
-        "detectorId": "detector-go",
-        "line": 13,
-        "column": 10
-      }
-    },
-    {
       "bom-ref": "2898152c-e8b5-5e80-a53c-0b4d664e0443",
       "assetType": "algorithm",
       "name": "SHA-256",
@@ -45,12 +29,22 @@
         "line": 13,
         "column": 10
       }
-    }
-  ],
-  "libraries": [
+    },
     {
-      "name": "Go std crypto",
-      "count": 2
+      "bom-ref": "8d87019b-2e9c-5335-8c36-37dffd06e3a5",
+      "assetType": "algorithm",
+      "name": "HMAC-SHA256",
+      "assetProperties": {
+        "primitive": "mac",
+        "nistQuantumSecurityLevel": 3
+      },
+      "sourceLibrary": "Go std crypto",
+      "evidence": {
+        "file": "fixtures/go/x-crypto/hmac-sha256/main.go",
+        "detectorId": "detector-go",
+        "line": 13,
+        "column": 10
+      }
     }
   ]
 }

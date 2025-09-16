@@ -30,11 +30,5 @@
         "column": 15
       }
     }
-  ],
-  "libraries": [
-    {
-      "name": "JCA/JCE (Kotlin)",
-      "count": 1
-    }
   ]
 }

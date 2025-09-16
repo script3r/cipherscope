@@ -34,22 +34,6 @@
       }
     },
     {
-      "bom-ref": "2898152c-e8b5-5e80-a53c-0b4d664e0443",
-      "assetType": "algorithm",
-      "name": "SHA-256",
-      "assetProperties": {
-        "primitive": "hash",
-        "nistQuantumSecurityLevel": 3
-      },
-      "sourceLibrary": "Google Tink (Java)",
-      "evidence": {
-        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/java/jca/rsa-sign/Main.java",
-        "detectorId": "algorithm-detector",
-        "line": 13,
-        "column": 51
-      }
-    },
-    {
       "bom-ref": "cecdb684-a18f-57bd-9319-b2cfafe4d210",
       "assetType": "algorithm",
       "name": "RSA",
@@ -80,20 +64,22 @@
         "line": 13,
         "column": 51
       }
-    }
-  ],
-  "libraries": [
-    {
-      "name": "Conscrypt",
-      "count": 1
     },
     {
-      "name": "Google Tink (Java)",
-      "count": 1
-    },
-    {
-      "name": "Java JCA/JCE",
-      "count": 2
+      "bom-ref": "2898152c-e8b5-5e80-a53c-0b4d664e0443",
+      "assetType": "algorithm",
+      "name": "SHA-256",
+      "assetProperties": {
+        "primitive": "hash",
+        "nistQuantumSecurityLevel": 3
+      },
+      "sourceLibrary": "Google Tink (Java)",
+      "evidence": {
+        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/java/jca/rsa-sign/Main.java",
+        "detectorId": "algorithm-detector",
+        "line": 13,
+        "column": 51
+      }
     }
   ]
 }

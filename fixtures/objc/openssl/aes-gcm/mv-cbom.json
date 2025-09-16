@@ -52,11 +52,5 @@
         "column": 29
       }
     }
-  ],
-  "libraries": [
-    {
-      "name": "OpenSSL (Objective-C)",
-      "count": 2
-    }
   ]
 }

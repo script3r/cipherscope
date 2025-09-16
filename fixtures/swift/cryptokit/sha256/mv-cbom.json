@@ -30,11 +30,5 @@
         "column": 14
       }
     }
-  ],
-  "libraries": [
-    {
-      "name": "CryptoKit",
-      "count": 1
-    }
   ]
 }

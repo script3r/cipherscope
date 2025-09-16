@@ -49,15 +49,5 @@
         "column": 10
       }
     }
-  ],
-  "libraries": [
-    {
-      "name": "PyCA cryptography",
-      "count": 1
-    },
-    {
-      "name": "PyCryptodome",
-      "count": 1
-    }
   ]
 }

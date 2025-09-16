@@ -107,7 +107,7 @@ impl AlgorithmDetector {
                     .symbol_patterns
                     .iter()
                     .any(|pattern| pattern.is_match(&finding.snippet));
-                
+
                 if symbol_match || snippet_match {
                     // Extract parameters from the finding
                     let parameters = self.extract_parameters_from_finding(finding, algorithm)?;
@@ -368,10 +368,7 @@ impl AlgorithmDetector {
             AssetProperties::Algorithm(props) => {
                 // Deduplicate by algorithm name, primitive, and source library to avoid merging
                 // different libraries' detections of the same algorithm (e.g., OpenSSL vs CommonCrypto).
-                let library = asset
-                    .source_library
-                    .as_deref()
-                    .unwrap_or("unknown-library");
+                let library = asset.source_library.as_deref().unwrap_or("unknown-library");
                 format!(
                     "{}:{}:{}",
                     asset.name.as_deref().unwrap_or("unknown"),

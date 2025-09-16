@@ -34,22 +34,19 @@
       }
     },
     {
-      "bom-ref": "b5dc99a9-59bc-58e6-82c8-29de37994c73",
+      "bom-ref": "c26548de-7898-5c93-8f20-08d3d70a7488",
       "assetType": "algorithm",
-      "name": "RSA",
+      "name": "AES",
       "assetProperties": {
-        "primitive": "signature",
-        "parameterSet": {
-          "keySize": 2048
-        },
-        "nistQuantumSecurityLevel": 0
+        "primitive": "aead",
+        "nistQuantumSecurityLevel": 3
       },
       "sourceLibrary": "BouncyCastle",
       "evidence": {
-        "file": "fixtures/java/bouncycastle/aes-gcm/Main.java",
-        "detectorId": "detector-java",
-        "line": 1,
-        "column": 8
+        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/java/bouncycastle/aes-gcm/Main.java",
+        "detectorId": "algorithm-detector",
+        "line": 23,
+        "column": 25
       }
     },
     {
@@ -69,34 +66,23 @@
       }
     },
     {
-      "bom-ref": "c26548de-7898-5c93-8f20-08d3d70a7488",
+      "bom-ref": "b5dc99a9-59bc-58e6-82c8-29de37994c73",
       "assetType": "algorithm",
-      "name": "AES",
+      "name": "RSA",
       "assetProperties": {
-        "primitive": "aead",
-        "nistQuantumSecurityLevel": 3
+        "primitive": "signature",
+        "parameterSet": {
+          "keySize": 2048
+        },
+        "nistQuantumSecurityLevel": 0
       },
       "sourceLibrary": "BouncyCastle",
       "evidence": {
-        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/java/bouncycastle/aes-gcm/Main.java",
-        "detectorId": "algorithm-detector",
-        "line": 23,
-        "column": 25
+        "file": "fixtures/java/bouncycastle/aes-gcm/Main.java",
+        "detectorId": "detector-java",
+        "line": 1,
+        "column": 8
       }
-    }
-  ],
-  "libraries": [
-    {
-      "name": "BouncyCastle",
-      "count": 2
-    },
-    {
-      "name": "Conscrypt",
-      "count": 1
-    },
-    {
-      "name": "Java JCA/JCE",
-      "count": 1
     }
   ]
 }

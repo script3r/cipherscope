@@ -20,7 +20,7 @@ fn normalize(v: &mut Value) {
                 for a in assets.iter_mut() {
                     if let Some(obj) = a.as_object_mut() {
                         obj.remove("bom-ref");
-                        
+
                         // Normalize file paths in evidence to be relative
                         if let Some(Value::Object(evidence)) = obj.get_mut("evidence") {
                             if let Some(Value::String(file_path)) = evidence.get_mut("file") {
@@ -37,10 +37,16 @@ fn normalize(v: &mut Value) {
                 // Sort assets by name, sourceLibrary, then assetType for stable comparisons
                 assets.sort_by(|a, b| {
                     let an = a.get("name").and_then(|x| x.as_str()).unwrap_or("");
-                    let as_ = a.get("sourceLibrary").and_then(|x| x.as_str()).unwrap_or("");
+                    let as_ = a
+                        .get("sourceLibrary")
+                        .and_then(|x| x.as_str())
+                        .unwrap_or("");
                     let at = a.get("assetType").and_then(|x| x.as_str()).unwrap_or("");
                     let bn = b.get("name").and_then(|x| x.as_str()).unwrap_or("");
-                    let bs = b.get("sourceLibrary").and_then(|x| x.as_str()).unwrap_or("");
+                    let bs = b
+                        .get("sourceLibrary")
+                        .and_then(|x| x.as_str())
+                        .unwrap_or("");
                     let bt = b.get("assetType").and_then(|x| x.as_str()).unwrap_or("");
                     (an, as_, at).cmp(&(bn, bs, bt))
                 });

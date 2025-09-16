@@ -15,22 +15,6 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "8d87019b-2e9c-5335-8c36-37dffd06e3a5",
-      "assetType": "algorithm",
-      "name": "HMAC-SHA256",
-      "assetProperties": {
-        "primitive": "mac",
-        "nistQuantumSecurityLevel": 3
-      },
-      "sourceLibrary": "Crypto++",
-      "evidence": {
-        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/cpp/cryptopp/hmac-sha256/main.cpp",
-        "detectorId": "algorithm-detector",
-        "line": 10,
-        "column": 14
-      }
-    },
-    {
       "bom-ref": "2898152c-e8b5-5e80-a53c-0b4d664e0443",
       "assetType": "algorithm",
       "name": "SHA-256",
@@ -45,16 +29,22 @@
         "line": 10,
         "column": 19
       }
-    }
-  ],
-  "libraries": [
-    {
-      "name": "Crypto++",
-      "count": 1
     },
     {
-      "name": "OpenSSL",
-      "count": 1
+      "bom-ref": "8d87019b-2e9c-5335-8c36-37dffd06e3a5",
+      "assetType": "algorithm",
+      "name": "HMAC-SHA256",
+      "assetProperties": {
+        "primitive": "mac",
+        "nistQuantumSecurityLevel": 3
+      },
+      "sourceLibrary": "Crypto++",
+      "evidence": {
+        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/cpp/cryptopp/hmac-sha256/main.cpp",
+        "detectorId": "algorithm-detector",
+        "line": 10,
+        "column": 14
+      }
     }
   ]
 }

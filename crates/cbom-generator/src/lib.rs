@@ -19,7 +19,7 @@ pub mod certificate_parser;
 
 use algorithm_detector::AlgorithmDetector;
 use certificate_parser::CertificateParser;
- 
+
 /// The main MV-CBOM document structure
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MvCbom {
@@ -38,9 +38,6 @@ pub struct MvCbom {
 
     #[serde(rename = "cryptoAssets")]
     pub crypto_assets: Vec<CryptoAsset>,
-
-    #[serde(skip_serializing_if = "Vec::is_empty", default)]
-    pub libraries: Vec<LibrarySummary>,
 }
 
 /// Metadata about the BOM's creation
@@ -149,12 +146,6 @@ pub struct AssetEvidence {
     pub column: usize,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct LibrarySummary {
-    pub name: String,
-    pub count: usize,
-}
-
 /// Classification of cryptographic primitives
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -228,18 +219,6 @@ impl CbomGenerator {
         crypto_assets.extend(algorithms);
         crypto_assets.extend(certificates);
 
-        let mut lib_counts: std::collections::BTreeMap<String, usize> =
-            std::collections::BTreeMap::new();
-        for asset in &crypto_assets {
-            if let Some(ref lib) = asset.source_library {
-                *lib_counts.entry(lib.clone()).or_insert(0) += 1;
-            }
-        }
-        let libraries: Vec<LibrarySummary> = lib_counts
-            .into_iter()
-            .map(|(name, count)| LibrarySummary { name, count })
-            .collect();
-
         let cbom = MvCbom {
             bom_format: "MV-CBOM".to_string(),
             spec_version: "1.0".to_string(),
@@ -265,7 +244,6 @@ impl CbomGenerator {
                 }],
             },
             crypto_assets: { crypto_assets },
-            libraries,
         };
 
         Ok(cbom)
@@ -282,8 +260,7 @@ impl CbomGenerator {
             .with_context(|| format!("Failed to canonicalize path: {}", scan_path.display()))?;
 
         // Project discovery removed; just generate one CBOM for the root
-        let mut cboms = Vec::new();
-        cboms.push((scan_path.clone(), self.generate_cbom(&scan_path, findings)?));
+        let cboms = vec![(scan_path.clone(), self.generate_cbom(&scan_path, findings)?)];
         Ok(cboms)
     }
 
@@ -338,7 +315,6 @@ mod tests {
                 }],
             },
             crypto_assets: vec![],
-            libraries: vec![],
         };
 
         let json = serde_json::to_string_pretty(&cbom).unwrap();

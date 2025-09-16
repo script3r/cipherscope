@@ -30,11 +30,5 @@
         "column": 9
       }
     }
-  ],
-  "libraries": [
-    {
-      "name": "CommonCrypto (Swift)",
-      "count": 1
-    }
   ]
 }

@@ -30,11 +30,5 @@
         "column": 8
       }
     }
-  ],
-  "libraries": [
-    {
-      "name": "OpenSSL (PHP)",
-      "count": 1
-    }
   ]
 }

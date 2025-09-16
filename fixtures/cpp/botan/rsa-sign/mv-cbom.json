@@ -25,6 +25,25 @@
         },
         "nistQuantumSecurityLevel": 0
       },
+      "sourceLibrary": "OpenSSL",
+      "evidence": {
+        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/cpp/botan/rsa-sign/main.cpp",
+        "detectorId": "algorithm-detector",
+        "line": 12,
+        "column": 12
+      }
+    },
+    {
+      "bom-ref": "b5dc99a9-59bc-58e6-82c8-29de37994c73",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "parameterSet": {
+          "keySize": 2048
+        },
+        "nistQuantumSecurityLevel": 0
+      },
       "sourceLibrary": "Botan",
       "evidence": {
         "file": "/Users/ielbaz/Projects/cipherscope/fixtures/cpp/botan/rsa-sign/main.cpp",
@@ -48,35 +67,6 @@
         "line": 15,
         "column": 57
       }
-    },
-    {
-      "bom-ref": "b5dc99a9-59bc-58e6-82c8-29de37994c73",
-      "assetType": "algorithm",
-      "name": "RSA",
-      "assetProperties": {
-        "primitive": "signature",
-        "parameterSet": {
-          "keySize": 2048
-        },
-        "nistQuantumSecurityLevel": 0
-      },
-      "sourceLibrary": "OpenSSL",
-      "evidence": {
-        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/cpp/botan/rsa-sign/main.cpp",
-        "detectorId": "algorithm-detector",
-        "line": 12,
-        "column": 12
-      }
-    }
-  ],
-  "libraries": [
-    {
-      "name": "Botan",
-      "count": 2
-    },
-    {
-      "name": "OpenSSL",
-      "count": 1
     }
   ]
 }

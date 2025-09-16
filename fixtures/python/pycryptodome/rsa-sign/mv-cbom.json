@@ -15,19 +15,22 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "2898152c-e8b5-5e80-a53c-0b4d664e0443",
+      "bom-ref": "b5dc99a9-59bc-58e6-82c8-29de37994c73",
       "assetType": "algorithm",
-      "name": "SHA-256",
+      "name": "RSA",
       "assetProperties": {
-        "primitive": "hash",
-        "nistQuantumSecurityLevel": 3
+        "primitive": "signature",
+        "parameterSet": {
+          "keySize": 2048
+        },
+        "nistQuantumSecurityLevel": 0
       },
       "sourceLibrary": "PyCryptodome",
       "evidence": {
         "file": "/Users/ielbaz/Projects/cipherscope/fixtures/python/pycryptodome/rsa-sign/main.py",
         "detectorId": "algorithm-detector",
-        "line": 11,
-        "column": 5
+        "line": 8,
+        "column": 7
       }
     },
     {
@@ -50,22 +53,19 @@
       }
     },
     {
-      "bom-ref": "b5dc99a9-59bc-58e6-82c8-29de37994c73",
+      "bom-ref": "2898152c-e8b5-5e80-a53c-0b4d664e0443",
       "assetType": "algorithm",
-      "name": "RSA",
+      "name": "SHA-256",
       "assetProperties": {
-        "primitive": "signature",
-        "parameterSet": {
-          "keySize": 2048
-        },
-        "nistQuantumSecurityLevel": 0
+        "primitive": "hash",
+        "nistQuantumSecurityLevel": 3
       },
       "sourceLibrary": "PyCryptodome",
       "evidence": {
         "file": "/Users/ielbaz/Projects/cipherscope/fixtures/python/pycryptodome/rsa-sign/main.py",
         "detectorId": "algorithm-detector",
-        "line": 8,
-        "column": 7
+        "line": 11,
+        "column": 5
       }
     },
     {
@@ -83,16 +83,6 @@
         "line": 3,
         "column": 25
       }
-    }
-  ],
-  "libraries": [
-    {
-      "name": "PyCA cryptography",
-      "count": 2
-    },
-    {
-      "name": "PyCryptodome",
-      "count": 2
     }
   ]
 }

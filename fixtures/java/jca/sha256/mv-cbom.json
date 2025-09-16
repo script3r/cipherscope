@@ -30,11 +30,5 @@
         "column": 28
       }
     }
-  ],
-  "libraries": [
-    {
-      "name": "Java JCA/JCE",
-      "count": 1
-    }
   ]
 }

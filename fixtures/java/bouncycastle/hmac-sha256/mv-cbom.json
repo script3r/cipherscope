@@ -15,6 +15,22 @@
   },
   "cryptoAssets": [
     {
+      "bom-ref": "8d87019b-2e9c-5335-8c36-37dffd06e3a5",
+      "assetType": "algorithm",
+      "name": "HMAC-SHA256",
+      "assetProperties": {
+        "primitive": "mac",
+        "nistQuantumSecurityLevel": 3
+      },
+      "sourceLibrary": "Java JCA/JCE",
+      "evidence": {
+        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/java/bouncycastle/hmac-sha256/Main.java",
+        "detectorId": "algorithm-detector",
+        "line": 14,
+        "column": 19
+      }
+    },
+    {
       "bom-ref": "b5dc99a9-59bc-58e6-82c8-29de37994c73",
       "assetType": "algorithm",
       "name": "RSA",
@@ -41,22 +57,6 @@
         "primitive": "mac",
         "nistQuantumSecurityLevel": 3
       },
-      "sourceLibrary": "Java JCA/JCE",
-      "evidence": {
-        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/java/bouncycastle/hmac-sha256/Main.java",
-        "detectorId": "algorithm-detector",
-        "line": 14,
-        "column": 19
-      }
-    },
-    {
-      "bom-ref": "8d87019b-2e9c-5335-8c36-37dffd06e3a5",
-      "assetType": "algorithm",
-      "name": "HMAC-SHA256",
-      "assetProperties": {
-        "primitive": "mac",
-        "nistQuantumSecurityLevel": 3
-      },
       "sourceLibrary": "BouncyCastle",
       "evidence": {
         "file": "/Users/ielbaz/Projects/cipherscope/fixtures/java/bouncycastle/hmac-sha256/Main.java",
@@ -64,16 +64,6 @@
         "line": 14,
         "column": 19
       }
-    }
-  ],
-  "libraries": [
-    {
-      "name": "BouncyCastle",
-      "count": 2
-    },
-    {
-      "name": "Java JCA/JCE",
-      "count": 1
     }
   ]
 }

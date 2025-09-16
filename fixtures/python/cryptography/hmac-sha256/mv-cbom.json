@@ -30,11 +30,5 @@
         "column": 20
       }
     }
-  ],
-  "libraries": [
-    {
-      "name": "PyCA cryptography",
-      "count": 1
-    }
   ]
 }

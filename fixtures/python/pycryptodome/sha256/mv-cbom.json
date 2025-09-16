@@ -22,12 +22,12 @@
         "primitive": "hash",
         "nistQuantumSecurityLevel": 3
       },
-      "sourceLibrary": "PyCryptodome",
+      "sourceLibrary": "PyCA cryptography",
       "evidence": {
         "file": "/Users/ielbaz/Projects/cipherscope/fixtures/python/pycryptodome/sha256/main.py",
         "detectorId": "algorithm-detector",
-        "line": 5,
-        "column": 12
+        "line": 1,
+        "column": 25
       }
     },
     {
@@ -38,23 +38,13 @@
         "primitive": "hash",
         "nistQuantumSecurityLevel": 3
       },
-      "sourceLibrary": "PyCA cryptography",
+      "sourceLibrary": "PyCryptodome",
       "evidence": {
         "file": "/Users/ielbaz/Projects/cipherscope/fixtures/python/pycryptodome/sha256/main.py",
         "detectorId": "algorithm-detector",
-        "line": 1,
-        "column": 25
+        "line": 5,
+        "column": 12
       }
-    }
-  ],
-  "libraries": [
-    {
-      "name": "PyCA cryptography",
-      "count": 1
-    },
-    {
-      "name": "PyCryptodome",
-      "count": 1
     }
   ]
 }

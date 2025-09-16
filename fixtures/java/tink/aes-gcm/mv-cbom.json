@@ -33,11 +33,5 @@
         "column": 36
       }
     }
-  ],
-  "libraries": [
-    {
-      "name": "Google Tink (Java)",
-      "count": 1
-    }
   ]
 }

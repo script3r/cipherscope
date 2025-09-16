@@ -30,11 +30,5 @@
         "column": 24
       }
     }
-  ],
-  "libraries": [
-    {
-      "name": "libsodium",
-      "count": 1
-    }
   ]
 }

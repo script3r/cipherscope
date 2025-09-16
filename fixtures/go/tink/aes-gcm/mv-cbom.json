@@ -30,11 +30,5 @@
         "column": 14
       }
     }
-  ],
-  "libraries": [
-    {
-      "name": "Google Tink (Go)",
-      "count": 1
-    }
   ]
 }

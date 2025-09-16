@@ -65,15 +65,5 @@
         "column": 32
       }
     }
-  ],
-  "libraries": [
-    {
-      "name": "BouncyCastle",
-      "count": 2
-    },
-    {
-      "name": "Java JCA/JCE",
-      "count": 1
-    }
   ]
 }

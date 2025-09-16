@@ -30,11 +30,5 @@
         "column": 21
       }
     }
-  ],
-  "libraries": [
-    {
-      "name": "CommonCrypto (Objective-C)",
-      "count": 1
-    }
   ]
 }

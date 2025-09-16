@@ -33,11 +33,5 @@
         "column": 29
       }
     }
-  ],
-  "libraries": [
-    {
-      "name": "OpenSSL",
-      "count": 1
-    }
   ]
 }

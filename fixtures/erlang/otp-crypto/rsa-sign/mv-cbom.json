@@ -30,11 +30,5 @@
         "column": 34
       }
     }
-  ],
-  "libraries": [
-    {
-      "name": "Erlang/OTP crypto",
-      "count": 1
-    }
   ]
 }

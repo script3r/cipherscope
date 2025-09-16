@@ -15,6 +15,22 @@
   },
   "cryptoAssets": [
     {
+      "bom-ref": "2898152c-e8b5-5e80-a53c-0b4d664e0443",
+      "assetType": "algorithm",
+      "name": "SHA-256",
+      "assetProperties": {
+        "primitive": "hash",
+        "nistQuantumSecurityLevel": 3
+      },
+      "sourceLibrary": "OpenSSL",
+      "evidence": {
+        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/c/openssl/rsa-sign/main.c",
+        "detectorId": "algorithm-detector",
+        "line": 21,
+        "column": 24
+      }
+    },
+    {
       "bom-ref": "b5dc99a9-59bc-58e6-82c8-29de37994c73",
       "assetType": "algorithm",
       "name": "RSA",
@@ -32,28 +48,6 @@
         "line": 12,
         "column": 26
       }
-    },
-    {
-      "bom-ref": "2898152c-e8b5-5e80-a53c-0b4d664e0443",
-      "assetType": "algorithm",
-      "name": "SHA-256",
-      "assetProperties": {
-        "primitive": "hash",
-        "nistQuantumSecurityLevel": 3
-      },
-      "sourceLibrary": "OpenSSL",
-      "evidence": {
-        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/c/openssl/rsa-sign/main.c",
-        "detectorId": "algorithm-detector",
-        "line": 21,
-        "column": 24
-      }
-    }
-  ],
-  "libraries": [
-    {
-      "name": "OpenSSL",
-      "count": 2
     }
   ]
 }

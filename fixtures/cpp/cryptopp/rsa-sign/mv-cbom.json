@@ -15,22 +15,6 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "cecdb684-a18f-57bd-9319-b2cfafe4d210",
-      "assetType": "algorithm",
-      "name": "RSA",
-      "assetProperties": {
-        "primitive": "signature",
-        "nistQuantumSecurityLevel": 0
-      },
-      "sourceLibrary": "Crypto++",
-      "evidence": {
-        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/cpp/cryptopp/rsa-sign/main.cpp",
-        "detectorId": "algorithm-detector",
-        "line": 14,
-        "column": 5
-      }
-    },
-    {
       "bom-ref": "2898152c-e8b5-5e80-a53c-0b4d664e0443",
       "assetType": "algorithm",
       "name": "SHA-256",
@@ -45,16 +29,22 @@
         "line": 19,
         "column": 16
       }
-    }
-  ],
-  "libraries": [
-    {
-      "name": "Crypto++",
-      "count": 1
     },
     {
-      "name": "OpenSSL",
-      "count": 1
+      "bom-ref": "cecdb684-a18f-57bd-9319-b2cfafe4d210",
+      "assetType": "algorithm",
+      "name": "RSA",
+      "assetProperties": {
+        "primitive": "signature",
+        "nistQuantumSecurityLevel": 0
+      },
+      "sourceLibrary": "Crypto++",
+      "evidence": {
+        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/cpp/cryptopp/rsa-sign/main.cpp",
+        "detectorId": "algorithm-detector",
+        "line": 14,
+        "column": 5
+      }
     }
   ]
 }

@@ -30,11 +30,5 @@
         "column": 5
       }
     }
-  ],
-  "libraries": [
-    {
-      "name": "Crypto++",
-      "count": 1
-    }
   ]
 }

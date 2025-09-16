@@ -33,11 +33,5 @@
         "column": 5
       }
     }
-  ],
-  "libraries": [
-    {
-      "name": "RustCrypto (common crates)",
-      "count": 1
-    }
   ]
 }

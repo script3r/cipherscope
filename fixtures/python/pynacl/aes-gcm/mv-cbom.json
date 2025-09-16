@@ -15,22 +15,6 @@
   },
   "cryptoAssets": [
     {
-      "bom-ref": "fbe00a14-7b9d-5aba-9e91-8f9b29fee66c",
-      "assetType": "algorithm",
-      "name": "AES-GCM",
-      "assetProperties": {
-        "primitive": "aead",
-        "nistQuantumSecurityLevel": 3
-      },
-      "sourceLibrary": "PyCA cryptography",
-      "evidence": {
-        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/python/pynacl/aes-gcm/main.py",
-        "detectorId": "algorithm-detector",
-        "line": 4,
-        "column": 32
-      }
-    },
-    {
       "bom-ref": "50beea07-0a57-5ec1-acb4-ff2800baa8b3",
       "assetType": "algorithm",
       "name": "XSalsa20Poly1305",
@@ -45,16 +29,22 @@
         "line": 5,
         "column": 37
       }
-    }
-  ],
-  "libraries": [
-    {
-      "name": "PyCA cryptography",
-      "count": 1
     },
     {
-      "name": "PyNaCl",
-      "count": 1
+      "bom-ref": "fbe00a14-7b9d-5aba-9e91-8f9b29fee66c",
+      "assetType": "algorithm",
+      "name": "AES-GCM",
+      "assetProperties": {
+        "primitive": "aead",
+        "nistQuantumSecurityLevel": 3
+      },
+      "sourceLibrary": "PyCA cryptography",
+      "evidence": {
+        "file": "/Users/ielbaz/Projects/cipherscope/fixtures/python/pynacl/aes-gcm/main.py",
+        "detectorId": "algorithm-detector",
+        "line": 4,
+        "column": 32
+      }
     }
   ]
 }
