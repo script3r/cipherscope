@@ -3557,6 +3557,14 @@ symbol_patterns = [
 ]
 
 [[library.algorithms]]
+name = "MD5"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCC_MD5",
+]
+
+[[library.algorithms]]
 name = "PBKDF2"
 primitive = "kdf"
 nistQuantumSecurityLevel = 3

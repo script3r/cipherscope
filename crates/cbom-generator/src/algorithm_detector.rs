@@ -51,43 +51,40 @@ impl AlgorithmDetector {
         scan_path: &Path,
         findings: &[Finding],
     ) -> Result<Vec<CryptoAsset>> {
+        let registry = match &self.registry {
+            Some(registry) => registry,
+            None => return Ok(Vec::new()),
+        };
+
         let mut algorithms = Vec::new();
         let mut seen_algorithms = HashSet::new();
 
-        if let Some(registry) = &self.registry {
-            // Extract algorithms from findings using registry patterns
-            for finding in findings {
-                if let Some(algorithm_assets) =
-                    self.extract_algorithms_from_finding_with_registry(finding, registry)?
-                {
-                    for asset in algorithm_assets {
-                        let key = self.create_deduplication_key(&asset);
-                        if seen_algorithms.insert(key) {
-                            algorithms.push(asset);
-                        }
-                    }
-                }
-            }
-
-            // Only perform deep static analysis if we have a reasonable number of findings
-            // Skip for large codebases to avoid performance issues
-            if findings.len() < 1000 {
-                let additional_algorithms =
-                    self.perform_deep_static_analysis_with_registry(scan_path, registry)?;
-                for asset in additional_algorithms {
+        // Extract algorithms from findings using registry patterns
+        for finding in findings {
+            if let Some(algorithm_assets) =
+                self.extract_algorithms_from_finding_with_registry(finding, registry)?
+            {
+                for asset in algorithm_assets {
                     let key = self.create_deduplication_key(&asset);
                     if seen_algorithms.insert(key) {
                         algorithms.push(asset);
                     }
                 }
             }
-        } else {
-            // No registry available; skip instead of using static fallbacks.
+        }
+
+        // Always perform deep static analysis regardless of findings count
+        let additional_algorithms =
+            self.perform_deep_static_analysis_with_registry(scan_path, registry)?;
+        for asset in additional_algorithms {
+            let key = self.create_deduplication_key(&asset);
+            if seen_algorithms.insert(key) {
+                algorithms.push(asset);
+            }
         }
 
         // Merge duplicate algorithms with different parameter specificity
-        let merged_algorithms = self.merge_algorithm_assets(algorithms);
-        Ok(merged_algorithms)
+        Ok(self.merge_algorithm_assets(algorithms))
     }
 
     /// Extract algorithms from finding using pattern registry
@@ -119,7 +116,7 @@ impl AlgorithmDetector {
                         parameters,
                         Some(finding.library.clone()),
                         Some(AssetEvidence {
-                            file: finding.file.display().to_string(),
+                            file: finding.file.to_string_lossy().to_string(),
                             detector_id: finding.detector_id.clone(),
                             line: finding.span.line,
                             column: finding.span.column,
@@ -258,20 +255,18 @@ impl AlgorithmDetector {
     ) -> Result<Vec<CryptoAsset>> {
         let mut algorithms = Vec::new();
 
-        // Only analyze a limited number of files to avoid performance issues
-        const MAX_FILES_TO_ANALYZE: usize = 100;
-        let mut files_analyzed = 0;
+        // Analyze files for parameter extraction - removed arbitrary limits for comprehensive scanning
+        let mut _files_analyzed = 0;
 
         // Walk through source files for parameter extraction
         for entry in WalkDir::new(scan_path)
-            .max_depth(5) // Limit depth to avoid deep recursion
+            .max_depth(20) // Support very deep directory structures
             .into_iter()
             .filter_map(|e| e.ok())
             .filter(|e| e.file_type().is_file())
         {
-            if files_analyzed >= MAX_FILES_TO_ANALYZE {
-                break; // Stop after analyzing enough files
-            }
+            // Note: Removed MAX_FILES_TO_ANALYZE limit for comprehensive cryptographic analysis
+            // In large codebases, crypto usage can be deeply nested and limits can miss important findings
 
             let path = entry.path();
 
@@ -285,7 +280,7 @@ impl AlgorithmDetector {
                 ) {
                     if let Ok(mut extracted) = self.analyze_file_with_registry(path, registry) {
                         algorithms.append(&mut extracted);
-                        files_analyzed += 1;
+                        _files_analyzed += 1;
                     }
                 }
             }
@@ -373,18 +368,33 @@ impl AlgorithmDetector {
         Ok(algorithms)
     }
 
-    /// Create a proper deduplication key based on algorithm properties, not bom_ref
+    /// Create a deduplication key based on algorithm properties AND evidence location
+    /// This ensures same algorithms from different files are reported separately
     fn create_deduplication_key(&self, asset: &CryptoAsset) -> String {
         match &asset.asset_properties {
             AssetProperties::Algorithm(props) => {
-                // Deduplicate by algorithm name, primitive, and source library to avoid merging
-                // different libraries' detections of the same algorithm (e.g., OpenSSL vs CommonCrypto).
+                // Include evidence location to allow multiple instances from different files/locations
                 let library = asset.source_library.as_deref().unwrap_or("unknown-library");
+                let params_key = props
+                    .parameter_set
+                    .as_ref()
+                    .map(|p| format!("{:?}", p))
+                    .unwrap_or_else(|| "no-params".to_string());
+
+                // Include file and line information to allow same algorithm from different locations
+                let evidence_key = if let Some(evidence) = &asset.evidence {
+                    format!("{}:{}:{}", evidence.file, evidence.line, evidence.column)
+                } else {
+                    "no-evidence".to_string()
+                };
+
                 format!(
-                    "{}:{}:{}",
+                    "{}:{}:{}:{}:{}",
                     asset.name.as_deref().unwrap_or("unknown"),
                     props.primitive as u8,
-                    library
+                    library,
+                    params_key,
+                    evidence_key
                 )
             }
             _ => format!(

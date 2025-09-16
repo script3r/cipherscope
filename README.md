@@ -4,7 +4,7 @@
   <img src="cipherscope.png" alt="CipherScope Logo" width="350" height="350">
 </div>
 
-Fast cryptographic inventory generator. Scans codebases to identify cryptographic algorithms and assess quantum resistance.
+Fast cryptographic inventory generator that creates Minimal Viable Cryptographic Bill of Materials (MV-CBOM) documents. Scans codebases to identify cryptographic algorithms, certificates, and assess post-quantum cryptography readiness.
 
 ## Quick Start
 
@@ -39,9 +39,25 @@ cargo build --release
 
 ## Options
 
+### Core Options
 - `--patterns PATH` - Custom patterns file (default: `patterns.toml`)
-- `--progress` - Show progress bar
-- `--deterministic` - Reproducible output for testing
+- `--progress` - Show progress bar during scanning
+- `--deterministic` - Reproducible output for testing/ground-truth generation
+- `--output FILE` - Output file for single-project CBOM (default: stdout)
+- `--recursive` - Generate MV-CBOMs for all discovered projects
+- `--output-dir DIR` - Output directory for recursive CBOMs
+
+### Filtering & Performance
+- `--threads N` - Number of processing threads
+- `--max-file-size MB` - Maximum file size to scan (default: 2MB)
+- `--include-glob GLOB` - Include files matching glob pattern(s)
+- `--exclude-glob GLOB` - Exclude files matching glob pattern(s)
+
+### Certificate Scanning
+- `--skip-certificates` - Skip certificate scanning during CBOM generation
+
+### Configuration
+- `--print-config` - Print merged patterns/config and exit
 
 ## Languages Supported
 

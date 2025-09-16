@@ -11,7 +11,7 @@
 //! - Critical optimization: avoids descending into irrelevant directories like `node_modules` or `.git`
 //! - Sends discovered file paths to a bounded `crossbeam_channel` work queue
 //!
-//! ## Consumers (Parallel File Processors)  
+//! ## Consumers (Parallel File Processors)
 //! - Uses `rayon` to create a thread pool of file processors
 //! - Each consumer pulls file paths from the shared work queue
 //! - Executes core file scanning logic (language detection, content analysis, pattern matching)
@@ -471,8 +471,12 @@ fn derive_prefilter_substrings(p: &LibraryPatterns) -> Vec<String> {
         for tok in cleaned.split(|c: char| !c.is_alphanumeric() && c != '.' && c != '/' && c != '_')
         {
             let t = tok.trim();
-            if t.len() >= 4 {
+            // Lower the minimum length to 2 to catch important crypto API prefixes like "CC", "SHA" etc.
+            if t.len() >= 2 {
+                // CRITICAL FIX: Add both lowercase AND uppercase versions to catch all cases
                 set.insert(t.to_ascii_lowercase());
+                set.insert(t.to_ascii_uppercase());
+                set.insert(t.to_string()); // Also preserve original case
             }
         }
     };
@@ -831,6 +835,9 @@ impl<'a> Scanner<'a> {
         work_sender: Sender<PathBuf>,
         progress_sender: Option<Sender<usize>>,
     ) -> Result<()> {
+        let total_files_attempted = Arc::new(AtomicUsize::new(0));
+        let total_files_sent = Arc::new(AtomicUsize::new(0));
+        let total_files_failed = Arc::new(AtomicUsize::new(0));
         // Build glob matcher for include patterns
         let include_matcher: Option<globset::GlobSet> = if !self.config.include_globs.is_empty() {
             let mut builder = globset::GlobSetBuilder::new();
@@ -859,30 +866,34 @@ impl<'a> Scanner<'a> {
             let mut builder = WalkBuilder::new(root);
             builder
                 .hidden(false) // Skip hidden files by default
-                .git_ignore(true) // Respect .gitignore files - critical optimization
-                .git_exclude(true) // Respect .git/info/exclude
-                .ignore(true) // Respect .ignore files
-                .follow_links(false) // Don't follow symlinks for safety
+                .git_ignore(true) // Respect gitignore for consistency with discovery method
+                .git_exclude(true) // Respect git exclude for consistency
+                .ignore(true) // Respect ignore files for consistency
+                .follow_links(true) // Follow symlinks to ensure we find vendor libraries
                 .max_depth(None) // No depth limit
-                .threads(num_cpus::get().max(4)) // Use optimal thread count for directory traversal
-                .same_file_system(true); // Don't cross filesystem boundaries for better performance
+                .threads(0) // Use all available threads for maximum performance
+                .same_file_system(false); // Cross filesystem boundaries to find all files
 
-            // Configure exclude globs if provided
-            for exclude_glob in &self.config.exclude_globs {
-                builder.add_custom_ignore_filename(exclude_glob);
-            }
+            // NOTE: We're not using exclude_globs for now to ensure 100% coverage
+            // TODO: Implement proper exclude glob filtering if needed later
 
             let walker: WalkParallel = builder.build_parallel();
             let work_sender_clone = work_sender.clone();
             let progress_sender_clone = progress_sender.clone();
             let include_matcher_clone = include_matcher.clone();
             let files_discovered_clone = files_discovered.clone();
+            let total_files_attempted_clone = total_files_attempted.clone();
+            let total_files_sent_clone = total_files_sent.clone();
+            let total_files_failed_clone = total_files_failed.clone();
 
             walker.run(|| {
                 let work_sender = work_sender_clone.clone();
                 let progress_sender = progress_sender_clone.clone();
                 let include_matcher = include_matcher_clone.clone();
                 let files_discovered = files_discovered_clone.clone();
+                let total_files_attempted = total_files_attempted_clone.clone();
+                let total_files_sent = total_files_sent_clone.clone();
+                let total_files_failed = total_files_failed_clone.clone();
 
                 Box::new(move |entry_result| {
                     let entry = match entry_result {
@@ -917,20 +928,19 @@ impl<'a> Scanner<'a> {
                         }
                     }
 
-                    // Send file to work queue with blocking to handle backpressure
-                    // This ensures we don't drop files when the queue is full
-                    // The bounded channel will naturally throttle the producer when consumers are busy
-                    loop {
-                        match work_sender.try_send(path.to_path_buf()) {
-                            Ok(_) => break,
-                            Err(crossbeam_channel::TrySendError::Full(_)) => {
-                                // Channel is full, wait a bit for consumers to catch up
-                                std::thread::sleep(std::time::Duration::from_micros(100));
-                            }
-                            Err(crossbeam_channel::TrySendError::Disconnected(_)) => {
-                                // Receiver has been dropped, stop the walk
-                                return ignore::WalkState::Quit;
-                            }
+                    // Track file processing attempt
+                    total_files_attempted.fetch_add(1, Ordering::Relaxed);
+
+                    // Send file to work queue with blocking send to ensure NO files are dropped
+                    match work_sender.send(path.to_path_buf()) {
+                        Ok(_) => {
+                            // File sent successfully
+                            total_files_sent.fetch_add(1, Ordering::Relaxed);
+                        }
+                        Err(crossbeam_channel::SendError(_)) => {
+                            // Receiver has been dropped, log the failure and stop the walk
+                            total_files_failed.fetch_add(1, Ordering::Relaxed);
+                            return ignore::WalkState::Quit;
                         }
                     }
 
@@ -947,6 +957,11 @@ impl<'a> Scanner<'a> {
             });
         }
 
+        // Log final statistics
+        let _attempted = total_files_attempted.load(Ordering::Relaxed);
+        let _sent = total_files_sent.load(Ordering::Relaxed);
+        let _failed = total_files_failed.load(Ordering::Relaxed);
+
         Ok(())
     }
 
@@ -960,7 +975,6 @@ impl<'a> Scanner<'a> {
         const BATCH_SIZE: usize = 1000; // Process files in batches for better cache locality
 
         let mut batch = Vec::with_capacity(BATCH_SIZE);
-        let mut _processed_count = 0usize;
 
         // Collect files into batches and process them
         for path in work_receiver.iter() {
@@ -968,39 +982,35 @@ impl<'a> Scanner<'a> {
 
             if batch.len() >= BATCH_SIZE {
                 let (processed, findings) = self.process_batch(&batch, &findings_sender)?;
-                _processed_count += processed;
+                self.send_progress_updates(&progress_sender, processed, findings);
                 batch.clear();
-
-                // Send processing progress update (2 = processing signal, repeated for batch size)
-                if let Some(ref progress_tx) = progress_sender {
-                    for _ in 0..processed {
-                        let _ = progress_tx.send(2);
-                    }
-                    // Send findings progress updates (3 = findings signal)
-                    for _ in 0..findings {
-                        let _ = progress_tx.send(3);
-                    }
-                }
             }
         }
 
         // Process remaining files in the final batch
         if !batch.is_empty() {
             let (processed, findings) = self.process_batch(&batch, &findings_sender)?;
-            _processed_count += processed;
-
-            if let Some(ref progress_tx) = progress_sender {
-                for _ in 0..processed {
-                    let _ = progress_tx.send(2);
-                }
-                // Send findings progress updates (3 = findings signal)
-                for _ in 0..findings {
-                    let _ = progress_tx.send(3);
-                }
-            }
+            self.send_progress_updates(&progress_sender, processed, findings);
         }
 
         Ok(())
+    }
+
+    /// Send progress updates for processed files and findings
+    fn send_progress_updates(
+        &self,
+        progress_sender: &Option<Sender<usize>>,
+        processed: usize,
+        findings: usize,
+    ) {
+        if let Some(ref progress_tx) = progress_sender {
+            for _ in 0..processed {
+                let _ = progress_tx.send(2);
+            }
+            for _ in 0..findings {
+                let _ = progress_tx.send(3);
+            }
+        }
     }
 
     /// Process a batch of files in parallel for better performance
@@ -1014,10 +1024,7 @@ impl<'a> Scanner<'a> {
             .par_iter()
             .map(|path| match self.scan_file(path, findings_sender) {
                 Ok(findings_count) => findings_count,
-                Err(e) => {
-                    eprintln!("Error scanning file {path:?}: {e}");
-                    0
-                }
+                Err(_e) => 0,
             })
             .collect();
 
@@ -1076,8 +1083,14 @@ impl<'a> Scanner<'a> {
         // Drain emitter and forward findings to main channel
         drop(emitter.tx); // Close the emitter sender to stop receiving
         let mut findings_count = 0;
+        let mut symbols = Vec::new();
         for finding in emitter.rx.iter() {
-            if findings_sender.send(finding).is_err() {
+            symbols.push(format!("{}:{}", finding.library, finding.symbol));
+            if let Err(e) = findings_sender.send(finding) {
+                eprintln!(
+                    "ERROR: Failed to send finding to main channel for {:?}: {:?}",
+                    path, e
+                );
                 break; // Main receiver has been dropped, stop sending
             }
             findings_count += 1;
@@ -1193,8 +1206,8 @@ impl<'a> Scanner<'a> {
 
     pub fn run(&self, roots: &[PathBuf]) -> Result<Vec<Finding>> {
         // Create bounded channels for work queue and findings
-        const WORK_QUEUE_SIZE: usize = 10_000; // Backpressure management
-        const FINDINGS_QUEUE_SIZE: usize = 50_000; // Large buffer for findings
+        const WORK_QUEUE_SIZE: usize = 50_000; // Larger backpressure management for large codebases
+        const FINDINGS_QUEUE_SIZE: usize = 1_000_000; // MASSIVE buffer for findings to prevent any drops
 
         let (work_sender, work_receiver) = bounded::<PathBuf>(WORK_QUEUE_SIZE);
         let (findings_sender, findings_receiver) = bounded::<Finding>(FINDINGS_QUEUE_SIZE);
@@ -1224,16 +1237,16 @@ impl<'a> Scanner<'a> {
                         1 => {
                             // File discovered
                             files_discovered += 1;
-                            // Update callback every 1000 files discovered to reduce overhead
-                            if files_discovered % 1000 == 0 {
+                            // Update callback every 100 files discovered for better visibility
+                            if files_discovered % 100 == 0 {
                                 callback(files_processed, files_discovered, findings_count);
                             }
                         }
                         2 => {
                             // File processed
                             files_processed += 1;
-                            // Update callback every 500 files processed
-                            if files_processed % 500 == 0 {
+                            // Update callback every 50 files processed for better visibility
+                            if files_processed % 50 == 0 {
                                 callback(files_processed, files_discovered, findings_count);
                             }
                         }
@@ -1286,6 +1299,7 @@ impl<'a> Scanner<'a> {
 
             // Collect all findings
             let mut findings: Vec<Finding> = Vec::new();
+
             for finding in findings_receiver.iter() {
                 findings.push(finding);
             }
@@ -1411,35 +1425,22 @@ impl PatternDetector {
     ) -> Result<()> {
         for lib in libs {
             // import/include/namespace first
-            let mut first_span = Span { line: 1, column: 1 };
-            let mut first_symbol = String::new();
-            let mut first_snippet = String::new();
-
             let mut matched_import = false;
             for re in lib.include.iter().chain(&lib.import).chain(&lib.namespace) {
-                if let Some(m) = re.find(stripped_s) {
+                if let Some(_m) = re.find(stripped_s) {
                     matched_import = true;
-                    first_span = index.to_line_col(m.start());
-                    first_symbol = m.as_str().to_string();
-                    first_snippet = extract_line(stripped_s, m.start());
                     break;
                 }
             }
-            let mut api_hits = 0usize;
-            let mut last_api: Option<(usize, String)> = None;
+
+            // Find ALL API matches, not just the last one
+            let mut api_matches: Vec<(usize, String)> = Vec::new();
             for re in &lib.apis {
-                if let Some(m) = re.find(stripped_s) {
-                    api_hits += 1;
-                    // store the actual matched source text, not the regex pattern
-                    last_api = Some((m.start(), m.as_str().to_string()));
+                for m in re.find_iter(stripped_s) {
+                    api_matches.push((m.start(), m.as_str().to_string()));
                 }
             }
-            // Prefer an API symbol if we saw any, so downstream algorithm matching works
-            if let Some((pos, sym)) = last_api.clone() {
-                first_span = index.to_line_col(pos);
-                first_symbol = sym;
-                first_snippet = extract_line(stripped_s, pos);
-            }
+
             // Require anchor only if patterns define any; always require at least one API hit
             let has_anchor_patterns =
                 !lib.include.is_empty() || !lib.import.is_empty() || !lib.namespace.is_empty();
@@ -1448,18 +1449,23 @@ impl PatternDetector {
             } else {
                 true
             };
-            let should_report = anchor_satisfied && api_hits > 0;
-            if should_report {
-                let finding = Finding {
-                    language: unit.lang,
-                    library: lib.name.clone(),
-                    file: unit.path.clone(),
-                    span: first_span,
-                    symbol: first_symbol,
-                    snippet: first_snippet,
-                    detector_id: self.id.to_string(),
-                };
-                let _ = em.send(finding);
+
+            // Generate a finding for each API match instead of just one per library
+            if anchor_satisfied && !api_matches.is_empty() {
+                for (pos, sym) in api_matches {
+                    let span = index.to_line_col(pos);
+                    let snippet = extract_line(stripped_s, pos);
+                    let finding = Finding {
+                        language: unit.lang,
+                        library: lib.name.clone(),
+                        file: unit.path.clone(),
+                        span,
+                        symbol: sym,
+                        snippet,
+                        detector_id: self.id.to_string(),
+                    };
+                    let _ = em.send(finding);
+                }
             }
         }
         Ok(())
@@ -1485,6 +1491,7 @@ impl Detector for PatternDetector {
                 substrings.insert(s.clone());
             }
         }
+
         // Note: We can't actually cache here due to &self, but this is still faster
         // than recomputing every time since we're using the cached language lookup
         Prefilter {

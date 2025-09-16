@@ -191,7 +191,7 @@ impl CertificateParser {
         }
     }
 
-    /// Map signature algorithm OID to algorithm properties
+    /// Map signature algorithm OID to algorithm properties (for tests)
     #[cfg(test)]
     fn map_signature_algorithm(
         &self,
@@ -202,113 +202,79 @@ impl CertificateParser {
         u8,
         Option<serde_json::Value>,
     ) {
-        match oid {
+        let (name, primitive, level) = match oid {
             // RSA signature algorithms - all vulnerable to quantum attacks
-            "1.2.840.113549.1.1.1" => (
-                "RSA".to_string(),
-                crate::CryptographicPrimitive::Signature,
-                0,
-                None,
-            ),
-            "1.2.840.113549.1.1.4" => (
-                "RSA with MD5".to_string(),
-                crate::CryptographicPrimitive::Signature,
-                0,
-                None,
-            ),
+            "1.2.840.113549.1.1.1" => ("RSA", crate::CryptographicPrimitive::Signature, 0),
+            "1.2.840.113549.1.1.4" => ("RSA with MD5", crate::CryptographicPrimitive::Signature, 0),
             "1.2.840.113549.1.1.5" => (
-                "RSA with SHA-1".to_string(),
+                "RSA with SHA-1",
                 crate::CryptographicPrimitive::Signature,
                 0,
-                None,
             ),
             "1.2.840.113549.1.1.11" => (
-                "RSA with SHA-256".to_string(),
+                "RSA with SHA-256",
                 crate::CryptographicPrimitive::Signature,
                 0,
-                None,
             ),
             "1.2.840.113549.1.1.12" => (
-                "RSA with SHA-384".to_string(),
+                "RSA with SHA-384",
                 crate::CryptographicPrimitive::Signature,
                 0,
-                None,
             ),
             "1.2.840.113549.1.1.13" => (
-                "RSA with SHA-512".to_string(),
+                "RSA with SHA-512",
                 crate::CryptographicPrimitive::Signature,
                 0,
-                None,
             ),
 
             // ECDSA signature algorithms - all vulnerable to quantum attacks
             "1.2.840.10045.4.1" => (
-                "ECDSA with SHA-1".to_string(),
+                "ECDSA with SHA-1",
                 crate::CryptographicPrimitive::Signature,
                 0,
-                None,
             ),
             "1.2.840.10045.4.3.1" => (
-                "ECDSA with SHA-224".to_string(),
+                "ECDSA with SHA-224",
                 crate::CryptographicPrimitive::Signature,
                 0,
-                None,
             ),
             "1.2.840.10045.4.3.2" => (
-                "ECDSA with SHA-256".to_string(),
+                "ECDSA with SHA-256",
                 crate::CryptographicPrimitive::Signature,
                 0,
-                None,
             ),
             "1.2.840.10045.4.3.3" => (
-                "ECDSA with SHA-384".to_string(),
+                "ECDSA with SHA-384",
                 crate::CryptographicPrimitive::Signature,
                 0,
-                None,
             ),
             "1.2.840.10045.4.3.4" => (
-                "ECDSA with SHA-512".to_string(),
+                "ECDSA with SHA-512",
                 crate::CryptographicPrimitive::Signature,
                 0,
-                None,
             ),
 
             // EdDSA - also vulnerable to quantum attacks
-            "1.3.101.112" => (
-                "Ed25519".to_string(),
-                crate::CryptographicPrimitive::Signature,
-                0,
-                None,
-            ),
-            "1.3.101.113" => (
-                "Ed448".to_string(),
-                crate::CryptographicPrimitive::Signature,
-                0,
-                None,
-            ),
+            "1.3.101.112" => ("Ed25519", crate::CryptographicPrimitive::Signature, 0),
+            "1.3.101.113" => ("Ed448", crate::CryptographicPrimitive::Signature, 0),
 
             // DSA - vulnerable to quantum attacks
-            "1.2.840.10040.4.1" => (
-                "DSA".to_string(),
-                crate::CryptographicPrimitive::Signature,
-                0,
-                None,
-            ),
+            "1.2.840.10040.4.1" => ("DSA", crate::CryptographicPrimitive::Signature, 0),
             "1.2.840.10040.4.3" => (
-                "DSA with SHA-1".to_string(),
+                "DSA with SHA-1",
                 crate::CryptographicPrimitive::Signature,
                 0,
-                None,
             ),
 
             // Default case for unknown algorithms
             _ => (
-                format!("Unknown Algorithm (OID: {})", oid),
+                "Unknown Algorithm",
                 crate::CryptographicPrimitive::Signature,
                 0,
-                None,
             ),
-        }
+        };
+
+        (name.to_string(), primitive, level, None)
     }
 
     /// Convert ASN.1 time to Chrono DateTime

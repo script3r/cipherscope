@@ -172,6 +172,7 @@ pub struct CbomGenerator {
     certificate_parser: CertificateParser,
     algorithm_detector: AlgorithmDetector,
     deterministic: bool,
+    skip_certificates: bool,
 }
 
 impl CbomGenerator {
@@ -180,18 +181,38 @@ impl CbomGenerator {
     }
 
     pub fn with_registry(registry: Arc<PatternRegistry>) -> Self {
-        Self {
-            certificate_parser: CertificateParser::default(),
-            algorithm_detector: AlgorithmDetector::with_registry(registry),
-            deterministic: false,
-        }
+        Self::with_options(registry, false, false)
     }
 
     pub fn with_registry_mode(registry: Arc<PatternRegistry>, deterministic: bool) -> Self {
+        Self::with_options(registry, deterministic, false)
+    }
+
+    pub fn with_registry_and_options(
+        registry: Arc<PatternRegistry>,
+        skip_certificates: bool,
+    ) -> Self {
+        Self::with_options(registry, false, skip_certificates)
+    }
+
+    pub fn with_registry_mode_and_options(
+        registry: Arc<PatternRegistry>,
+        deterministic: bool,
+        skip_certificates: bool,
+    ) -> Self {
+        Self::with_options(registry, deterministic, skip_certificates)
+    }
+
+    fn with_options(
+        registry: Arc<PatternRegistry>,
+        deterministic: bool,
+        skip_certificates: bool,
+    ) -> Self {
         Self {
             certificate_parser: CertificateParser::with_mode(deterministic),
             algorithm_detector: AlgorithmDetector::with_registry_and_mode(registry, deterministic),
             deterministic,
+            skip_certificates,
         }
     }
 
@@ -208,8 +229,12 @@ impl CbomGenerator {
 
         // Project parsing removed; no component information included
 
-        // Parse certificates in the directory
-        let certificates = self.certificate_parser.parse_certificates(&scan_path)?;
+        // Parse certificates in the directory (unless skipped)
+        let certificates = if self.skip_certificates {
+            Vec::new()
+        } else {
+            self.certificate_parser.parse_certificates(&scan_path)?
+        };
 
         // Detect algorithms from findings and static analysis
         let algorithms = self

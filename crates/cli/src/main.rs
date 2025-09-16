@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use cbom_generator::CbomGenerator;
 use clap::{ArgAction, Parser};
 use indicatif::{ProgressBar, ProgressStyle};
-use scanner_core::*;
+use scanner_core::{Config, Detector, Language, PatternDetector, PatternRegistry, Scanner};
 use std::fs;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -58,6 +58,10 @@ struct Args {
     /// Output directory for recursive CBOMs (default: stdout JSON array)
     #[arg(long, value_name = "DIR")]
     output_dir: Option<PathBuf>,
+
+    /// Skip certificate scanning during CBOM generation
+    #[arg(long, action = ArgAction::SetTrue)]
+    skip_certificates: bool,
 }
 
 fn main() -> Result<()> {
@@ -178,18 +182,14 @@ fn main() -> Result<()> {
     // Generate MV-CBOM (always - this is the primary functionality)
     // Deterministic mode for tests/ground-truth when --deterministic is set
     let cbom_generator = if args.deterministic {
-        CbomGenerator::with_registry_mode(reg.clone(), true)
+        CbomGenerator::with_registry_mode_and_options(reg.clone(), true, args.skip_certificates)
     } else {
-        CbomGenerator::with_registry(reg.clone())
+        CbomGenerator::with_registry_and_options(reg.clone(), args.skip_certificates)
     };
 
     // Use the first path as the scan root for CBOM generation
     let default_path = PathBuf::from(".");
     let scan_path = args.paths.first().unwrap_or(&default_path);
-
-    if args.progress {
-        eprintln!("Generating CBOM for {} findings...", findings.len());
-    }
 
     if args.recursive {
         // Simplified: generate a single CBOM for the root
