@@ -229,10 +229,9 @@ nistQuantumSecurityLevel = 0
 symbol_patterns = [
   "\\bEVP_md5\\s*\\(",
   "\\bEVP_DigestInit.*MD5",
-  "\\bMD5_Init",
-  "\\bMD5_Update",
-  "\\bMD5_Final",
-  "\\bMD5",
+  "\\bMD5_Init\\s*\\(",
+  "\\bMD5_Update\\s*\\(",
+  "\\bMD5_Final\\s*\\(",
 ]
 
 [[library.algorithms]]
@@ -874,9 +873,13 @@ name = "libMD"
 languages = ["C", "C++"]
 [library.patterns]
 include = [
-  "^\\s*#\\s*include\\s*<md[45]\\.h>",
+  "^\\s*#\\s*include\\s*<sys/md[45]\\.h>",
+  "^\\s*#\\s*include\\s*<sys/sha\\.h>",
+  "^\\s*#\\s*include\\s*<sys/sha[0-9]+\\.h>",
+  "^\\s*#\\s*include\\s*<sys/ripemd\\.h>",
+  "^\\s*#\\s*include\\s*<md5\\.h>",
   "^\\s*#\\s*include\\s*<sha\\.h>",
-  "^\\s*#\\s*include\\s*<sha[0-9]+\\.h>",
+  "^\\s*#\\s*include\\s*<sha256\\.h>",
   "^\\s*#\\s*include\\s*<ripemd\\.h>",
 ]
 apis = [
@@ -891,14 +894,14 @@ name = "SHA-1"
 primitive = "hash"
 nistQuantumSecurityLevel = 0
 symbol_patterns = [
-  "\\bSHA1_End",
-  "\\bSHA1_Data",
-  "\\bSHA1_File",
-  "\\bSHA1_FileChunk",
-  "\\bSHA_End",
-  "\\bSHA_Data",
-  "\\bSHA_File",
-  "\\bSHA_FileChunk",
+  "\\bSHA1_End\\s*\\(",
+  "\\bSHA1_Data\\s*\\(",
+  "\\bSHA1_File\\s*\\(",
+  "\\bSHA1_FileChunk\\s*\\(",
+  "\\bSHA_End\\s*\\(",
+  "\\bSHA_Data\\s*\\(",
+  "\\bSHA_File\\s*\\(",
+  "\\bSHA_FileChunk\\s*\\(",
 ]
 
 [[library.algorithms]]
@@ -906,10 +909,10 @@ name = "SHA-224"
 primitive = "hash"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
-  "\\bSHA224_End",
-  "\\bSHA224_Data",
-  "\\bSHA224_File",
-  "\\bSHA224_FileChunk",
+  "\\bSHA224_End\\s*\\(",
+  "\\bSHA224_Data\\s*\\(",
+  "\\bSHA224_File\\s*\\(",
+  "\\bSHA224_FileChunk\\s*\\(",
 ]
 
 [[library.algorithms]]
@@ -917,10 +920,10 @@ name = "SHA-256"
 primitive = "hash"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
-  "\\bSHA256_End",
-  "\\bSHA256_Data",
-  "\\bSHA256_File",
-  "\\bSHA256_FileChunk",
+  "\\bSHA256_End\\s*\\(",
+  "\\bSHA256_Data\\s*\\(",
+  "\\bSHA256_File\\s*\\(",
+  "\\bSHA256_FileChunk\\s*\\(",
 ]
 
 [[library.algorithms]]
@@ -928,10 +931,10 @@ name = "SHA-384"
 primitive = "hash"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
-  "\\bSHA384_End",
-  "\\bSHA384_Data",
-  "\\bSHA384_File",
-  "\\bSHA384_FileChunk",
+  "\\bSHA384_End\\s*\\(",
+  "\\bSHA384_Data\\s*\\(",
+  "\\bSHA384_File\\s*\\(",
+  "\\bSHA384_FileChunk\\s*\\(",
 ]
 
 [[library.algorithms]]
@@ -939,10 +942,10 @@ name = "SHA-512"
 primitive = "hash"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
-  "\\bSHA512_End",
-  "\\bSHA512_Data",
-  "\\bSHA512_File",
-  "\\bSHA512_FileChunk",
+  "\\bSHA512_End\\s*\\(",
+  "\\bSHA512_Data\\s*\\(",
+  "\\bSHA512_File\\s*\\(",
+  "\\bSHA512_FileChunk\\s*\\(",
 ]
 
 [[library.algorithms]]
@@ -950,14 +953,14 @@ name = "MD4"
 primitive = "hash"
 nistQuantumSecurityLevel = 0
 symbol_patterns = [
-  "\\bMD4Init",
-  "\\bMD4Update",
-  "\\bMD4Pad",
-  "\\bMD4Final",
-  "\\bMD4End",
-  "\\bMD4File",
-  "\\bMD4FileChunk",
-  "\\bMD4Data",
+  "\\bMD4Init\\s*\\(",
+  "\\bMD4Update\\s*\\(",
+  "\\bMD4Pad\\s*\\(",
+  "\\bMD4Final\\s*\\(",
+  "\\bMD4End\\s*\\(",
+  "\\bMD4File\\s*\\(",
+  "\\bMD4FileChunk\\s*\\(",
+  "\\bMD4Data\\s*\\(",
 ]
 
 [[library.algorithms]]
@@ -965,14 +968,10 @@ name = "MD5"
 primitive = "hash"
 nistQuantumSecurityLevel = 0
 symbol_patterns = [
-  "\\bMD5Init",
-  "\\bMD5Update",
-  "\\bMD5Pad",
-  "\\bMD5Final",
-  "\\bMD5End",
-  "\\bMD5File",
-  "\\bMD5FileChunk",
-  "\\bMD5Data",
+  "\\bMD5End\\s*\\(",
+  "\\bMD5File\\s*\\(",
+  "\\bMD5FileChunk\\s*\\(",
+  "\\bMD5Data\\s*\\(",
 ]
 
 [[library.algorithms]]
@@ -980,13 +979,13 @@ name = "RIPEMD-160"
 primitive = "hash"
 nistQuantumSecurityLevel = 0
 symbol_patterns = [
-  "\\bRIPEMD160_Init",
-  "\\bRIPEMD160_Update",
-  "\\bRIPEMD160_Final",
-  "\\bRIPEMD160_End",
-  "\\bRIPEMD160_File",
-  "\\bRIPEMD160_FileChunk",
-  "\\bRIPEMD160_Data",
+  "\\bRIPEMD160_Init\\s*\\(",
+  "\\bRIPEMD160_Update\\s*\\(",
+  "\\bRIPEMD160_Final\\s*\\(",
+  "\\bRIPEMD160_End\\s*\\(",
+  "\\bRIPEMD160_File\\s*\\(",
+  "\\bRIPEMD160_FileChunk\\s*\\(",
+  "\\bRIPEMD160_Data\\s*\\(",
 ]
 
 [[library]]
@@ -1131,6 +1130,10 @@ symbol_patterns = [
   "\\bAES::Encryption",
   "\\bAES::Decryption",
 ]
+[[library.algorithms.parameter_patterns]]
+name = "mode"
+pattern = "(GCM|CBC|CTR|CFB|OFB)<AES>"
+default_value = "CBC"
 
 [[library.algorithms]]
 name = "DES"
@@ -1445,6 +1448,62 @@ nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bHMAC<SHA256>",
   "\\bCryptoPP::HMAC",
+]
+
+[[library.algorithms]]
+name = "SHA3-224"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCryptoPP::SHA3_224",
+  "\\bSHA3_224::",
+]
+
+[[library.algorithms]]
+name = "SHA3-384"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCryptoPP::SHA3_384",
+  "\\bSHA3_384::",
+]
+
+[[library.algorithms]]
+name = "SHAKE128"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCryptoPP::SHAKE128",
+  "\\bSHAKE128::",
+]
+
+[[library.algorithms]]
+name = "SHAKE256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCryptoPP::SHAKE256",
+  "\\bSHAKE256::",
+]
+
+[[library.algorithms]]
+name = "ChaCha20-Poly1305"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCryptoPP::ChaCha20Poly1305",
+  "\\bChaCha20Poly1305::",
+  "\\bChaChaPoly1305::",
+]
+
+[[library.algorithms]]
+name = "CAST5"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCryptoPP::CAST5",
+  "\\bCAST5::Encryption",
+  "\\bCAST5::Decryption",
 ]
 
 [[library]]
@@ -1850,6 +1909,10 @@ symbol_patterns = [
   "\\bBotan::AEAD_Mode.*AES.*GCM",
   "\\bAES-\\d+/GCM",
 ]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "AES-(\\d+)/GCM"
+default_value = 256
 
 [[library.algorithms]]
 name = "AES"
@@ -1861,6 +1924,10 @@ symbol_patterns = [
   "\\bAES-192",
   "\\bAES-256",
 ]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "AES-(\\d+)"
+default_value = 256
 
 [[library.algorithms]]
 name = "DES"
@@ -1868,7 +1935,6 @@ primitive = "aead"
 nistQuantumSecurityLevel = 0
 symbol_patterns = [
   "\\bBotan::BlockCipher.*DES",
-  "\\bDES",
 ]
 
 [[library.algorithms]]
@@ -2079,7 +2145,7 @@ primitive = "hash"
 nistQuantumSecurityLevel = 0
 symbol_patterns = [
   "\\bBotan::HashFunction.*MD5",
-  "\\bMD5",
+  "\\bBotan::MD5",
 ]
 
 [[library.algorithms]]
@@ -2107,6 +2173,70 @@ nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bBotan::HashFunction.*BLAKE2b",
   "\\bBLAKE2b",
+]
+
+[[library.algorithms]]
+name = "BLAKE2s"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bBotan::HashFunction.*BLAKE2s",
+  "\\bBLAKE2s",
+]
+
+[[library.algorithms]]
+name = "SHA3-224"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bBotan::HashFunction.*SHA3-224",
+  "\\bSHA3-224",
+]
+
+[[library.algorithms]]
+name = "SHA3-384"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bBotan::HashFunction.*SHA3-384",
+  "\\bSHA3-384",
+]
+
+[[library.algorithms]]
+name = "SHAKE128"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bBotan::HashFunction.*SHAKE-128",
+  "\\bSHAKE-128",
+]
+
+[[library.algorithms]]
+name = "SHAKE256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bBotan::HashFunction.*SHAKE-256",
+  "\\bSHAKE-256",
+]
+
+[[library.algorithms]]
+name = "ChaCha20-Poly1305"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bBotan::AEAD_Mode.*ChaCha20Poly1305",
+  "\\bChaCha20Poly1305",
+]
+
+[[library.algorithms]]
+name = "CAST5"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bBotan::BlockCipher.*CAST5",
+  "\\bBotan::BlockCipher.*CAST-128",
+  "\\bCAST5",
 ]
 
 # =========================
@@ -2177,6 +2307,10 @@ nistQuantumSecurityLevel = 0
 symbol_patterns = [
   "\\bCipher\\.getInstance\\s*\\(\\s*[\"']DES/(?:ECB|CBC)/(?:NoPadding|PKCS5Padding)[\"']",
 ]
+[[library.algorithms.parameter_patterns]]
+name = "mode"
+pattern = "Cipher\\.getInstance\\s*\\([^)]*DES/(ECB|CBC)"
+default_value = "CBC"
 
 [[library.algorithms]]
 name = "3DES"
@@ -2185,6 +2319,10 @@ nistQuantumSecurityLevel = 0
 symbol_patterns = [
   "\\bCipher\\.getInstance\\s*\\(\\s*[\"']DESede/(?:ECB|CBC)/(?:NoPadding|PKCS5Padding)[\"']",
 ]
+[[library.algorithms.parameter_patterns]]
+name = "mode"
+pattern = "Cipher\\.getInstance\\s*\\([^)]*DESede/(ECB|CBC)"
+default_value = "CBC"
 
 [[library.algorithms]]
 name = "Blowfish"
@@ -2256,6 +2394,95 @@ symbol_patterns = [
   "\\bMac\\.getInstance\\s*\\([^)]*HmacSHA256",
 ]
 
+[[library.algorithms]]
+name = "SHA-1"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*SHA-?1[\"']",
+  "\\bSHA1with",
+]
+
+[[library.algorithms]]
+name = "SHA-224"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*SHA-?224",
+]
+
+[[library.algorithms]]
+name = "SHA-384"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*SHA-?384",
+]
+
+[[library.algorithms]]
+name = "SHA-512"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*SHA-?512",
+]
+
+[[library.algorithms]]
+name = "SHA3-224"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*SHA3-224",
+]
+
+[[library.algorithms]]
+name = "SHA3-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*SHA3-256",
+]
+
+[[library.algorithms]]
+name = "SHA3-384"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*SHA3-384",
+]
+
+[[library.algorithms]]
+name = "SHA3-512"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*SHA3-512",
+]
+
+[[library.algorithms]]
+name = "MD5"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*MD5",
+]
+
+[[library.algorithms]]
+name = "AES-GCM"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCipher\\.getInstance\\s*\\(\\s*[\"']AES/GCM/NoPadding[\"']",
+]
+
+[[library.algorithms]]
+name = "CAST5"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCipher\\.getInstance\\s*\\(\\s*[\"']CAST5",
+]
+
 [[library]]
 name = "BouncyCastle"
 languages = ["Java"]
@@ -2315,6 +2542,184 @@ symbol_patterns = [
   "\\bMac\\.getInstance\\s*\\([^)]*HmacSHA256[^)]*BC",
 ]
 
+[[library.algorithms]]
+name = "AES-GCM"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCipher\\.getInstance\\s*\\([^)]*AES/GCM[^)]*BC",
+]
+
+[[library.algorithms]]
+name = "DES"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCipher\\.getInstance\\s*\\([^)]*DES[^)]*BC",
+]
+
+[[library.algorithms]]
+name = "3DES"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCipher\\.getInstance\\s*\\([^)]*DESede[^)]*BC",
+]
+
+[[library.algorithms]]
+name = "Blowfish"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCipher\\.getInstance\\s*\\([^)]*Blowfish[^)]*BC",
+]
+
+[[library.algorithms]]
+name = "CAST5"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCipher\\.getInstance\\s*\\([^)]*CAST5[^)]*BC",
+]
+
+[[library.algorithms]]
+name = "RC4"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCipher\\.getInstance\\s*\\([^)]*RC4[^)]*BC",
+  "\\bCipher\\.getInstance\\s*\\([^)]*ARC4[^)]*BC",
+]
+
+[[library.algorithms]]
+name = "ChaCha20"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCipher\\.getInstance\\s*\\([^)]*ChaCha20[^)]*BC",
+  "\\bCipher\\.getInstance\\s*\\([^)]*ChaCha7539[^)]*BC",
+]
+
+[[library.algorithms]]
+name = "ChaCha20-Poly1305"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCipher\\.getInstance\\s*\\([^)]*ChaCha20-Poly1305[^)]*BC",
+]
+
+[[library.algorithms]]
+name = "SHA-1"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*SHA-?1[^)]*BC",
+]
+
+[[library.algorithms]]
+name = "SHA-224"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*SHA-?224[^)]*BC",
+]
+
+[[library.algorithms]]
+name = "SHA-384"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*SHA-?384[^)]*BC",
+]
+
+[[library.algorithms]]
+name = "SHA-512"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*SHA-?512[^)]*BC",
+]
+
+[[library.algorithms]]
+name = "SHA3-224"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*SHA3-224[^)]*BC",
+]
+
+[[library.algorithms]]
+name = "SHA3-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*SHA3-256[^)]*BC",
+]
+
+[[library.algorithms]]
+name = "SHA3-384"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*SHA3-384[^)]*BC",
+]
+
+[[library.algorithms]]
+name = "SHA3-512"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*SHA3-512[^)]*BC",
+]
+
+[[library.algorithms]]
+name = "SHAKE128"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*SHAKE128[^)]*BC",
+]
+
+[[library.algorithms]]
+name = "SHAKE256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*SHAKE256[^)]*BC",
+]
+
+[[library.algorithms]]
+name = "MD5"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*MD5[^)]*BC",
+]
+
+[[library.algorithms]]
+name = "BLAKE2b"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*BLAKE2B[^)]*BC",
+]
+
+[[library.algorithms]]
+name = "BLAKE2s"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*BLAKE2S[^)]*BC",
+]
+
+[[library.algorithms]]
+name = "RIPEMD-160"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bMessageDigest\\.getInstance\\s*\\([^)]*RIPEMD160[^)]*BC",
+]
+
 [[library]]
 name = "Google Tink (Java)"
 languages = ["Java"]
@@ -2336,8 +2741,9 @@ primitive = "aead"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bAeadKeyTemplates\\.AES\\d+_GCM",
-  "\\bAead",
-  "\\bAesGcmKeyManager",
+  "\\bcom\\.google\\.crypto\\.tink\\.aead\\.AesGcmKeyManager",
+  "\\bAesGcmKeyManager\\.aes\\d+GcmTemplate",
+  "\\btink\\.aead\\.AesGcmKeyManager",
 ]
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
@@ -2469,6 +2875,10 @@ symbol_patterns = [
   "\\bcipher\\.NewGCM",
   "\\baes\\.NewCipher",
 ]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "make\\(\\[\\]byte,\\s*(16|24|32)\\)"
+default_value = 32
 
 [[library.algorithms]]
 name = "SHA-256"
@@ -2538,6 +2948,81 @@ symbol_patterns = [
   "\\bsha512\\.New",
 ]
 
+[[library.algorithms]]
+name = "SHA-1"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bsha1\\.Sum",
+  "\\bsha1\\.New",
+]
+
+[[library.algorithms]]
+name = "SHA-224"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bsha256\\.Sum224",
+  "\\bsha256\\.New224",
+]
+
+[[library.algorithms]]
+name = "SHA-384"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bsha512\\.Sum384",
+  "\\bsha512\\.New384",
+]
+
+[[library.algorithms]]
+name = "MD5"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bmd5\\.Sum",
+  "\\bmd5\\.New",
+]
+
+[[library.algorithms]]
+name = "AES"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\baes\\.NewCipher",
+  "\\bcipher\\.NewCBCEncrypter",
+  "\\bcipher\\.NewCBCDecrypter",
+  "\\bcipher\\.NewCFBEncrypter",
+  "\\bcipher\\.NewCFBDecrypter",
+  "\\bcipher\\.NewOFB",
+  "\\bcipher\\.NewCTR",
+]
+
+[[library.algorithms]]
+name = "DES"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bdes\\.NewCipher",
+  "\\bdes\\.NewTripleDESCipher",
+]
+
+[[library.algorithms]]
+name = "3DES"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bdes\\.NewTripleDESCipher",
+]
+
+[[library.algorithms]]
+name = "RC4"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\brc4\\.NewCipher",
+]
+
 [[library]]
 name = "golang.org/x/crypto"
 languages = ["Go"]
@@ -2558,6 +3043,10 @@ symbol_patterns = [
   "\\bchacha20poly1305\\.New",
   "\\bchachapolykey",
 ]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "chacha20poly1305\\.Key\\s*\\{[^}]*\\}"
+default_value = 32
 
 [[library.algorithms]]
 name = "Argon2"
@@ -2574,6 +3063,115 @@ primitive = "kdf"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bpbkdf2\\.Key",
+]
+
+[[library.algorithms]]
+name = "ChaCha20"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bchacha20\\.NewUnauthenticatedCipher",
+]
+
+[[library.algorithms]]
+name = "SHA3-224"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bsha3\\.Sum224",
+  "\\bsha3\\.New224",
+]
+
+[[library.algorithms]]
+name = "SHA3-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bsha3\\.Sum256",
+  "\\bsha3\\.New256",
+]
+
+[[library.algorithms]]
+name = "SHA3-384"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bsha3\\.Sum384",
+  "\\bsha3\\.New384",
+]
+
+[[library.algorithms]]
+name = "SHA3-512"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bsha3\\.Sum512",
+  "\\bsha3\\.New512",
+]
+
+[[library.algorithms]]
+name = "SHAKE128"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bsha3\\.NewShake128",
+]
+
+[[library.algorithms]]
+name = "SHAKE256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bsha3\\.NewShake256",
+]
+
+[[library.algorithms]]
+name = "BLAKE2b"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bblake2b\\.Sum256",
+  "\\bblake2b\\.Sum384",
+  "\\bblake2b\\.Sum512",
+  "\\bblake2b\\.New256",
+  "\\bblake2b\\.New384",
+  "\\bblake2b\\.New512",
+]
+
+[[library.algorithms]]
+name = "BLAKE2s"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bblake2s\\.Sum256",
+  "\\bblake2s\\.New256",
+  "\\bblake2s\\.New128",
+]
+
+[[library.algorithms]]
+name = "RIPEMD-160"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bripemd160\\.Sum",
+  "\\bripemd160\\.New",
+]
+
+[[library.algorithms]]
+name = "Blowfish"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bblowfish\\.NewCipher",
+  "\\bblowfish\\.NewSaltedCipher",
+]
+
+[[library.algorithms]]
+name = "CAST5"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bcast5\\.NewCipher",
 ]
 
 [[library]]
@@ -2597,8 +3195,9 @@ primitive = "aead"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\baead\\.AES\\d+GCMKeyTemplate",
-  "\\baead\\.New",
-  "\\baesgcm\\.",
+  "\\bgithub\\.com/google/tink/go/aead\\.New",
+  "\\btink/go/aead/subtle/aesgcm",
+  "\\baesgcm\\.New",
 ]
 
 [[library.algorithms]]
@@ -3000,6 +3599,46 @@ symbol_patterns = [
   "\\bCurve25519\\.KeyAgreement",
 ]
 
+[[library.algorithms]]
+name = "SHA-384"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bSHA384",
+]
+
+[[library.algorithms]]
+name = "SHA-512"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bSHA512",
+]
+
+[[library.algorithms]]
+name = "HMAC-SHA256"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bHMAC<SHA256>",
+]
+
+[[library.algorithms]]
+name = "HMAC-SHA384"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bHMAC<SHA384>",
+]
+
+[[library.algorithms]]
+name = "HMAC-SHA512"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bHMAC<SHA512>",
+]
+
 [[library]]
 name = "CommonCrypto (Swift)"
 languages = ["Swift"]
@@ -3027,6 +3666,100 @@ primitive = "mac"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bCCHmac.*kCCHmacAlgSHA256",
+]
+
+[[library.algorithms]]
+name = "AES"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCCCrypt.*kCCAlgorithmAES",
+  "\\bCCCryptorCreate.*kCCAlgorithmAES",
+]
+
+[[library.algorithms]]
+name = "DES"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCCCrypt.*kCCAlgorithmDES",
+  "\\bCCCryptorCreate.*kCCAlgorithmDES",
+]
+
+[[library.algorithms]]
+name = "3DES"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCCCrypt.*kCCAlgorithm3DES",
+  "\\bCCCryptorCreate.*kCCAlgorithm3DES",
+]
+
+[[library.algorithms]]
+name = "Blowfish"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCCCrypt.*kCCAlgorithmBlowfish",
+  "\\bCCCryptorCreate.*kCCAlgorithmBlowfish",
+]
+
+[[library.algorithms]]
+name = "CAST5"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCCCrypt.*kCCAlgorithmCAST",
+  "\\bCCCryptorCreate.*kCCAlgorithmCAST",
+]
+
+[[library.algorithms]]
+name = "RC4"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCCCrypt.*kCCAlgorithmRC4",
+  "\\bCCCryptorCreate.*kCCAlgorithmRC4",
+]
+
+[[library.algorithms]]
+name = "SHA-1"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCC_SHA1\\s*\\(",
+]
+
+[[library.algorithms]]
+name = "SHA-224"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCC_SHA224\\s*\\(",
+]
+
+[[library.algorithms]]
+name = "SHA-384"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCC_SHA384\\s*\\(",
+]
+
+[[library.algorithms]]
+name = "SHA-512"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCC_SHA512\\s*\\(",
+]
+
+[[library.algorithms]]
+name = "MD5"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCC_MD5\\s*\\(",
 ]
 
 [[library]]
@@ -3414,6 +4147,233 @@ symbol_patterns = [
   "\\bhash_hmac.*sha256",
 ]
 
+[[library.algorithms]]
+name = "AES-GCM"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bopenssl_encrypt.*aes-\\d+-gcm",
+  "\\bopenssl_decrypt.*aes-\\d+-gcm",
+]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "openssl_(?:encrypt|decrypt)\\s*\\([^,)]*aes-(\\d+)-gcm"
+default_value = 256
+
+[[library.algorithms]]
+name = "DES"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bopenssl_encrypt.*des-(?:cbc|ecb|cfb|ofb)",
+  "\\bopenssl_decrypt.*des-(?:cbc|ecb|cfb|ofb)",
+]
+
+[[library.algorithms]]
+name = "3DES"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bopenssl_encrypt.*des-ede3",
+  "\\bopenssl_decrypt.*des-ede3",
+]
+
+[[library.algorithms]]
+name = "Blowfish"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bopenssl_encrypt.*bf-(?:cbc|ecb|cfb|ofb)",
+  "\\bopenssl_decrypt.*bf-(?:cbc|ecb|cfb|ofb)",
+]
+
+[[library.algorithms]]
+name = "CAST5"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bopenssl_encrypt.*cast5-(?:cbc|ecb|cfb|ofb)",
+  "\\bopenssl_decrypt.*cast5-(?:cbc|ecb|cfb|ofb)",
+]
+
+[[library.algorithms]]
+name = "RC4"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bopenssl_encrypt.*rc4",
+  "\\bopenssl_decrypt.*rc4",
+]
+
+[[library.algorithms]]
+name = "ChaCha20"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bopenssl_encrypt.*chacha20",
+  "\\bopenssl_decrypt.*chacha20",
+]
+
+[[library.algorithms]]
+name = "ChaCha20-Poly1305"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bopenssl_encrypt.*chacha20-poly1305",
+  "\\bopenssl_decrypt.*chacha20-poly1305",
+]
+
+[[library.algorithms]]
+name = "SHA-1"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bopenssl_digest.*sha1",
+  "\\bhash\\s*\\(\\s*['\"]sha1['\"]",
+]
+
+[[library.algorithms]]
+name = "SHA-224"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bopenssl_digest.*sha224",
+  "\\bhash\\s*\\(\\s*['\"]sha224['\"]",
+]
+
+[[library.algorithms]]
+name = "SHA-384"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bopenssl_digest.*sha384",
+  "\\bhash\\s*\\(\\s*['\"]sha384['\"]",
+]
+
+[[library.algorithms]]
+name = "SHA-512"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bopenssl_digest.*sha512",
+  "\\bhash\\s*\\(\\s*['\"]sha512['\"]",
+]
+
+[[library.algorithms]]
+name = "SHA3-224"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bopenssl_digest.*sha3-224",
+  "\\bhash\\s*\\(\\s*['\"]sha3-224['\"]",
+]
+
+[[library.algorithms]]
+name = "SHA3-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bopenssl_digest.*sha3-256",
+  "\\bhash\\s*\\(\\s*['\"]sha3-256['\"]",
+]
+
+[[library.algorithms]]
+name = "SHA3-384"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bopenssl_digest.*sha3-384",
+  "\\bhash\\s*\\(\\s*['\"]sha3-384['\"]",
+]
+
+[[library.algorithms]]
+name = "SHA3-512"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bopenssl_digest.*sha3-512",
+  "\\bhash\\s*\\(\\s*['\"]sha3-512['\"]",
+]
+
+[[library.algorithms]]
+name = "SHAKE128"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bopenssl_digest.*shake128",
+  "\\bhash\\s*\\(\\s*['\"]shake128['\"]",
+]
+
+[[library.algorithms]]
+name = "SHAKE256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bopenssl_digest.*shake256",
+  "\\bhash\\s*\\(\\s*['\"]shake256['\"]",
+]
+
+[[library.algorithms]]
+name = "MD5"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bopenssl_digest.*md5",
+  "\\bhash\\s*\\(\\s*['\"]md5['\"]",
+  "\\bmd5\\s*\\(",
+]
+
+[[library.algorithms]]
+name = "BLAKE2b"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bopenssl_digest.*blake2b512",
+  "\\bhash\\s*\\(\\s*['\"]blake2b512['\"]",
+]
+
+[[library.algorithms]]
+name = "BLAKE2s"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bopenssl_digest.*blake2s256",
+  "\\bhash\\s*\\(\\s*['\"]blake2s256['\"]",
+]
+
+[[library.algorithms]]
+name = "RIPEMD-160"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bopenssl_digest.*ripemd160",
+  "\\bhash\\s*\\(\\s*['\"]ripemd160['\"]",
+]
+
+[[library.algorithms]]
+name = "HMAC-SHA1"
+primitive = "mac"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bhash_hmac.*sha1",
+]
+
+[[library.algorithms]]
+name = "HMAC-SHA384"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bhash_hmac.*sha384",
+]
+
+[[library.algorithms]]
+name = "HMAC-SHA512"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bhash_hmac.*sha512",
+]
+
 [[library]]
 name = "Sodium (PHP)"
 languages = ["PHP"]
@@ -3458,6 +4418,65 @@ symbol_patterns = [
   "\\bsodium_crypto_auth",
 ]
 
+[[library.algorithms]]
+name = "AES-GCM"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bsodium_crypto_aead_aes256gcm",
+]
+
+[[library.algorithms]]
+name = "XChaCha20-Poly1305"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bsodium_crypto_aead_xchacha20poly1305",
+]
+
+[[library.algorithms]]
+name = "ChaCha20"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bsodium_crypto_stream_chacha20",
+]
+
+[[library.algorithms]]
+name = "X25519"
+primitive = "kem"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bsodium_crypto_box",
+  "\\bsodium_crypto_box_keypair",
+  "\\bsodium_crypto_scalarmult",
+]
+
+[[library.algorithms]]
+name = "Argon2"
+primitive = "kdf"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bsodium_crypto_pwhash",
+  "\\bsodium_crypto_pwhash_str",
+]
+
+[[library.algorithms]]
+name = "SHA-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bsodium_crypto_hash_sha256",
+]
+
+[[library.algorithms]]
+name = "SHA-512"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bsodium_crypto_hash_sha512",
+]
+
 [[library]]
 name = "phpseclib"
 languages = ["PHP"]
@@ -3470,6 +4489,126 @@ apis = [
   "\\bnew\\s+Crypt_[A-Z][A-Za-z0-9_]*\\s*\\(", # legacy v2
 ]
 
+# Algorithm definitions for phpseclib
+[[library.algorithms]]
+name = "RSA"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bnew\\s+(?:\\\\?phpseclib\\d*\\\\Crypt\\\\)?RSA",
+  "\\bnew\\s+Crypt_RSA",
+]
+
+[[library.algorithms]]
+name = "AES"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bnew\\s+(?:\\\\?phpseclib\\d*\\\\Crypt\\\\)?AES",
+  "\\bnew\\s+Crypt_AES",
+  "\\bnew\\s+(?:\\\\?phpseclib\\d*\\\\Crypt\\\\)?Rijndael",
+  "\\bnew\\s+Crypt_Rijndael",
+]
+
+[[library.algorithms]]
+name = "DES"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bnew\\s+(?:\\\\?phpseclib\\d*\\\\Crypt\\\\)?DES",
+  "\\bnew\\s+Crypt_DES",
+]
+
+[[library.algorithms]]
+name = "3DES"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bnew\\s+(?:\\\\?phpseclib\\d*\\\\Crypt\\\\)?TripleDES",
+  "\\bnew\\s+Crypt_TripleDES",
+]
+
+[[library.algorithms]]
+name = "Blowfish"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bnew\\s+(?:\\\\?phpseclib\\d*\\\\Crypt\\\\)?Blowfish",
+  "\\bnew\\s+Crypt_Blowfish",
+]
+
+[[library.algorithms]]
+name = "RC4"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bnew\\s+(?:\\\\?phpseclib\\d*\\\\Crypt\\\\)?RC4",
+  "\\bnew\\s+Crypt_RC4",
+]
+
+[[library.algorithms]]
+name = "Twofish"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bnew\\s+(?:\\\\?phpseclib\\d*\\\\Crypt\\\\)?Twofish",
+  "\\bnew\\s+Crypt_Twofish",
+]
+
+[[library.algorithms]]
+name = "SHA-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bnew\\s+(?:\\\\?phpseclib\\d*\\\\Crypt\\\\)?Hash.*sha256",
+  "\\bnew\\s+Crypt_Hash.*sha256",
+]
+
+[[library.algorithms]]
+name = "SHA-1"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bnew\\s+(?:\\\\?phpseclib\\d*\\\\Crypt\\\\)?Hash.*sha1",
+  "\\bnew\\s+Crypt_Hash.*sha1",
+]
+
+[[library.algorithms]]
+name = "SHA-512"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bnew\\s+(?:\\\\?phpseclib\\d*\\\\Crypt\\\\)?Hash.*sha512",
+  "\\bnew\\s+Crypt_Hash.*sha512",
+]
+
+[[library.algorithms]]
+name = "MD5"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bnew\\s+(?:\\\\?phpseclib\\d*\\\\Crypt\\\\)?Hash.*md5",
+  "\\bnew\\s+Crypt_Hash.*md5",
+]
+
+[[library.algorithms]]
+name = "ECDSA"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bnew\\s+(?:\\\\?phpseclib\\d*\\\\Crypt\\\\)?EC",
+  "\\bEC::createKey",
+]
+
+[[library.algorithms]]
+name = "DSA"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bnew\\s+(?:\\\\?phpseclib\\d*\\\\Crypt\\\\)?DSA",
+  "\\bnew\\s+Crypt_DSA",
+]
+
 [[library]]
 name = "Halite (ParagonIE)"
 languages = ["PHP"]
@@ -3479,6 +4618,82 @@ include = [
 ]
 apis = [
   "\\bParagonIE\\\\Halite\\\\[A-Za-z0-9_\\\\]+::[A-Za-z0-9_]+\\s*\\(",
+]
+
+# Algorithm definitions for Halite (ParagonIE)
+# Halite is a high-level wrapper around libsodium
+[[library.algorithms]]
+name = "XChaCha20-Poly1305"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bHalite\\\\Symmetric\\\\Crypto::encrypt",
+  "\\bHalite\\\\Symmetric\\\\Crypto::decrypt",
+  "\\bSymmetric\\\\Crypto::encrypt",
+  "\\bSymmetric\\\\Crypto::decrypt",
+]
+
+[[library.algorithms]]
+name = "Ed25519"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bHalite\\\\Asymmetric\\\\SignatureSecretKey",
+  "\\bHalite\\\\Asymmetric\\\\Crypto::sign",
+  "\\bAsymmetric\\\\Crypto::sign",
+]
+
+[[library.algorithms]]
+name = "X25519"
+primitive = "kem"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bHalite\\\\Asymmetric\\\\Crypto::seal",
+  "\\bHalite\\\\Asymmetric\\\\Crypto::unseal",
+  "\\bAsymmetric\\\\Crypto::seal",
+  "\\bAsymmetric\\\\Crypto::unseal",
+  "\\bHalite\\\\KeyExchange",
+]
+
+[[library.algorithms]]
+name = "BLAKE2b"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bHalite\\\\File::checksum",
+  "\\bHalite\\\\Util::hash",
+  "\\bFile::checksum",
+]
+
+[[library.algorithms]]
+name = "Argon2id"
+primitive = "kdf"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bHalite\\\\Password::hash",
+  "\\bHalite\\\\Password::verify",
+  "\\bPassword::hash",
+  "\\bPassword::verify",
+]
+
+[[library.algorithms]]
+name = "HMAC-BLAKE2b"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bHalite\\\\Symmetric\\\\Crypto::authenticate",
+  "\\bSymmetric\\\\Crypto::authenticate",
+]
+
+[[library.algorithms]]
+name = "AES-256-CTR"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bHalite\\\\Stream\\\\MutableFile",
+  "\\bHalite\\\\Stream\\\\ReadOnlyFile",
+  "\\bStream\\\\MutableFile",
+  "\\bStream\\\\ReadOnlyFile",
 ]
 
 # =========================
@@ -3570,6 +4785,99 @@ primitive = "kdf"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bCCKeyDerivationPBKDF",
+]
+
+[[library.algorithms]]
+name = "DES"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCCCrypt.*kCCAlgorithmDES",
+  "\\bkCCAlgorithmDES",
+]
+
+[[library.algorithms]]
+name = "3DES"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCCCrypt.*kCCAlgorithm3DES",
+  "\\bkCCAlgorithm3DES",
+]
+
+[[library.algorithms]]
+name = "Blowfish"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCCCrypt.*kCCAlgorithmBlowfish",
+  "\\bkCCAlgorithmBlowfish",
+]
+
+[[library.algorithms]]
+name = "CAST5"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCCCrypt.*kCCAlgorithmCAST",
+  "\\bkCCAlgorithmCAST",
+]
+
+[[library.algorithms]]
+name = "RC4"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCCCrypt.*kCCAlgorithmRC4",
+  "\\bkCCAlgorithmRC4",
+]
+
+[[library.algorithms]]
+name = "SHA-1"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCC_SHA1",
+]
+
+[[library.algorithms]]
+name = "SHA-224"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCC_SHA224",
+]
+
+[[library.algorithms]]
+name = "SHA-384"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCC_SHA384",
+]
+
+[[library.algorithms]]
+name = "HMAC-SHA256"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCCHmac.*kCCHmacAlgSHA256",
+]
+
+[[library.algorithms]]
+name = "HMAC-SHA1"
+primitive = "mac"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCCHmac.*kCCHmacAlgSHA1",
+]
+
+[[library.algorithms]]
+name = "HMAC-SHA512"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCCHmac.*kCCHmacAlgSHA512",
 ]
 
 # =========================
@@ -3690,8 +4998,11 @@ include = [
 ]
 apis = [
   "\\btink\\.(?:aead|mac|hybrid|signature|prf|streaming_aead)\\b",
-  "\\b(?:JsonKeysetReader|JsonKeysetWriter|cleartext_keyset_handle|KeysetHandle)\\b",
-  "\\b(?:Aead|Mac|HybridEncrypt|HybridDecrypt|PublicKeySign|PublicKeyVerify)\\b",
+  "\\btink\\.(?:JsonKeysetReader|JsonKeysetWriter|cleartext_keyset_handle|KeysetHandle)\\b",
+  "\\btink\\.aead\\.Aead\\b",
+  "\\btink\\.mac\\.Mac\\b",
+  "\\btink\\.hybrid\\.(?:HybridEncrypt|HybridDecrypt)\\b",
+  "\\btink\\.signature\\.(?:PublicKeySign|PublicKeyVerify)\\b",
   "\\btink\\.core\\.PrimitiveSet\\b",
   "\\bmac_key_templates\\.HMAC_SHA256",
   "\\btink\\.new_keyset_handle\\b",
@@ -3704,7 +5015,8 @@ primitive = "aead"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\baead\\.aead_key_templates\\.AES\\d+_GCM",
-  "\\baead\\.Aead",
+  "\\btink\\.aead\\.aead_key_templates\\.AES\\d+_GCM",
+  "\\btink\\.aead\\.AesGcmKeyManager",
 ]
 
 [[library.algorithms]]
@@ -3753,7 +5065,8 @@ primitive = "mac"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bmac_key_templates\\.HMAC_SHA256",
-  "\\bmac\\.Mac",
+  "\\btink\\.mac\\.mac_key_templates\\.HMAC_SHA256",
+  "\\btink\\.mac\\.HmacKeyManager",
 ]
 
 # =========================
@@ -3809,6 +5122,201 @@ primitive = "kdf"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bcrypto:pbkdf2_hmac",
+]
+
+[[library.algorithms]]
+name = "AES-GCM"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\baes_gcm",
+  "\\baes_\\d+_gcm",
+  "\\bcrypto:crypto_one_time_aead.*aes_\\d+_gcm",
+]
+
+[[library.algorithms]]
+name = "ChaCha20-Poly1305"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bchacha20_poly1305",
+  "\\bcrypto:crypto_one_time_aead.*chacha20_poly1305",
+]
+
+[[library.algorithms]]
+name = "SHA-1"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bcrypto:hash.*sha1",
+  "\\bsha1",
+  "\\bcrypto:hash\\s*\\(\\s*sha\\s*,",
+  "\\bcrypto:hash\\s*\\(\\s*sha\\)",
+]
+
+[[library.algorithms]]
+name = "SHA-224"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcrypto:hash.*sha224",
+  "\\bsha224",
+]
+
+[[library.algorithms]]
+name = "SHA-384"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcrypto:hash.*sha384",
+  "\\bsha384",
+]
+
+[[library.algorithms]]
+name = "SHA-512"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcrypto:hash.*sha512",
+  "\\bsha512",
+]
+
+[[library.algorithms]]
+name = "SHA3-224"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcrypto:hash.*sha3_224",
+  "\\bsha3_224",
+]
+
+[[library.algorithms]]
+name = "SHA3-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcrypto:hash.*sha3_256",
+  "\\bsha3_256",
+]
+
+[[library.algorithms]]
+name = "SHA3-384"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcrypto:hash.*sha3_384",
+  "\\bsha3_384",
+]
+
+[[library.algorithms]]
+name = "SHA3-512"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcrypto:hash.*sha3_512",
+  "\\bsha3_512",
+]
+
+[[library.algorithms]]
+name = "SHAKE128"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcrypto:hash_xof.*shake128",
+  "\\bshake128",
+]
+
+[[library.algorithms]]
+name = "SHAKE256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcrypto:hash_xof.*shake256",
+  "\\bshake256",
+]
+
+[[library.algorithms]]
+name = "MD5"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bcrypto:hash.*md5",
+  "\\bmd5",
+]
+
+[[library.algorithms]]
+name = "BLAKE2b"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcrypto:hash.*blake2b",
+  "\\bblake2b",
+]
+
+[[library.algorithms]]
+name = "BLAKE2s"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcrypto:hash.*blake2s",
+  "\\bblake2s",
+]
+
+[[library.algorithms]]
+name = "RIPEMD-160"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bcrypto:hash.*ripemd160",
+  "\\bripemd160",
+]
+
+[[library.algorithms]]
+name = "HMAC-SHA256"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcrypto:mac.*hmac.*sha256",
+  "\\bhmac.*sha256",
+]
+
+[[library.algorithms]]
+name = "DES"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bdes_cbc",
+  "\\bdes_ecb",
+  "\\bcrypto:block_encrypt.*des_cbc",
+]
+
+[[library.algorithms]]
+name = "3DES"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bdes3_cbc",
+  "\\bdes_ede3_cbc",
+  "\\bcrypto:block_encrypt.*des3_cbc",
+]
+
+[[library.algorithms]]
+name = "Blowfish"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bblowfish_cbc",
+  "\\bblowfish_ecb",
+  "\\bcrypto:block_encrypt.*blowfish",
+]
+
+[[library.algorithms]]
+name = "RC4"
+primitive = "aead"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\brc4",
+  "\\bcrypto:stream_encrypt.*rc4",
 ]
 
 [[library]]
