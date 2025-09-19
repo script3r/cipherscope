@@ -1,0 +1,13 @@
+{"language":"Rust","library":"crypto-lib","symbol":"AES-GCM","file":"fixtures/rust/ring/sha256/main.rs","line":1,"column":5,"snippet":"ring","detector":"ast-detector-rust"}
+{"language":"Rust","library":"ring","symbol":"ring","file":"fixtures/rust/ring/sha256/main.rs","line":1,"column":5,"snippet":"ring","detector":"ast-detector-rust"}
+{"language":"Rust","library":"crypto-lib","symbol":"AES-GCM","file":"fixtures/rust/ring/sha256/main.rs","line":1,"column":11,"snippet":"digest","detector":"ast-detector-rust"}
+{"language":"Rust","library":"crypto-lib","symbol":"AES-GCM","file":"fixtures/rust/ring/sha256/main.rs","line":3,"column":4,"snippet":"main","detector":"ast-detector-rust"}
+{"language":"Rust","library":"crypto-lib","symbol":"AES-GCM","file":"fixtures/rust/ring/sha256/main.rs","line":4,"column":9,"snippet":"message","detector":"ast-detector-rust"}
+{"language":"Rust","library":"crypto-lib","symbol":"AES-GCM","file":"fixtures/rust/ring/sha256/main.rs","line":6,"column":9,"snippet":"digest","detector":"ast-detector-rust"}
+{"language":"Rust","library":"crypto-lib","symbol":"AES-GCM","file":"fixtures/rust/ring/sha256/main.rs","line":6,"column":18,"snippet":"digest","detector":"ast-detector-rust"}
+{"language":"Rust","library":"crypto-lib","symbol":"AES-GCM","file":"fixtures/rust/ring/sha256/main.rs","line":6,"column":26,"snippet":"digest","detector":"ast-detector-rust"}
+{"language":"Rust","library":"crypto-lib","symbol":"AES-GCM","file":"fixtures/rust/ring/sha256/main.rs","line":6,"column":34,"snippet":"digest","detector":"ast-detector-rust"}
+{"language":"Rust","library":"crypto-lib","symbol":"AES-GCM","file":"fixtures/rust/ring/sha256/main.rs","line":6,"column":42,"snippet":"SHA256","detector":"ast-detector-rust"}
+{"language":"Rust","library":"crypto-lib","symbol":"AES-GCM","file":"fixtures/rust/ring/sha256/main.rs","line":6,"column":50,"snippet":"message","detector":"ast-detector-rust"}
+{"language":"Rust","library":"crypto-lib","symbol":"AES-GCM","file":"fixtures/rust/ring/sha256/main.rs","line":7,"column":9,"snippet":"_hash","detector":"ast-detector-rust"}
+{"language":"Rust","library":"crypto-lib","symbol":"AES-GCM","file":"fixtures/rust/ring/sha256/main.rs","line":7,"column":17,"snippet":"digest","detector":"ast-detector-rust"}

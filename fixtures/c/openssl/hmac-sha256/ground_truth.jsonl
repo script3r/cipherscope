@@ -1,0 +1,1 @@
+{"language":"C","library":"OpenSSL","symbol":"<openssl/hmac.h>","file":"fixtures/c/openssl/hmac-sha256/main.c","line":1,"column":10,"snippet":"<openssl/hmac.h>","detector":"ast-detector-c"}

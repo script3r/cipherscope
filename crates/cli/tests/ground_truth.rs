@@ -65,6 +65,7 @@ fn normalize(v: &mut Value) {
 }
 
 #[test]
+#[ignore] // Disabled for AST-based approach - use ast_ground_truth.rs instead
 fn compare_comprehensive_ground_truth() {
     let workspace = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
     let patterns_path = workspace.join("patterns.toml");

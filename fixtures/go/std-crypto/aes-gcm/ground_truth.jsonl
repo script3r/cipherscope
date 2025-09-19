@@ -1,0 +1,3 @@
+{"language":"Go","library":"std-crypto","symbol":"\"crypto/aes\"","file":"fixtures/go/std-crypto/aes-gcm/main.go","line":4,"column":5,"snippet":"\"crypto/aes\"","detector":"ast-detector-go"}
+{"language":"Go","library":"std-crypto","symbol":"\"crypto/cipher\"","file":"fixtures/go/std-crypto/aes-gcm/main.go","line":5,"column":5,"snippet":"\"crypto/cipher\"","detector":"ast-detector-go"}
+{"language":"Go","library":"std-crypto","symbol":"\"crypto/rand\"","file":"fixtures/go/std-crypto/aes-gcm/main.go","line":6,"column":5,"snippet":"\"crypto/rand\"","detector":"ast-detector-go"}

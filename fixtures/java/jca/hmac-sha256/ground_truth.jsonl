@@ -1,0 +1,2 @@
+{"language":"Java","library":"JCA","symbol":"javax","file":"fixtures/java/jca/hmac-sha256/Main.java","line":1,"column":8,"snippet":"javax","detector":"ast-detector-java"}
+{"language":"Java","library":"JCA","symbol":"crypto","file":"fixtures/java/jca/hmac-sha256/Main.java","line":1,"column":14,"snippet":"crypto","detector":"ast-detector-java"}

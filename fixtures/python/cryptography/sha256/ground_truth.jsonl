@@ -1,0 +1,2 @@
+{"language":"Python","library":"cryptography","symbol":"cryptography.hazmat.primitives","file":"fixtures/python/cryptography/sha256/main.py","line":1,"column":6,"snippet":"cryptography.hazmat.primitives","detector":"ast-detector-python"}
+{"language":"Python","library":"cryptography","symbol":"cryptography.hazmat.backends","file":"fixtures/python/cryptography/sha256/main.py","line":2,"column":6,"snippet":"cryptography.hazmat.backends","detector":"ast-detector-python"}

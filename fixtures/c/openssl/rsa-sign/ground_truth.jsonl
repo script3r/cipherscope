@@ -1,0 +1,3 @@
+{"language":"C","library":"OpenSSL","symbol":"<openssl/rsa.h>","file":"fixtures/c/openssl/rsa-sign/main.c","line":1,"column":10,"snippet":"<openssl/rsa.h>","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"<openssl/pem.h>","file":"fixtures/c/openssl/rsa-sign/main.c","line":2,"column":10,"snippet":"<openssl/pem.h>","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"<openssl/evp.h>","file":"fixtures/c/openssl/rsa-sign/main.c","line":3,"column":10,"snippet":"<openssl/evp.h>","detector":"ast-detector-c"}

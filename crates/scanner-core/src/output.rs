@@ -199,7 +199,6 @@ impl Default for CryptoFindings {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::Span;
     use std::path::PathBuf;
     
     #[test]
