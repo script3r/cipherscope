@@ -4,48 +4,38 @@
   <img src="cipherscope.png" alt="CipherScope Logo" width="350" height="350">
 </div>
 
-Fast cryptographic inventory generator that creates Minimal Viable Cryptographic Bill of Materials (MV-CBOM) documents. Scans codebases to identify cryptographic algorithms, certificates, and assess post-quantum cryptography readiness.
+Fast AST-based cryptographic library and algorithm detection tool. Uses Abstract Syntax Tree parsing to precisely identify cryptographic usage in source code and outputs findings in JSONL format.
 
 ## Quick Start
 
 ```bash
 cargo build --release
-./target/release/cipherscope --patterns patterns.toml --progress /path/to/scan [... paths]
+./target/release/cipherscope --progress /path/to/scan [... paths]
 ```
 
 ## What It Does
 
-- **Detects** cryptographic usage across 11 languages
-- **Identifies** many cryptographic algorithms (AES, SHA, RSA, ECDSA, ChaCha20, etc.)
-- **Outputs** JSON inventory with NIST quantum security levels
-- **Runs fast** - GiB/s throughput with parallel scanning
+- **AST-based detection** - Uses tree-sitter parsers for precise source code analysis
+- **Library detection** - Identifies crypto libraries via import/include/using statements
+- **Algorithm detection** - Finds algorithm usage via method names, function calls, and type definitions
+- **Multi-language support** - C, C++, Rust, Python, Java, Go
+- **JSONL output** - Simple one-JSON-object-per-line format for easy processing
+- **Fast parallel scanning** - Efficient processing of large codebases
 
 ## Example Output
 
-```json
-{
-  "bomFormat": "MV-CBOM",
-  "specVersion": "1.0",
-  "cryptoAssets": [{
-    "name": "RSA",
-    "assetProperties": {
-      "primitive": "signature",
-      "parameterSet": {"keySize": 2048},
-      "nistQuantumSecurityLevel": 0
-    }
-  }]
-}
+```jsonl
+{"language":"C","library":"OpenSSL","symbol":"<openssl/evp.h>","file":"src/main.c","line":1,"column":10,"snippet":"<openssl/evp.h>","detector":"ast-detector-c"}
+{"language":"Python","library":"cryptography","symbol":"cryptography.hazmat.primitives.ciphers","file":"app.py","line":1,"column":6,"snippet":"cryptography.hazmat.primitives.ciphers","detector":"ast-detector-python"}
+{"language":"Rust","library":"ring","symbol":"ring::aead","file":"main.rs","line":1,"column":5,"snippet":"ring::aead","detector":"ast-detector-rust"}
 ```
 
 ## Options
 
 ### Core Options
-- `--patterns PATH` - Custom patterns file (default: `patterns.toml`)
 - `--progress` - Show progress bar during scanning
-- `--deterministic` - Reproducible output for testing/ground-truth generation
-- `--output FILE` - Output file for single-project CBOM (default: stdout)
-- `--recursive` - Generate MV-CBOMs for all discovered projects
-- `--output-dir DIR` - Output directory for recursive CBOMs
+- `--deterministic` - Reproducible output for testing
+- `--output FILE` - Output file for JSONL results (default: stdout)
 
 ### Filtering & Performance
 - `--threads N` - Number of processing threads
@@ -53,41 +43,20 @@ cargo build --release
 - `--include-glob GLOB` - Include files matching glob pattern(s)
 - `--exclude-glob GLOB` - Exclude files matching glob pattern(s)
 
-### Certificate Scanning
-- `--skip-certificates` - Skip certificate scanning during CBOM generation
-
-### Configuration
-- `--print-config` - Print merged patterns/config and exit
-
 ## Languages Supported
 
-C, C++, Go, Java, Kotlin, Python, Rust, Swift, Objective-C, PHP, Erlang
-
-## Configuration
-
-Edit `patterns.toml` to add new libraries or algorithms. No code changes needed.
+C, C++, Go, Java, Python, Rust (AST-based detection)
 
 ## How It Works (High-Level)
 
-1. Workspace discovery and prefilter
-   - Walks files respecting .gitignore
-   - Cheap Aho-Corasick prefilter using language-specific substrings derived from patterns
-2. Language detection and comment stripping
-   - Detects language by extension; strips comments once for fast regex matching
-3. Library identification (anchors)
-   - Per-language detector loads compiled patterns for that language (from `patterns.toml`)
-   - Looks for include/import/namespace/API anchors to confirm a library is present in a file
-4. Algorithm matching
-   - For each identified library, matches algorithm `symbol_patterns` (regex) against the file
-   - Extracts parameters via `parameter_patterns` (e.g., key size, curve) with defaults when absent
-   - Emits findings with file, line/column, library, algorithm, primitive, and NIST quantum level
-5. Deep static analysis (fallback/enrichment)
-   - For small scans, analyzes files directly with the registry to find additional algorithms even if no library finding was produced
-6. CBOM generation
-   - Findings are deduplicated and merged
-   - Final MV-CBOM JSON is printed or written per CLI options
+1. **File Discovery** - Walks files respecting .gitignore and language detection
+2. **AST Parsing** - Uses tree-sitter parsers to build Abstract Syntax Trees for each supported language
+3. **Pattern Matching** - Executes tree-sitter queries to find:
+   - **Library imports** - `#include`, `import`, `use` statements for crypto libraries
+   - **Algorithm usage** - Function calls, method invocations, type references
+4. **Result Emission** - Outputs findings as JSONL with precise location information
 
-All behavior is driven by `patterns.toml` — adding new libraries/algorithms is a data-only change.
+The AST-based approach provides more accurate detection than regex patterns by understanding the actual structure of the code.
 
 ## Testing
 

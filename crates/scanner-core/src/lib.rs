@@ -41,6 +41,11 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread;
 
+pub mod ast;
+pub mod output;
+pub use ast::{AstDetector, AstBasedDetector, AstPattern, AstMatchType, AstMatch};
+pub use output::{CryptoFinding, CryptoFindings};
+
 // ---------------- Types ----------------
 
 type ProgressCallback = Arc<dyn Fn(usize, usize, usize) + Send + Sync>;
@@ -358,6 +363,13 @@ pub struct PatternRegistry {
 }
 
 impl PatternRegistry {
+    pub fn empty() -> Self {
+        Self {
+            libs: Vec::new(),
+            language_cache: HashMap::new(),
+        }
+    }
+    
     pub fn load(patterns_toml: &str) -> Result<Self> {
         let pf: PatternsFile = toml::from_str(patterns_toml)?;
         let libs = pf

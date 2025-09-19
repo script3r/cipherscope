@@ -1,23 +1,18 @@
 use anyhow::{Context, Result};
-use cbom_generator::CbomGenerator;
 use clap::{ArgAction, Parser};
 use indicatif::{ProgressBar, ProgressStyle};
-use scanner_core::{Config, Detector, Language, PatternDetector, PatternRegistry, Scanner};
+use scanner_core::{Config, Detector, Language, AstBasedDetector, Scanner, CryptoFindings};
 use std::fs;
 use std::path::PathBuf;
 use std::sync::Arc;
 
 #[derive(Parser, Debug)]
 #[command(name = "cipherscope")]
-#[command(version, about = "Generate Cryptographic Bill of Materials (MV-CBOM) for Post-Quantum Cryptography readiness assessment", long_about = None)]
+#[command(version, about = "AST-based cryptographic library and algorithm detection tool - outputs JSONL format", long_about = None)]
 struct Args {
     /// Paths to scan
     #[arg(value_name = "PATH", default_value = ".")]
     paths: Vec<PathBuf>,
-
-    /// Generate MV-CBOMs recursively for all discovered projects (default: single project)
-    #[arg(long, action = ArgAction::SetTrue)]
-    recursive: bool,
 
     /// Number of threads
     #[arg(long, value_name = "N")]
@@ -39,29 +34,13 @@ struct Args {
     #[arg(long, action = ArgAction::SetTrue)]
     deterministic: bool,
 
-    /// Print merged patterns/config and exit
-    #[arg(long, action = ArgAction::SetTrue)]
-    print_config: bool,
-
-    /// Path to patterns file
-    #[arg(long, value_name = "FILE", default_value = "patterns.toml")]
-    patterns: PathBuf,
-
     /// Show progress bar during scanning
     #[arg(long, action = ArgAction::SetTrue)]
     progress: bool,
 
-    /// Output file for single-project CBOM (default: stdout)
+    /// Output file for JSONL results (default: stdout)
     #[arg(long, value_name = "FILE")]
     output: Option<PathBuf>,
-
-    /// Output directory for recursive CBOMs (default: stdout JSON array)
-    #[arg(long, value_name = "DIR")]
-    output_dir: Option<PathBuf>,
-
-    /// Skip certificate scanning during CBOM generation
-    #[arg(long, action = ArgAction::SetTrue)]
-    skip_certificates: bool,
 }
 
 fn main() -> Result<()> {
@@ -73,74 +52,32 @@ fn main() -> Result<()> {
             .ok();
     }
 
-    // Load patterns from specified file
-    let base = fs::read_to_string(&args.patterns)
-        .with_context(|| format!("read patterns file: {}", args.patterns.display()))?;
-    let reg = PatternRegistry::load(&base)?;
-    let reg = Arc::new(reg);
-
-    if args.print_config {
-        println!("{}", base);
-        return Ok(());
-    }
-
-    // Prepare detectors
+    // Prepare AST-based detectors for each language
     let dets: Vec<Box<dyn Detector>> = vec![
-        Box::new(PatternDetector::new(
-            "detector-go",
-            &[Language::Go],
-            reg.clone(),
-        )),
-        Box::new(PatternDetector::new(
-            "detector-java",
-            &[Language::Java],
-            reg.clone(),
-        )),
-        Box::new(PatternDetector::new(
-            "detector-c",
+        Box::new(AstBasedDetector::new(
+            "ast-detector-c",
             &[Language::C],
-            reg.clone(),
-        )),
-        Box::new(PatternDetector::new(
-            "detector-cpp",
+        ).with_context(|| "Failed to create C AST detector")?),
+        Box::new(AstBasedDetector::new(
+            "ast-detector-cpp",
             &[Language::Cpp],
-            reg.clone(),
-        )),
-        Box::new(PatternDetector::new(
-            "detector-rust",
+        ).with_context(|| "Failed to create C++ AST detector")?),
+        Box::new(AstBasedDetector::new(
+            "ast-detector-rust",
             &[Language::Rust],
-            reg.clone(),
-        )),
-        Box::new(PatternDetector::new(
-            "detector-python",
+        ).with_context(|| "Failed to create Rust AST detector")?),
+        Box::new(AstBasedDetector::new(
+            "ast-detector-python",
             &[Language::Python],
-            reg.clone(),
-        )),
-        Box::new(PatternDetector::new(
-            "detector-php",
-            &[Language::Php],
-            reg.clone(),
-        )),
-        Box::new(PatternDetector::new(
-            "detector-swift",
-            &[Language::Swift],
-            reg.clone(),
-        )),
-        Box::new(PatternDetector::new(
-            "detector-objc",
-            &[Language::ObjC],
-            reg.clone(),
-        )),
-        Box::new(PatternDetector::new(
-            "detector-kotlin",
-            &[Language::Kotlin],
-            reg.clone(),
-        )),
-        Box::new(PatternDetector::new(
-            "detector-erlang",
-            &[Language::Erlang],
-            reg.clone(),
-        )),
+        ).with_context(|| "Failed to create Python AST detector")?),
+        Box::new(AstBasedDetector::new(
+            "ast-detector-java",
+            &[Language::Java],
+        ).with_context(|| "Failed to create Java AST detector")?),
+        Box::new(AstBasedDetector::new(
+            "ast-detector-go",
+            &[Language::Go],
+        ).with_context(|| "Failed to create Go AST detector")?),
     ];
 
     let mut cfg = Config {
@@ -171,7 +108,9 @@ fn main() -> Result<()> {
         }));
     }
 
-    let scanner = Scanner::new(&reg, dets, cfg);
+    // Create a dummy registry for the scanner (AST detectors don't use it)
+    let dummy_registry = scanner_core::PatternRegistry::empty();
+    let scanner = Scanner::new(&dummy_registry, dets, cfg);
     let findings = scanner.run(&args.paths)?;
 
     // Clear progress bar if it was shown
@@ -179,77 +118,22 @@ fn main() -> Result<()> {
         println!(); // Move to next line after progress bar
     }
 
-    // Generate MV-CBOM (always - this is the primary functionality)
-    // Deterministic mode for tests/ground-truth when --deterministic is set
-    let cbom_generator = if args.deterministic {
-        CbomGenerator::with_registry_mode_and_options(reg.clone(), true, args.skip_certificates)
-    } else {
-        CbomGenerator::with_registry_and_options(reg.clone(), args.skip_certificates)
-    };
+    // Convert scanner findings to crypto findings and output as JSONL
+    let crypto_findings = CryptoFindings::from_scanner_findings(findings);
+    let jsonl_output = crypto_findings.to_jsonl()
+        .with_context(|| "Failed to serialize findings to JSONL")?;
 
-    // Use the first path as the scan root for CBOM generation
-    let default_path = PathBuf::from(".");
-    let scan_path = args.paths.first().unwrap_or(&default_path);
-
-    if args.recursive {
-        // Simplified: generate a single CBOM for the root
-        match cbom_generator.generate_cboms_recursive(scan_path, &findings) {
-            Ok(cboms) => {
-                if let Some(dir) = &args.output_dir {
-                    // Write each CBOM into the specified directory
-                    if let Err(e) = fs::create_dir_all(dir) {
-                        eprintln!("Failed to create output directory {}: {}", dir.display(), e);
-                        std::process::exit(1);
-                    }
-                    for (i, (_project_path, cbom)) in cboms.iter().enumerate() {
-                        let file = dir.join(format!("{:03}-mv-cbom.json", i + 1));
-                        if let Err(e) = cbom_generator.write_cbom(cbom, &file) {
-                            eprintln!("Failed to write MV-CBOM to {}: {}", file.display(), e);
-                            std::process::exit(1);
-                        }
-                    }
-                    println!("Generated {} MV-CBOMs to {}", cboms.len(), dir.display());
-                } else {
-                    // Print JSON array to stdout
-                    let only_cboms: Vec<&cbom_generator::MvCbom> =
-                        cboms.iter().map(|(_, c)| c).collect();
-                    let json = serde_json::to_string_pretty(&only_cboms)
-                        .expect("Failed to serialize MV-CBOMs to JSON");
-                    println!("{}", json);
-                }
-            }
-            Err(e) => {
-                eprintln!("Failed to generate recursive MV-CBOMs: {}", e);
-                std::process::exit(1);
-            }
+    // Output results
+    match &args.output {
+        Some(output_file) => {
+            fs::write(output_file, &jsonl_output)
+                .with_context(|| format!("Failed to write JSONL to {}", output_file.display()))?;
+            eprintln!("Found {} cryptographic findings written to {}", 
+                     crypto_findings.len(), output_file.display());
         }
-    } else {
-        // Single CBOM generation
-        match cbom_generator.generate_cbom(scan_path, &findings) {
-            Ok(cbom) => {
-                if let Some(path) = &args.output {
-                    match cbom_generator.write_cbom(&cbom, path) {
-                        Ok(()) => {
-                            println!("MV-CBOM written to: {}", path.display());
-                            println!("Found {} cryptographic assets", cbom.crypto_assets.len());
-                            // Dependencies removed
-                        }
-                        Err(e) => {
-                            eprintln!("Failed to write MV-CBOM: {}", e);
-                            std::process::exit(1);
-                        }
-                    }
-                } else {
-                    // Print JSON to stdout (no extra lines)
-                    let json = serde_json::to_string_pretty(&cbom)
-                        .expect("Failed to serialize MV-CBOM to JSON");
-                    println!("{}", json);
-                }
-            }
-            Err(e) => {
-                eprintln!("Failed to generate MV-CBOM: {}", e);
-                std::process::exit(1);
-            }
+        None => {
+            // Print JSONL to stdout
+            println!("{}", jsonl_output);
         }
     }
 
