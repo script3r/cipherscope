@@ -681,6 +681,7 @@ dependencies = [
  "ignore",
  "num_cpus",
  "rayon",
+ "regex",
  "serde",
  "serde_json",
  "tempfile",

@@ -145,215 +145,9 @@ impl AstDetector {
     }
     
     /// Default AST patterns for common cryptographic libraries and algorithms
+    /// Get default patterns (empty - all patterns should come from patterns.toml)
     fn default_patterns() -> Vec<AstPattern> {
-        vec![
-            // C/C++ OpenSSL library detection
-            AstPattern {
-                query: r#"
-                    (preproc_include 
-                      path: (system_lib_string) @path
-                      (#match? @path "openssl/.*"))
-                "#.to_string(),
-                language: ScanLanguage::C,
-                match_type: AstMatchType::Library { name: "OpenSSL".to_string() },
-                metadata: HashMap::new(),
-            },
-            
-            // C/C++ OpenSSL RSA function calls
-            AstPattern {
-                query: r#"
-                    (call_expression
-                      function: (identifier) @func
-                      (#match? @func "RSA_.*|EVP_PKEY_RSA.*"))
-                "#.to_string(),
-                language: ScanLanguage::C,
-                match_type: AstMatchType::Algorithm { 
-                    name: "RSA".to_string(),
-                    primitive: "signature".to_string(),
-                    nist_quantum_security_level: 0,
-                },
-                metadata: HashMap::new(),
-            },
-            
-            // C/C++ OpenSSL AES function calls
-            AstPattern {
-                query: r#"
-                    (call_expression
-                      function: (identifier) @func
-                      (#match? @func "EVP_aes_.*|AES_.*"))
-                "#.to_string(),
-                language: ScanLanguage::C,
-                match_type: AstMatchType::Algorithm { 
-                    name: "AES".to_string(),
-                    primitive: "aead".to_string(),
-                    nist_quantum_security_level: 3,
-                },
-                metadata: HashMap::new(),
-            },
-            
-            // Rust ring crate imports
-            AstPattern {
-                query: r#"
-                    (use_declaration
-                      argument: (scoped_identifier
-                        path: (identifier) @crate
-                        (#eq? @crate "ring")))
-                "#.to_string(),
-                language: ScanLanguage::Rust,
-                match_type: AstMatchType::Library { name: "ring".to_string() },
-                metadata: HashMap::new(),
-            },
-            
-            // Rust crypto crate imports
-            AstPattern {
-                query: r#"
-                    (use_declaration
-                      argument: (identifier) @crate
-                      (#match? @crate "aes_gcm|sha2|rsa|hmac"))
-                "#.to_string(),
-                language: ScanLanguage::Rust,
-                match_type: AstMatchType::Library { name: "rust-crypto".to_string() },
-                metadata: HashMap::new(),
-            },
-            
-            // Rust ring module usage (e.g., ring::digest::SHA256)
-            AstPattern {
-                query: r#"
-                    (scoped_identifier
-                      path: (scoped_identifier
-                        path: (identifier) @crate
-                        name: (identifier) @module
-                        (#eq? @crate "ring")
-                        (#match? @module "digest|aead|signature")))
-                "#.to_string(),
-                language: ScanLanguage::Rust,
-                match_type: AstMatchType::Library { name: "ring".to_string() },
-                metadata: HashMap::new(),
-            },
-            
-            // Python cryptography library imports
-            AstPattern {
-                query: r#"
-                    (import_from_statement
-                      module_name: (dotted_name) @name
-                      (#match? @name "cryptography.*"))
-                "#.to_string(),
-                language: ScanLanguage::Python,
-                match_type: AstMatchType::Library { name: "cryptography".to_string() },
-                metadata: HashMap::new(),
-            },
-            
-            // Python simple import statements
-            AstPattern {
-                query: r#"
-                    (import_statement
-                      name: (dotted_name) @name
-                      (#match? @name "cryptography.*"))
-                "#.to_string(),
-                language: ScanLanguage::Python,
-                match_type: AstMatchType::Library { name: "cryptography".to_string() },
-                metadata: HashMap::new(),
-            },
-            
-            // Python AES algorithm calls
-            AstPattern {
-                query: r#"
-                    (call
-                      function: (attribute
-                        object: (identifier) @obj
-                        attribute: (identifier) @attr
-                        (#eq? @obj "algorithms")
-                        (#eq? @attr "AES")))
-                "#.to_string(),
-                language: ScanLanguage::Python,
-                match_type: AstMatchType::Algorithm { 
-                    name: "AES".to_string(),
-                    primitive: "aead".to_string(),
-                    nist_quantum_security_level: 3,
-                },
-                metadata: HashMap::new(),
-            },
-            
-            // Java crypto API imports
-            AstPattern {
-                query: r#"
-                    (import_declaration
-                      (scoped_identifier
-                        scope: (scoped_identifier
-                          scope: (identifier) @javax
-                          name: (identifier) @crypto
-                          (#eq? @javax "javax")
-                          (#eq? @crypto "crypto"))))
-                "#.to_string(),
-                language: ScanLanguage::Java,
-                match_type: AstMatchType::Library { name: "JCA".to_string() },
-                metadata: HashMap::new(),
-            },
-            
-            // Go crypto package imports
-            AstPattern {
-                query: r#"
-                    (import_spec
-                      path: (interpreted_string_literal) @path
-                      (#match? @path "\"crypto/.*\""))
-                "#.to_string(),
-                language: ScanLanguage::Go,
-                match_type: AstMatchType::Library { name: "std-crypto".to_string() },
-                metadata: HashMap::new(),
-            },
-            
-            // PHP OpenSSL function calls
-            AstPattern {
-                query: r#"
-                    (function_call_expression
-                      function: (name) @func
-                      (#match? @func "openssl_.*"))
-                "#.to_string(),
-                language: ScanLanguage::Php,
-                match_type: AstMatchType::Library { name: "OpenSSL".to_string() },
-                metadata: HashMap::new(),
-            },
-            
-            // Swift CryptoKit imports
-            AstPattern {
-                query: r#"
-                    (import_declaration
-                      (identifier) @name
-                      (#eq? @name "CryptoKit"))
-                "#.to_string(),
-                language: ScanLanguage::Swift,
-                match_type: AstMatchType::Library { name: "CryptoKit".to_string() },
-                metadata: HashMap::new(),
-            },
-            
-            // Kotlin JCA imports
-            AstPattern {
-                query: r#"
-                    (import_header
-                      (identifier) @javax
-                      (identifier) @crypto
-                      (#eq? @javax "javax")
-                      (#eq? @crypto "crypto"))
-                "#.to_string(),
-                language: ScanLanguage::Kotlin,
-                match_type: AstMatchType::Library { name: "JCA".to_string() },
-                metadata: HashMap::new(),
-            },
-            
-            // Objective-C CommonCrypto imports
-            AstPattern {
-                query: r#"
-                    (preproc_include
-                      path: (system_lib_string) @path
-                      (#match? @path "CommonCrypto/.*"))
-                "#.to_string(),
-                language: ScanLanguage::ObjC,
-                match_type: AstMatchType::Library { name: "CommonCrypto".to_string() },
-                metadata: HashMap::new(),
-            },
-            
-            
-        ]
+        Vec::new() // No hardcoded patterns - everything comes from patterns.toml
     }
     
     /// Parse source code and return the AST
@@ -530,77 +324,138 @@ impl AstBasedDetector {
         Ok(!findings.is_empty())
     }
     
-    /// Convert regex pattern to AST findings (simplified implementation)
+    /// Convert regex pattern to AST findings (agnostic implementation)
     fn regex_to_ast_findings(&self, tree: &Tree, source: &[u8], language: ScanLanguage, regex_pattern: &str, pattern_type: &str, symbol_name: &str, unit: &ScanUnit) -> Result<Vec<Finding>> {
-        // For now, use a simplified approach that converts common regex patterns to AST queries
+        // Get generic AST query for this language and pattern type
         let ast_query = self.convert_regex_to_ast_query(regex_pattern, language, pattern_type)?;
         
         if let Some(query_str) = ast_query {
-            let matches = self.execute_ast_query(tree, source, language, &query_str)?;
-            let findings = matches.into_iter().map(|ast_match| {
-                Finding {
-                    language,
-                    library: symbol_name.to_string(),
-                    file: unit.path.clone(),
-                    span: Span {
-                        line: ast_match.start_line,
-                        column: ast_match.start_column,
-                    },
-                    symbol: ast_match.text.clone(),
-                    snippet: ast_match.text,
-                    detector_id: self.id.to_string(),
-                }
-            }).collect();
+            // Execute the generic AST query
+            let ast_matches = self.execute_ast_query(tree, source, language, &query_str)?;
+            
+            // Filter AST matches using the regex pattern from patterns.toml
+            let regex = regex::Regex::new(regex_pattern)
+                .map_err(|e| anyhow!("Invalid regex pattern '{}': {}", regex_pattern, e))?;
+            
+            let findings = ast_matches.into_iter()
+                .filter(|ast_match| regex.is_match(&ast_match.text))
+                .map(|ast_match| {
+                    Finding {
+                        language,
+                        library: symbol_name.to_string(),
+                        file: unit.path.clone(),
+                        span: Span {
+                            line: ast_match.start_line,
+                            column: ast_match.start_column,
+                        },
+                        symbol: ast_match.text.clone(),
+                        snippet: ast_match.text,
+                        detector_id: self.id.to_string(),
+                    }
+                }).collect();
             Ok(findings)
         } else {
             Ok(Vec::new())
         }
     }
     
-    /// Convert regex pattern to AST query (simplified mapping)
+    /// Convert regex pattern to generic AST query (completely agnostic)
     fn convert_regex_to_ast_query(&self, regex_pattern: &str, language: ScanLanguage, pattern_type: &str) -> Result<Option<String>> {
+        // Create generic AST queries based on language and pattern type
+        // The actual matching content comes from the regex pattern
         let result = match (language, pattern_type) {
-            (ScanLanguage::C | ScanLanguage::Cpp, "include") if regex_pattern.contains("openssl") => {
-                Some(r#"(preproc_include path: (system_lib_string) @path (#match? @path "openssl/.*"))"#.to_string())
+            // C/C++ include statements (capture full include directive)
+            (ScanLanguage::C | ScanLanguage::Cpp, "include") => {
+                Some(r#"(preproc_include) @include"#.to_string())
             },
-            (ScanLanguage::C | ScanLanguage::Cpp, "api") if regex_pattern.contains("EVP_") => {
-                Some(r#"(call_expression function: (identifier) @func (#match? @func "EVP_.*"))"#.to_string())
+            // C/C++ function calls  
+            (ScanLanguage::C | ScanLanguage::Cpp, "api") => {
+                Some(r#"(call_expression function: (identifier) @func)"#.to_string())
             },
-            (ScanLanguage::Python, "include") if regex_pattern.contains("cryptography") => {
-                Some(r#"(import_from_statement module_name: (dotted_name) @name (#match? @name "cryptography.*"))"#.to_string())
+            // Python import statements (from X import Y) - capture full statement
+            (ScanLanguage::Python, "include") if regex_pattern.contains("from\\s+") => {
+                Some(r#"(import_from_statement) @import"#.to_string())
             },
-            (ScanLanguage::Python, "include") if regex_pattern.contains("from\\s+cryptography") => {
-                Some(r#"(import_from_statement module_name: (dotted_name) @name (#match? @name "cryptography.*"))"#.to_string())
+            // Python import statements (import X) - capture full statement
+            (ScanLanguage::Python, "include") if regex_pattern.contains("import\\s+") => {
+                Some(r#"(import_statement) @import"#.to_string())
             },
-            (ScanLanguage::Python, "api") if regex_pattern.contains("Fernet") => {
-                Some(r#"(call function: (identifier) @func (#eq? @func "Fernet"))"#.to_string())
+            // Python API calls and object access
+            (ScanLanguage::Python, "api") => {
+                Some(r#"[(call function: (identifier) @func) (call function: (attribute object: (identifier) @obj attribute: (identifier) @attr)) (identifier) @id]"#.to_string())
             },
-            (ScanLanguage::Java, "include") if regex_pattern.contains("javax.crypto") => {
-                Some(r#"(import_declaration (scoped_identifier) @import (#match? @import "javax\\.crypto.*"))"#.to_string())
+            // Java import statements - capture full statement
+            (ScanLanguage::Java, "include") => {
+                Some(r#"(import_declaration) @import"#.to_string())
             },
-            (ScanLanguage::Java, "api") if regex_pattern.contains("getInstance") => {
-                Some(r#"(method_invocation name: (identifier) @method (#eq? @method "getInstance"))"#.to_string())
+            // Java method calls and object access
+            (ScanLanguage::Java, "api") => {
+                Some(r#"[(method_invocation name: (identifier) @method) (identifier) @id]"#.to_string())
             },
-            (ScanLanguage::Go, "include") if regex_pattern.contains("crypto/") => {
-                Some(r#"(import_spec path: (interpreted_string_literal) @path (#match? @path "crypto/.*"))"#.to_string())
+            // Go import statements - capture full statement  
+            (ScanLanguage::Go, "include") => {
+                Some(r#"(import_spec) @import"#.to_string())
             },
-            (ScanLanguage::Rust, "include") if regex_pattern.contains("ring") => {
-                Some(r#"(use_declaration argument: (scoped_identifier path: (identifier) @crate (#eq? @crate "ring")))"#.to_string())
+            // Go function calls and object access
+            (ScanLanguage::Go, "api") => {
+                Some(r#"[(call_expression function: (identifier) @func) (selector_expression field: (field_identifier) @field)]"#.to_string())
             },
-            (ScanLanguage::Rust, "api") if regex_pattern.contains("ring::") => {
-                Some(r#"(scoped_identifier path: (identifier) @crate (#eq? @crate "ring"))"#.to_string())
+            // Rust use declarations - capture full statement
+            (ScanLanguage::Rust, "include") => {
+                Some(r#"(use_declaration) @use"#.to_string())
             },
-            _ => None, // Pattern not yet converted to AST
+            // Rust object access and method calls
+            (ScanLanguage::Rust, "api") => {
+                Some(r#"[(scoped_identifier) @scoped (call_expression function: (identifier) @func) (identifier) @id]"#.to_string())
+            },
+            _ => None, // Language not supported
         };
         Ok(result)
     }
     
-    /// Execute an AST query and return matches
-    fn execute_ast_query(&self, tree: &Tree, source: &[u8], language: ScanLanguage, _query_str: &str) -> Result<Vec<AstMatch>> {
-        let ast_detector = AstDetector::new()?;
-        let matches = ast_detector.find_matches(language, tree, source)?;
-        // Filter matches that come from the specific query
-        // For now, return all matches (this could be refined)
+    /// Execute an AST query and return matches, filtering by regex pattern
+    fn execute_ast_query(&self, tree: &Tree, source: &[u8], language: ScanLanguage, query_str: &str) -> Result<Vec<AstMatch>> {
+        // Get the tree-sitter language for query compilation
+        let ts_language = match language {
+            ScanLanguage::C => tree_sitter_c::language(),
+            ScanLanguage::Cpp => tree_sitter_cpp::language(),
+            ScanLanguage::Rust => tree_sitter_rust::language(),
+            ScanLanguage::Python => tree_sitter_python::language(),
+            ScanLanguage::Java => tree_sitter_java::language(),
+            ScanLanguage::Go => tree_sitter_go::language(),
+            _ => return Ok(Vec::new()), // Skip unsupported languages
+        };
+        
+        // Compile and execute the query
+        let query = Query::new(&ts_language, query_str)
+            .map_err(|e| anyhow!("Failed to compile query '{}': {}", query_str, e))?;
+            
+        let mut cursor = QueryCursor::new();
+        let query_matches = cursor.matches(&query, tree.root_node(), source);
+        
+        let mut matches = Vec::new();
+        for query_match in query_matches {
+            for capture in query_match.captures {
+                let node = capture.node;
+                let start_pos = node.start_position();
+                let end_pos = node.end_position();
+                
+                let text = node.utf8_text(source)
+                    .unwrap_or("<invalid utf8>")
+                    .to_string();
+                
+                matches.push(AstMatch {
+                    match_type: AstMatchType::Library { name: "generic".to_string() }, // Will be set by caller
+                    text,
+                    start_line: start_pos.row + 1, // Convert to 1-based
+                    start_column: start_pos.column + 1,
+                    end_line: end_pos.row + 1,
+                    end_column: end_pos.column + 1,
+                    metadata: HashMap::new(),
+                });
+            }
+        }
+        
         Ok(matches)
     }
 }
