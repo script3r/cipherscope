@@ -4,6 +4,7 @@ use indicatif::{ProgressBar, ProgressStyle};
 use scanner_core::{Config, Detector, Language, AstBasedDetector, AstDetector, Scanner, CryptoFindings};
 use std::fs;
 use std::path::PathBuf;
+use std::sync::Arc;
 
 #[derive(Parser, Debug)]
 #[command(name = "cipherscope")]

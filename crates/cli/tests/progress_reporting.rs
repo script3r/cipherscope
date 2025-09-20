@@ -138,27 +138,27 @@ fn test_progress_monotonic_increase() {
 
     for (processed, discovered, findings) in &all_updates {
         assert!(
-            processed >= last_processed,
+            *processed >= last_processed,
             "Processed count should never decrease: {} -> {}",
             last_processed,
             processed
         );
         assert!(
-            discovered >= last_discovered,
+            *discovered >= last_discovered,
             "Discovered count should never decrease: {} -> {}",
             last_discovered,
             discovered
         );
         assert!(
-            findings >= last_findings,
+            *findings >= last_findings,
             "Findings count should never decrease: {} -> {}",
             last_findings,
             findings
         );
 
-        last_processed = processed;
-        last_discovered = discovered;
-        last_findings = findings;
+        last_processed = *processed;
+        last_discovered = *discovered;
+        last_findings = *findings;
     }
 
     println!("✅ Monotonic increase test passed with {} updates", all_updates.len());

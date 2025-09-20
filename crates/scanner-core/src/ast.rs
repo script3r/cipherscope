@@ -78,9 +78,65 @@ impl AstDetector {
     
     /// Load AST patterns from TOML content
     pub fn load_patterns_from_toml(toml_content: &str) -> Result<Vec<AstPattern>> {
-        // For now, return default patterns - this can be expanded to parse the TOML
-        // and convert the library definitions into AST patterns
-        Ok(Self::default_patterns())
+        use crate::PatternsFile;
+        
+        let patterns_file: PatternsFile = toml::from_str(toml_content)?;
+        let mut ast_patterns = Vec::new();
+        
+        // Convert library specs to AST patterns
+        for library in patterns_file.library {
+            ast_patterns.extend(Self::convert_library_to_ast_patterns(&library)?);
+        }
+        
+        // Also include default patterns for comprehensive coverage
+        ast_patterns.extend(Self::default_patterns());
+        
+        Ok(ast_patterns)
+    }
+    
+    /// Convert a library specification to AST patterns
+    fn convert_library_to_ast_patterns(library: &crate::LibrarySpec) -> Result<Vec<AstPattern>> {
+        let mut patterns = Vec::new();
+        
+        for &language in &library.languages {
+            // Convert include patterns to AST patterns
+            for pattern in &library.patterns.include_patterns {
+                patterns.push(AstPattern {
+                    query: pattern.clone(),
+                    language,
+                    match_type: AstMatchType::Library { name: library.name.clone() },
+                    metadata: HashMap::new(),
+                });
+            }
+            
+            // Convert import patterns to AST patterns
+            for pattern in &library.patterns.import_patterns {
+                patterns.push(AstPattern {
+                    query: pattern.clone(),
+                    language,
+                    match_type: AstMatchType::Library { name: library.name.clone() },
+                    metadata: HashMap::new(),
+                });
+            }
+            
+            // Convert algorithm patterns
+            for algorithm in &library.algorithms {
+                for pattern in &algorithm.symbol_patterns {
+                    patterns.push(AstPattern {
+                        query: pattern.clone(),
+                        language,
+                        match_type: AstMatchType::Algorithm {
+                            name: algorithm.name.clone(),
+                            primitive: algorithm.primitive.clone(),
+                            nist_quantum_security_level: algorithm.nist_quantum_security_level,
+                        },
+                        metadata: HashMap::new(),
+                    });
+                }
+            }
+        }
+        
+        Ok(patterns)
     }
     
     /// Default AST patterns for common cryptographic libraries and algorithms

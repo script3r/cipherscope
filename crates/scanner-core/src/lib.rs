@@ -167,6 +167,70 @@ impl Emitter {
     }
 }
 
+// ---------------- Patterns & Config ----------------
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct PatternsFile {
+    pub version: PatternsVersion,
+    #[serde(default)]
+    pub library: Vec<LibrarySpec>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct PatternsVersion {
+    pub schema: String,
+    pub updated: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct LibrarySpec {
+    pub name: String,
+    pub languages: Vec<Language>,
+    #[serde(default)]
+    pub patterns: LibraryPatterns,
+    #[serde(default)]
+    pub algorithms: Vec<AlgorithmSpec>,
+}
+
+#[derive(Debug, Clone, Default, Deserialize)]
+pub struct LibraryPatterns {
+    #[serde(default)]
+    pub include: Vec<String>,
+    #[serde(default)]
+    pub import: Vec<String>,
+    #[serde(default)]
+    pub namespace: Vec<String>,
+    #[serde(default)]
+    pub apis: Vec<String>,
+    // New AST-specific patterns
+    #[serde(default)]
+    pub include_patterns: Vec<String>,
+    #[serde(default)]
+    pub import_patterns: Vec<String>,
+    #[serde(default)]
+    pub api_patterns: Vec<String>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct AlgorithmSpec {
+    pub name: String,
+    pub primitive: String, // "signature", "aead", "hash", "kem", "pke", "mac", "kdf", "prng"
+    #[serde(default)]
+    pub parameter_patterns: Vec<ParameterPattern>,
+    #[serde(rename = "nistQuantumSecurityLevel")]
+    pub nist_quantum_security_level: u8,
+    #[serde(default)]
+    pub symbol_patterns: Vec<String>, // AST queries to match this algorithm
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct ParameterPattern {
+    pub name: String,    // e.g., "keySize", "curve", "outputSize"
+    pub pattern: String, // AST query pattern to extract the parameter value
+    #[serde(default)]
+    pub default_value: Option<serde_json::Value>, // Default value if not found
+}
+
 // ---------------- Config ----------------
 
 #[derive(Deserialize)]
@@ -269,13 +333,20 @@ fn default_include_globs() -> Vec<String> {
     ]
 }
 
-// Simple stub for PatternRegistry (kept for compatibility with existing Scanner interface)
+// Pattern registry for AST-based detection
 #[derive(Debug)]
-pub struct PatternRegistry;
+pub struct PatternRegistry {
+    pub patterns_file: Option<PatternsFile>,
+}
 
 impl PatternRegistry {
     pub fn empty() -> Self {
-        Self
+        Self { patterns_file: None }
+    }
+    
+    pub fn load(patterns_toml: &str) -> Result<Self> {
+        let pf: PatternsFile = toml::from_str(patterns_toml)?;
+        Ok(Self { patterns_file: Some(pf) })
     }
 }
 
