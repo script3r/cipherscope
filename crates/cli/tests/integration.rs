@@ -5,36 +5,46 @@ use std::path::PathBuf;
 fn scan_fixtures() {
     let workspace = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
     
+    // Load patterns for AST-based detectors
+    let patterns_path = workspace.join("patterns.toml");
+    let patterns_content = std::fs::read_to_string(patterns_path).unwrap();
+    let registry = std::sync::Arc::new(PatternRegistry::load(&patterns_content).unwrap());
+    
     // Use AST-based detectors
     let dets: Vec<Box<dyn Detector>> = vec![
         Box::new(AstBasedDetector::new(
             "ast-detector-c",
             &[Language::C],
+            registry.clone(),
         ).unwrap()),
         Box::new(AstBasedDetector::new(
             "ast-detector-cpp",
             &[Language::Cpp],
+            registry.clone(),
         ).unwrap()),
         Box::new(AstBasedDetector::new(
             "ast-detector-rust",
             &[Language::Rust],
+            registry.clone(),
         ).unwrap()),
         Box::new(AstBasedDetector::new(
             "ast-detector-python",
             &[Language::Python],
+            registry.clone(),
         ).unwrap()),
         Box::new(AstBasedDetector::new(
             "ast-detector-java",
             &[Language::Java],
+            registry.clone(),
         ).unwrap()),
         Box::new(AstBasedDetector::new(
             "ast-detector-go",
             &[Language::Go],
+            registry.clone(),
         ).unwrap()),
     ];
     
-    let reg = PatternRegistry::empty();
-    let scanner = Scanner::new(&reg, dets, Config::default());
+    let scanner = Scanner::new(&registry, dets, Config::default());
     let fixtures = workspace.join("fixtures");
     let findings = scanner.run(std::slice::from_ref(&fixtures)).unwrap();
 
@@ -78,36 +88,46 @@ fn scan_fixtures() {
 fn scan_nested_general_fixtures() {
     let workspace = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
     
+    // Load patterns for AST-based detectors
+    let patterns_path = workspace.join("patterns.toml");
+    let patterns_content = std::fs::read_to_string(patterns_path).unwrap();
+    let registry = std::sync::Arc::new(PatternRegistry::load(&patterns_content).unwrap());
+    
     // Use AST-based detectors
     let dets: Vec<Box<dyn Detector>> = vec![
         Box::new(AstBasedDetector::new(
             "ast-detector-c",
             &[Language::C],
+            registry.clone(),
         ).unwrap()),
         Box::new(AstBasedDetector::new(
             "ast-detector-cpp",
             &[Language::Cpp],
+            registry.clone(),
         ).unwrap()),
         Box::new(AstBasedDetector::new(
             "ast-detector-rust",
             &[Language::Rust],
+            registry.clone(),
         ).unwrap()),
         Box::new(AstBasedDetector::new(
             "ast-detector-python",
             &[Language::Python],
+            registry.clone(),
         ).unwrap()),
         Box::new(AstBasedDetector::new(
             "ast-detector-java",
             &[Language::Java],
+            registry.clone(),
         ).unwrap()),
         Box::new(AstBasedDetector::new(
             "ast-detector-go",
             &[Language::Go],
+            registry.clone(),
         ).unwrap()),
     ];
     
-    let reg = PatternRegistry::empty();
-    let scanner = Scanner::new(&reg, dets, Config::default());
+    let scanner = Scanner::new(&registry, dets, Config::default());
 
     // Scan the nested general fixtures root; test should not rely on per-file targets
     let root = workspace.join("fixtures/general");

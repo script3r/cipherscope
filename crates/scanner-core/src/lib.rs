@@ -336,17 +336,32 @@ fn default_include_globs() -> Vec<String> {
 // Pattern registry for AST-based detection
 #[derive(Debug)]
 pub struct PatternRegistry {
-    pub patterns_file: Option<PatternsFile>,
+    pub patterns_file: PatternsFile,
 }
 
 impl PatternRegistry {
     pub fn empty() -> Self {
-        Self { patterns_file: None }
+        Self { 
+            patterns_file: PatternsFile {
+                version: PatternsVersion {
+                    schema: "1".to_string(),
+                    updated: "empty".to_string(),
+                },
+                library: Vec::new(),
+            }
+        }
     }
     
     pub fn load(patterns_toml: &str) -> Result<Self> {
         let pf: PatternsFile = toml::from_str(patterns_toml)?;
-        Ok(Self { patterns_file: Some(pf) })
+        Ok(Self { patterns_file: pf })
+    }
+    
+    /// Get all libraries for a specific language
+    pub fn libraries_for_language(&self, language: Language) -> Vec<&LibrarySpec> {
+        self.patterns_file.library.iter()
+            .filter(|lib| lib.languages.contains(&language))
+            .collect()
     }
 }
 

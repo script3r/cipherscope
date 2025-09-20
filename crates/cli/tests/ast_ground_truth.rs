@@ -7,38 +7,48 @@ use std::path::PathBuf;
 fn compare_ast_ground_truth() {
     let workspace = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
     
+    // Load patterns for AST-based detectors
+    let patterns_path = workspace.join("patterns.toml");
+    let patterns_content = fs::read_to_string(patterns_path).unwrap();
+    let registry = std::sync::Arc::new(PatternRegistry::load(&patterns_content).unwrap());
+    
     // Use AST-based detectors
     let dets: Vec<Box<dyn Detector>> = vec![
         Box::new(AstBasedDetector::new(
             "ast-detector-c",
             &[Language::C],
+            registry.clone(),
         ).unwrap()),
         Box::new(AstBasedDetector::new(
             "ast-detector-cpp",
             &[Language::Cpp],
+            registry.clone(),
         ).unwrap()),
         Box::new(AstBasedDetector::new(
             "ast-detector-rust",
             &[Language::Rust],
+            registry.clone(),
         ).unwrap()),
         Box::new(AstBasedDetector::new(
             "ast-detector-python",
             &[Language::Python],
+            registry.clone(),
         ).unwrap()),
         Box::new(AstBasedDetector::new(
             "ast-detector-java",
             &[Language::Java],
+            registry.clone(),
         ).unwrap()),
         Box::new(AstBasedDetector::new(
             "ast-detector-go",
             &[Language::Go],
+            registry.clone(),
         ).unwrap()),
     ];
     
-    let reg = PatternRegistry::empty();
     let mut config = Config::default();
     config.deterministic = true; // Ensure reproducible results
-    let scanner = Scanner::new(&reg, dets, config);
+    let scanner = Scanner::new(&registry, dets, config);
 
     let fixtures_root = workspace.join("fixtures");
 

@@ -1,7 +1,7 @@
 use anyhow::{Context, Result};
 use clap::{ArgAction, Parser};
 use indicatif::{ProgressBar, ProgressStyle};
-use scanner_core::{Config, Detector, Language, AstBasedDetector, AstDetector, Scanner, CryptoFindings};
+use scanner_core::{Config, Detector, Language, AstBasedDetector, PatternRegistry, Scanner, CryptoFindings};
 use std::fs;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -57,40 +57,42 @@ fn main() -> Result<()> {
     }
 
     // Load patterns from file
-    let patterns = AstDetector::load_patterns_from_file(args.patterns.to_str().unwrap())
-        .with_context(|| format!("Failed to load patterns from {}", args.patterns.display()))?;
+    let patterns_content = fs::read_to_string(&args.patterns)
+        .with_context(|| format!("Failed to read patterns file: {}", args.patterns.display()))?;
+    let registry = Arc::new(PatternRegistry::load(&patterns_content)
+        .with_context(|| "Failed to parse patterns.toml")?);
 
     // Prepare AST-based detectors for each language
     let dets: Vec<Box<dyn Detector>> = vec![
-        Box::new(AstBasedDetector::with_patterns(
+        Box::new(AstBasedDetector::new(
             "ast-detector-c",
             &[Language::C],
-            patterns.clone(),
+            registry.clone(),
         ).with_context(|| "Failed to create C AST detector")?),
-        Box::new(AstBasedDetector::with_patterns(
+        Box::new(AstBasedDetector::new(
             "ast-detector-cpp",
             &[Language::Cpp],
-            patterns.clone(),
+            registry.clone(),
         ).with_context(|| "Failed to create C++ AST detector")?),
-        Box::new(AstBasedDetector::with_patterns(
+        Box::new(AstBasedDetector::new(
             "ast-detector-rust",
             &[Language::Rust],
-            patterns.clone(),
+            registry.clone(),
         ).with_context(|| "Failed to create Rust AST detector")?),
-        Box::new(AstBasedDetector::with_patterns(
+        Box::new(AstBasedDetector::new(
             "ast-detector-python",
             &[Language::Python],
-            patterns.clone(),
+            registry.clone(),
         ).with_context(|| "Failed to create Python AST detector")?),
-        Box::new(AstBasedDetector::with_patterns(
+        Box::new(AstBasedDetector::new(
             "ast-detector-java",
             &[Language::Java],
-            patterns.clone(),
+            registry.clone(),
         ).with_context(|| "Failed to create Java AST detector")?),
-        Box::new(AstBasedDetector::with_patterns(
+        Box::new(AstBasedDetector::new(
             "ast-detector-go",
             &[Language::Go],
-            patterns.clone(),
+            registry.clone(),
         ).with_context(|| "Failed to create Go AST detector")?),
     ];
 
@@ -122,9 +124,7 @@ fn main() -> Result<()> {
         }));
     }
 
-    // Create a dummy registry for the scanner (AST detectors don't use it)
-    let dummy_registry = scanner_core::PatternRegistry::empty();
-    let scanner = Scanner::new(&dummy_registry, dets, cfg);
+    let scanner = Scanner::new(&registry, dets, cfg);
     let findings = scanner.run(&args.paths)?;
 
     // Clear progress bar if it was shown

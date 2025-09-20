@@ -44,27 +44,38 @@ impl ProgressCapture {
 
 #[test]
 fn test_progress_reporting_accuracy() {
+    // Load patterns for AST-based detectors
+    let workspace = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let patterns_path = workspace.join("patterns.toml");
+    let patterns_content = std::fs::read_to_string(patterns_path).unwrap();
+    let registry = std::sync::Arc::new(PatternRegistry::load(&patterns_content).unwrap());
+    
     // Create AST-based detectors
     let detectors: Vec<Box<dyn Detector>> = vec![
         Box::new(AstBasedDetector::new(
             "ast-detector-c",
             &[Language::C],
+            registry.clone(),
         ).unwrap()),
         Box::new(AstBasedDetector::new(
             "ast-detector-java",
             &[Language::Java],
+            registry.clone(),
         ).unwrap()),
         Box::new(AstBasedDetector::new(
             "ast-detector-python",
             &[Language::Python],
+            registry.clone(),
         ).unwrap()),
         Box::new(AstBasedDetector::new(
             "ast-detector-rust",
             &[Language::Rust],
+            registry.clone(),
         ).unwrap()),
         Box::new(AstBasedDetector::new(
             "ast-detector-go",
             &[Language::Go],
+            registry.clone(),
         ).unwrap()),
     ];
 
@@ -77,11 +88,9 @@ fn test_progress_reporting_accuracy() {
         ..Default::default()
     };
 
-    let registry = PatternRegistry::empty();
     let scanner = Scanner::new(&registry, detectors, config);
 
     // Scan the fixtures directory
-    let workspace = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
     let fixtures_dir = workspace.join("fixtures");
 
     let _findings = scanner.run(&[fixtures_dir]).unwrap();
@@ -103,11 +112,18 @@ fn test_progress_reporting_accuracy() {
 
 #[test]
 fn test_progress_monotonic_increase() {
+    // Load patterns for AST-based detectors
+    let workspace = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let patterns_path = workspace.join("patterns.toml");
+    let patterns_content = std::fs::read_to_string(patterns_path).unwrap();
+    let registry = std::sync::Arc::new(PatternRegistry::load(&patterns_content).unwrap());
+    
     // Test that progress counts only increase (never decrease)
     let detectors: Vec<Box<dyn Detector>> = vec![
         Box::new(AstBasedDetector::new(
             "ast-detector-rust",
             &[Language::Rust],
+            registry.clone(),
         ).unwrap()),
     ];
 
@@ -120,7 +136,6 @@ fn test_progress_monotonic_increase() {
         ..Default::default()
     };
 
-    let registry = PatternRegistry::empty();
     let scanner = Scanner::new(&registry, detectors, config);
 
     let workspace = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
@@ -166,11 +181,18 @@ fn test_progress_monotonic_increase() {
 
 #[test]
 fn test_progress_file_extension_accuracy() {
+    // Load patterns for AST-based detectors
+    let workspace = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let patterns_path = workspace.join("patterns.toml");
+    let patterns_content = std::fs::read_to_string(patterns_path).unwrap();
+    let registry = std::sync::Arc::new(PatternRegistry::load(&patterns_content).unwrap());
+    
     // Test that file extension filtering works correctly with progress reporting
     let detectors: Vec<Box<dyn Detector>> = vec![
         Box::new(AstBasedDetector::new(
             "ast-detector-java",
             &[Language::Java],
+            registry.clone(),
         ).unwrap()),
     ];
 
@@ -183,7 +205,6 @@ fn test_progress_file_extension_accuracy() {
         ..Default::default()
     };
 
-    let registry = PatternRegistry::empty();
     let scanner = Scanner::new(&registry, detectors, config);
 
     let workspace = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
