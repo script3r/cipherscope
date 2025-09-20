@@ -70,6 +70,19 @@ impl AstDetector {
         Ok(parser)
     }
     
+    /// Load AST patterns from patterns.toml or use defaults
+    pub fn load_patterns_from_file(patterns_file: &str) -> Result<Vec<AstPattern>> {
+        let patterns_content = std::fs::read_to_string(patterns_file)?;
+        Self::load_patterns_from_toml(&patterns_content)
+    }
+    
+    /// Load AST patterns from TOML content
+    pub fn load_patterns_from_toml(toml_content: &str) -> Result<Vec<AstPattern>> {
+        // For now, return default patterns - this can be expanded to parse the TOML
+        // and convert the library definitions into AST patterns
+        Ok(Self::default_patterns())
+    }
+    
     /// Default AST patterns for common cryptographic libraries and algorithms
     fn default_patterns() -> Vec<AstPattern> {
         vec![

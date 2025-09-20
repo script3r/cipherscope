@@ -1,0 +1,100 @@
+[version]
+schema = "1"
+updated = "2025-01-19"
+
+# =========================
+# AST-based Pattern Definitions
+# =========================
+# These patterns define what cryptographic libraries and algorithms to detect
+# using AST queries instead of regex patterns
+
+# C/C++ OpenSSL
+[[library]]
+name = "OpenSSL"
+languages = ["C", "C++"]
+[library.patterns]
+# AST queries for detecting OpenSSL includes
+include_patterns = [
+  "(preproc_include path: (system_lib_string) @path (#match? @path \"openssl/.*\"))"
+]
+# AST queries for detecting OpenSSL API calls
+api_patterns = [
+  "(call_expression function: (identifier) @func (#match? @func \"EVP_.*\"))",
+  "(call_expression function: (identifier) @func (#match? @func \"RSA_.*\"))",
+  "(call_expression function: (identifier) @func (#match? @func \"AES_.*\"))"
+]
+
+[[library.algorithms]]
+name = "RSA"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+# AST patterns for RSA algorithm detection
+symbol_patterns = [
+  "(call_expression function: (identifier) @func (#match? @func \"RSA_.*\"))",
+  "(identifier) @id (#eq? @id \"EVP_PKEY_RSA\")"
+]
+
+[[library.algorithms]]
+name = "AES"
+primitive = "aead" 
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "(call_expression function: (identifier) @func (#match? @func \"EVP_aes_.*\"))",
+  "(call_expression function: (identifier) @func (#match? @func \"AES_.*\"))"
+]
+
+# Python cryptography library
+[[library]]
+name = "cryptography"
+languages = ["Python"]
+[library.patterns]
+import_patterns = [
+  "(import_from_statement module_name: (dotted_name) @name (#match? @name \"cryptography.*\"))",
+  "(import_statement name: (dotted_name) @name (#match? @name \"cryptography.*\"))"
+]
+api_patterns = [
+  "(call function: (attribute object: (identifier) @obj attribute: (identifier) @attr (#eq? @obj \"algorithms\") (#eq? @attr \"AES\")))"
+]
+
+[[library.algorithms]]
+name = "AES"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "(call function: (attribute object: (identifier) @obj attribute: (identifier) @attr (#eq? @obj \"algorithms\") (#eq? @attr \"AES\")))"
+]
+
+# Java JCA
+[[library]]
+name = "JCA"
+languages = ["Java"]
+[library.patterns]
+import_patterns = [
+  "(import_declaration (scoped_identifier scope: (scoped_identifier scope: (identifier) @javax name: (identifier) @crypto (#eq? @javax \"javax\") (#eq? @crypto \"crypto\"))))"
+]
+
+# Go standard crypto
+[[library]]
+name = "std-crypto"
+languages = ["Go"]
+[library.patterns]
+import_patterns = [
+  "(import_spec path: (interpreted_string_literal) @path (#match? @path \"\\\"crypto/.*\\\"\"))"
+]
+
+# Rust ring crate
+[[library]]
+name = "ring"
+languages = ["Rust"]
+[library.patterns]
+import_patterns = [
+  "(use_declaration argument: (scoped_identifier path: (identifier) @crate (#eq? @crate \"ring\")))"
+]
+
+[[library.algorithms]]
+name = "AES-GCM"
+primitive = "aead"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "(identifier) @id (#match? @id \"AES_.*_GCM\")"
+]

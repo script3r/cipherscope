@@ -1,10 +1,9 @@
 use anyhow::{Context, Result};
 use clap::{ArgAction, Parser};
 use indicatif::{ProgressBar, ProgressStyle};
-use scanner_core::{Config, Detector, Language, AstBasedDetector, Scanner, CryptoFindings};
+use scanner_core::{Config, Detector, Language, AstBasedDetector, AstDetector, Scanner, CryptoFindings};
 use std::fs;
 use std::path::PathBuf;
-use std::sync::Arc;
 
 #[derive(Parser, Debug)]
 #[command(name = "cipherscope")]
@@ -41,6 +40,10 @@ struct Args {
     /// Output file for JSONL results (default: stdout)
     #[arg(long, value_name = "FILE")]
     output: Option<PathBuf>,
+
+    /// Path to patterns file
+    #[arg(long, value_name = "FILE", default_value = "patterns.toml")]
+    patterns: PathBuf,
 }
 
 fn main() -> Result<()> {
@@ -52,31 +55,41 @@ fn main() -> Result<()> {
             .ok();
     }
 
+    // Load patterns from file
+    let patterns = AstDetector::load_patterns_from_file(args.patterns.to_str().unwrap())
+        .with_context(|| format!("Failed to load patterns from {}", args.patterns.display()))?;
+
     // Prepare AST-based detectors for each language
     let dets: Vec<Box<dyn Detector>> = vec![
-        Box::new(AstBasedDetector::new(
+        Box::new(AstBasedDetector::with_patterns(
             "ast-detector-c",
             &[Language::C],
+            patterns.clone(),
         ).with_context(|| "Failed to create C AST detector")?),
-        Box::new(AstBasedDetector::new(
+        Box::new(AstBasedDetector::with_patterns(
             "ast-detector-cpp",
             &[Language::Cpp],
+            patterns.clone(),
         ).with_context(|| "Failed to create C++ AST detector")?),
-        Box::new(AstBasedDetector::new(
+        Box::new(AstBasedDetector::with_patterns(
             "ast-detector-rust",
             &[Language::Rust],
+            patterns.clone(),
         ).with_context(|| "Failed to create Rust AST detector")?),
-        Box::new(AstBasedDetector::new(
+        Box::new(AstBasedDetector::with_patterns(
             "ast-detector-python",
             &[Language::Python],
+            patterns.clone(),
         ).with_context(|| "Failed to create Python AST detector")?),
-        Box::new(AstBasedDetector::new(
+        Box::new(AstBasedDetector::with_patterns(
             "ast-detector-java",
             &[Language::Java],
+            patterns.clone(),
         ).with_context(|| "Failed to create Java AST detector")?),
-        Box::new(AstBasedDetector::new(
+        Box::new(AstBasedDetector::with_patterns(
             "ast-detector-go",
             &[Language::Go],
+            patterns.clone(),
         ).with_context(|| "Failed to create Go AST detector")?),
     ];
 
