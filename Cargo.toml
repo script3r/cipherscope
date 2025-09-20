@@ -25,7 +25,7 @@ globset = "0.4"
 crossbeam-channel = "0.5"
 num_cpus = "1"
 
-# AST parsing dependencies
+# AST parsing dependencies - working versions
 tree-sitter = "0.22"
 tree-sitter-c = "0.21"
 tree-sitter-cpp = "0.22"
@@ -34,7 +34,3 @@ tree-sitter-python = "0.21"
 tree-sitter-javascript = "0.21"
 tree-sitter-java = "0.21"
 tree-sitter-go = "0.21"
-# tree-sitter-php = "0.22"
-# tree-sitter-swift = "0.7" 
-# tree-sitter-kotlin = "0.3"
-# Note: Additional languages disabled due to inconsistent tree-sitter APIs

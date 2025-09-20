@@ -11,6 +11,7 @@ use tree_sitter::{Language, Parser, Query, QueryCursor, Tree};
 
 use crate::{Language as ScanLanguage, ScanUnit, Finding, Span, Emitter};
 
+
 /// AST-based pattern matching for cryptographic detection
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AstPattern {
@@ -48,7 +49,7 @@ impl AstDetector {
     pub fn new() -> Result<Self> {
         let mut parsers = HashMap::new();
         
-        // Initialize parsers for supported languages
+        // Initialize parsers for supported languages (known working versions)
         parsers.insert(ScanLanguage::C, Self::create_parser(tree_sitter_c::language())?);
         parsers.insert(ScanLanguage::Cpp, Self::create_parser(tree_sitter_cpp::language())?);
         parsers.insert(ScanLanguage::Rust, Self::create_parser(tree_sitter_rust::language())?);
@@ -56,7 +57,7 @@ impl AstDetector {
         parsers.insert(ScanLanguage::Java, Self::create_parser(tree_sitter_java::language())?);
         parsers.insert(ScanLanguage::Go, Self::create_parser(tree_sitter_go::language())?);
         
-        // Note: PHP, Swift, Kotlin, Objective-C and Erlang disabled due to inconsistent tree-sitter APIs
+        // Additional languages can be added here as tree-sitter parsers become compatible
         
         Ok(Self {
             parsers,
@@ -70,6 +71,8 @@ impl AstDetector {
             .map_err(|e| anyhow!("Failed to set parser language: {}", e))?;
         Ok(parser)
     }
+    
+    
     
     
     /// Load AST patterns from patterns.toml or use defaults
@@ -205,32 +208,26 @@ impl AstDetector {
             AstPattern {
                 query: r#"
                     (use_declaration
-                      argument: (scoped_identifier
-                        path: (identifier) @crate
-                        (#eq? @crate "crypto")))
+                      argument: (identifier) @crate
+                      (#match? @crate "aes_gcm|sha2|rsa|hmac"))
                 "#.to_string(),
                 language: ScanLanguage::Rust,
                 match_type: AstMatchType::Library { name: "rust-crypto".to_string() },
                 metadata: HashMap::new(),
             },
             
-            // Rust AES constants (more specific)
+            // Rust ring module usage (e.g., ring::digest::SHA256)
             AstPattern {
                 query: r#"
-                    (use_declaration
-                      argument: (scoped_use_list
-                        path: (scoped_identifier
-                          path: (identifier) @crate
-                          name: (identifier) @item
-                          (#eq? @crate "ring")
-                          (#match? @item "AES_.*_GCM"))))
+                    (scoped_identifier
+                      path: (scoped_identifier
+                        path: (identifier) @crate
+                        name: (identifier) @module
+                        (#eq? @crate "ring")
+                        (#match? @module "digest|aead|signature")))
                 "#.to_string(),
                 language: ScanLanguage::Rust,
-                match_type: AstMatchType::Algorithm { 
-                    name: "AES-GCM".to_string(),
-                    primitive: "aead".to_string(),
-                    nist_quantum_security_level: 3,
-                },
+                match_type: AstMatchType::Library { name: "ring".to_string() },
                 metadata: HashMap::new(),
             },
             
@@ -305,6 +302,56 @@ impl AstDetector {
                 metadata: HashMap::new(),
             },
             
+            // PHP OpenSSL function calls
+            AstPattern {
+                query: r#"
+                    (function_call_expression
+                      function: (name) @func
+                      (#match? @func "openssl_.*"))
+                "#.to_string(),
+                language: ScanLanguage::Php,
+                match_type: AstMatchType::Library { name: "OpenSSL".to_string() },
+                metadata: HashMap::new(),
+            },
+            
+            // Swift CryptoKit imports
+            AstPattern {
+                query: r#"
+                    (import_declaration
+                      (identifier) @name
+                      (#eq? @name "CryptoKit"))
+                "#.to_string(),
+                language: ScanLanguage::Swift,
+                match_type: AstMatchType::Library { name: "CryptoKit".to_string() },
+                metadata: HashMap::new(),
+            },
+            
+            // Kotlin JCA imports
+            AstPattern {
+                query: r#"
+                    (import_header
+                      (identifier) @javax
+                      (identifier) @crypto
+                      (#eq? @javax "javax")
+                      (#eq? @crypto "crypto"))
+                "#.to_string(),
+                language: ScanLanguage::Kotlin,
+                match_type: AstMatchType::Library { name: "JCA".to_string() },
+                metadata: HashMap::new(),
+            },
+            
+            // Objective-C CommonCrypto imports
+            AstPattern {
+                query: r#"
+                    (preproc_include
+                      path: (system_lib_string) @path
+                      (#match? @path "CommonCrypto/.*"))
+                "#.to_string(),
+                language: ScanLanguage::ObjC,
+                match_type: AstMatchType::Library { name: "CommonCrypto".to_string() },
+                metadata: HashMap::new(),
+            },
+            
             
         ]
     }
@@ -330,7 +377,7 @@ impl AstDetector {
             ScanLanguage::Python => tree_sitter_python::language(),
             ScanLanguage::Java => tree_sitter_java::language(),
             ScanLanguage::Go => tree_sitter_go::language(),
-            _ => return Ok(matches), // Skip unsupported languages (PHP, Swift, Kotlin, ObjC, Erlang)
+            _ => return Ok(matches), // Skip unsupported languages
         };
         
         // Execute each pattern that matches this language

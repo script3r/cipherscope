@@ -1,4 +1,2 @@
-{"language":"Rust","library":"crypto-lib","symbol":"AES-GCM","file":"fixtures/general/rust/src/main.rs","line":1,"column":4,"snippet":"main","detector":"ast-detector-rust"}
-{"language":"Rust","library":"crypto-lib","symbol":"AES-GCM","file":"fixtures/general/rust/src/main.rs","line":2,"column":13,"snippet":"ring","detector":"ast-detector-rust"}
-{"language":"Rust","library":"crypto-lib","symbol":"AES-GCM","file":"fixtures/general/rust/src/main.rs","line":2,"column":19,"snippet":"digest","detector":"ast-detector-rust"}
-{"language":"Rust","library":"crypto-lib","symbol":"AES-GCM","file":"fixtures/general/rust/src/main.rs","line":2,"column":27,"snippet":"SHA256","detector":"ast-detector-rust"}
+{"language":"Rust","library":"ring","symbol":"ring","file":"fixtures/general/rust/src/main.rs","line":2,"column":13,"snippet":"ring","detector":"ast-detector-rust"}
+{"language":"Rust","library":"ring","symbol":"digest","file":"fixtures/general/rust/src/main.rs","line":2,"column":19,"snippet":"digest","detector":"ast-detector-rust"}
