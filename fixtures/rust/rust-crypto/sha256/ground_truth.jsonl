@@ -1,0 +1,7 @@
+{"language":"Rust","library":"RustCrypto (common crates)","symbol":"sha2","file":"fixtures/rust/rust-crypto/sha256/main.rs","line":1,"column":5,"snippet":"use sha2::{Sha256, Digest};","detector":"ast-detector-rust"}
+{"language":"Rust","library":"RustCrypto (common crates)","symbol":"Sha256","file":"fixtures/rust/rust-crypto/sha256/main.rs","line":1,"column":12,"snippet":"use sha2::{Sha256, Digest};","detector":"ast-detector-rust"}
+{"language":"Rust","library":"RustCrypto (common crates)","symbol":"Digest","file":"fixtures/rust/rust-crypto/sha256/main.rs","line":1,"column":20,"snippet":"use sha2::{Sha256, Digest};","detector":"ast-detector-rust"}
+{"language":"Rust","library":"RustCrypto (common crates)","symbol":"hasher","file":"fixtures/rust/rust-crypto/sha256/main.rs","line":4,"column":13,"snippet":"let mut hasher = Sha256::new();","detector":"ast-detector-rust"}
+{"language":"Rust","library":"RustCrypto (common crates)","symbol":"Sha256","file":"fixtures/rust/rust-crypto/sha256/main.rs","line":4,"column":22,"snippet":"let mut hasher = Sha256::new();","detector":"ast-detector-rust"}
+{"language":"Rust","library":"RustCrypto (common crates)","symbol":"Sha256::new","file":"fixtures/rust/rust-crypto/sha256/main.rs","line":4,"column":22,"snippet":"let mut hasher = Sha256::new();","detector":"ast-detector-rust"}
+{"language":"Rust","library":"RustCrypto (common crates)","symbol":"new","file":"fixtures/rust/rust-crypto/sha256/main.rs","line":4,"column":30,"snippet":"let mut hasher = Sha256::new();","detector":"ast-detector-rust"}

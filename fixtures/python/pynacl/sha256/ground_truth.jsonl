@@ -1,0 +1,10 @@
+{"language":"Python","library":"PyNaCl","symbol":"digest","file":"fixtures/python/pynacl/sha256/main.py","line":6,"column":1,"snippet":"digest = nacl.hash.sha256(message)","detector":"ast-detector-python"}
+{"language":"Python","library":"PyNaCl","symbol":"digest","file":"fixtures/python/pynacl/sha256/main.py","line":6,"column":1,"snippet":"digest = nacl.hash.sha256(message)","detector":"ast-detector-python"}
+{"language":"Python","library":"PyNaCl","symbol":"nacl","file":"fixtures/python/pynacl/sha256/main.py","line":6,"column":10,"snippet":"digest = nacl.hash.sha256(message)","detector":"ast-detector-python"}
+{"language":"Python","library":"PyNaCl","symbol":"nacl","file":"fixtures/python/pynacl/sha256/main.py","line":6,"column":10,"snippet":"digest = nacl.hash.sha256(message)","detector":"ast-detector-python"}
+{"language":"Python","library":"PyNaCl","symbol":"hash","file":"fixtures/python/pynacl/sha256/main.py","line":6,"column":15,"snippet":"digest = nacl.hash.sha256(message)","detector":"ast-detector-python"}
+{"language":"Python","library":"PyNaCl","symbol":"hash","file":"fixtures/python/pynacl/sha256/main.py","line":6,"column":15,"snippet":"digest = nacl.hash.sha256(message)","detector":"ast-detector-python"}
+{"language":"Python","library":"PyNaCl","symbol":"sha256","file":"fixtures/python/pynacl/sha256/main.py","line":6,"column":20,"snippet":"digest = nacl.hash.sha256(message)","detector":"ast-detector-python"}
+{"language":"Python","library":"PyNaCl","symbol":"sha256","file":"fixtures/python/pynacl/sha256/main.py","line":6,"column":20,"snippet":"digest = nacl.hash.sha256(message)","detector":"ast-detector-python"}
+{"language":"Python","library":"PyNaCl","symbol":"message","file":"fixtures/python/pynacl/sha256/main.py","line":6,"column":27,"snippet":"digest = nacl.hash.sha256(message)","detector":"ast-detector-python"}
+{"language":"Python","library":"PyNaCl","symbol":"message","file":"fixtures/python/pynacl/sha256/main.py","line":6,"column":27,"snippet":"digest = nacl.hash.sha256(message)","detector":"ast-detector-python"}

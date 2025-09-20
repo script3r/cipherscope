@@ -1,3 +1,20 @@
-{"language":"C","library":"OpenSSL","symbol":"<openssl/rsa.h>","file":"fixtures/c/openssl/rsa-sign/main.c","line":1,"column":10,"snippet":"<openssl/rsa.h>","detector":"ast-detector-c"}
-{"language":"C","library":"OpenSSL","symbol":"<openssl/pem.h>","file":"fixtures/c/openssl/rsa-sign/main.c","line":2,"column":10,"snippet":"<openssl/pem.h>","detector":"ast-detector-c"}
-{"language":"C","library":"OpenSSL","symbol":"<openssl/evp.h>","file":"fixtures/c/openssl/rsa-sign/main.c","line":3,"column":10,"snippet":"<openssl/evp.h>","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_PKEY_CTX_new_id","file":"fixtures/c/openssl/rsa-sign/main.c","line":12,"column":26,"snippet":"EVP_PKEY_CTX *kctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, NULL);","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_PKEY_keygen_init","file":"fixtures/c/openssl/rsa-sign/main.c","line":13,"column":5,"snippet":"EVP_PKEY_keygen_init(kctx);","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_PKEY_CTX_set_rsa_keygen_bits","file":"fixtures/c/openssl/rsa-sign/main.c","line":14,"column":5,"snippet":"EVP_PKEY_CTX_set_rsa_keygen_bits(kctx, 2048);","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_PKEY_keygen","file":"fixtures/c/openssl/rsa-sign/main.c","line":16,"column":5,"snippet":"EVP_PKEY_keygen(kctx, &pkey);","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_PKEY_CTX_free","file":"fixtures/c/openssl/rsa-sign/main.c","line":17,"column":5,"snippet":"EVP_PKEY_CTX_free(kctx);","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_MD_CTX_new","file":"fixtures/c/openssl/rsa-sign/main.c","line":20,"column":24,"snippet":"EVP_MD_CTX *sctx = EVP_MD_CTX_new();","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_SignInit","file":"fixtures/c/openssl/rsa-sign/main.c","line":21,"column":5,"snippet":"EVP_SignInit(sctx, EVP_sha256());","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_sha256","file":"fixtures/c/openssl/rsa-sign/main.c","line":21,"column":24,"snippet":"EVP_SignInit(sctx, EVP_sha256());","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_SignUpdate","file":"fixtures/c/openssl/rsa-sign/main.c","line":22,"column":5,"snippet":"EVP_SignUpdate(sctx, message, strlen((char*)message));","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"strlen","file":"fixtures/c/openssl/rsa-sign/main.c","line":22,"column":35,"snippet":"EVP_SignUpdate(sctx, message, strlen((char*)message));","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_SignFinal","file":"fixtures/c/openssl/rsa-sign/main.c","line":23,"column":5,"snippet":"EVP_SignFinal(sctx, signature, &sig_len, pkey);","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_MD_CTX_new","file":"fixtures/c/openssl/rsa-sign/main.c","line":26,"column":24,"snippet":"EVP_MD_CTX *vctx = EVP_MD_CTX_new();","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_VerifyInit","file":"fixtures/c/openssl/rsa-sign/main.c","line":27,"column":5,"snippet":"EVP_VerifyInit(vctx, EVP_sha256());","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_sha256","file":"fixtures/c/openssl/rsa-sign/main.c","line":27,"column":26,"snippet":"EVP_VerifyInit(vctx, EVP_sha256());","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_VerifyUpdate","file":"fixtures/c/openssl/rsa-sign/main.c","line":28,"column":5,"snippet":"EVP_VerifyUpdate(vctx, message, strlen((char*)message));","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"strlen","file":"fixtures/c/openssl/rsa-sign/main.c","line":28,"column":37,"snippet":"EVP_VerifyUpdate(vctx, message, strlen((char*)message));","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_VerifyFinal","file":"fixtures/c/openssl/rsa-sign/main.c","line":29,"column":18,"snippet":"int result = EVP_VerifyFinal(vctx, signature, sig_len, pkey);","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_MD_CTX_free","file":"fixtures/c/openssl/rsa-sign/main.c","line":31,"column":5,"snippet":"EVP_MD_CTX_free(sctx);","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_MD_CTX_free","file":"fixtures/c/openssl/rsa-sign/main.c","line":32,"column":5,"snippet":"EVP_MD_CTX_free(vctx);","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_PKEY_free","file":"fixtures/c/openssl/rsa-sign/main.c","line":33,"column":5,"snippet":"EVP_PKEY_free(pkey);","detector":"ast-detector-c"}

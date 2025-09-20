@@ -35,3 +35,6 @@ tree-sitter-python = "0.21"
 tree-sitter-javascript = "0.21"
 tree-sitter-java = "0.21"
 tree-sitter-go = "0.21"
+# Additional languages
+tree-sitter-php = "0.22"
+tree-sitter-swift = "0.7"

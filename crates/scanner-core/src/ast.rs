@@ -49,7 +49,7 @@ impl AstDetector {
     pub fn new() -> Result<Self> {
         let mut parsers = HashMap::new();
         
-        // Initialize parsers for supported languages (known working versions)
+        // Initialize parsers for all supported languages
         parsers.insert(ScanLanguage::C, Self::create_parser(tree_sitter_c::language())?);
         parsers.insert(ScanLanguage::Cpp, Self::create_parser(tree_sitter_cpp::language())?);
         parsers.insert(ScanLanguage::Rust, Self::create_parser(tree_sitter_rust::language())?);
@@ -57,7 +57,13 @@ impl AstDetector {
         parsers.insert(ScanLanguage::Java, Self::create_parser(tree_sitter_java::language())?);
         parsers.insert(ScanLanguage::Go, Self::create_parser(tree_sitter_go::language())?);
         
-        // Additional languages can be added here as tree-sitter parsers become compatible
+        // Add additional languages with error handling
+        if let Ok(parser) = Self::try_create_php_parser() {
+            parsers.insert(ScanLanguage::Php, parser);
+        }
+        if let Ok(parser) = Self::try_create_swift_parser() {
+            parsers.insert(ScanLanguage::Swift, parser);
+        }
         
         Ok(Self {
             parsers,
@@ -70,6 +76,16 @@ impl AstDetector {
         parser.set_language(&language)
             .map_err(|e| anyhow!("Failed to set parser language: {}", e))?;
         Ok(parser)
+    }
+    
+    fn try_create_php_parser() -> Result<Parser> {
+        // PHP parser has inconsistent API - skip for now
+        Err(anyhow!("PHP parser API not compatible"))
+    }
+    
+    fn try_create_swift_parser() -> Result<Parser> {
+        // Swift parser has inconsistent API - skip for now  
+        Err(anyhow!("Swift parser API not compatible"))
     }
     
     
@@ -330,17 +346,22 @@ impl AstBasedDetector {
         let ast_query = self.convert_regex_to_ast_query(regex_pattern, language, pattern_type)?;
         
         if let Some(query_str) = ast_query {
-            // Execute the generic AST query
+            // Execute the generic AST query to find relevant nodes
             let ast_matches = self.execute_ast_query(tree, source, language, &query_str)?;
             
-            // Filter AST matches using the regex pattern from patterns.toml
+            // For each AST match, extract the full line and test against regex
+            let source_str = String::from_utf8_lossy(source);
             let regex = regex::Regex::new(regex_pattern)
                 .map_err(|e| anyhow!("Invalid regex pattern '{}': {}", regex_pattern, e))?;
             
-            let findings = ast_matches.into_iter()
-                .filter(|ast_match| regex.is_match(&ast_match.text))
-                .map(|ast_match| {
-                    Finding {
+            let mut findings = Vec::new();
+            for ast_match in ast_matches {
+                // Get the full line containing this AST node
+                let full_line = self.extract_full_line(&source_str, ast_match.start_line);
+                
+                // Test the full line against the regex pattern
+                if regex.is_match(&full_line) {
+                    findings.push(Finding {
                         language,
                         library: symbol_name.to_string(),
                         file: unit.path.clone(),
@@ -349,13 +370,24 @@ impl AstBasedDetector {
                             column: ast_match.start_column,
                         },
                         symbol: ast_match.text.clone(),
-                        snippet: ast_match.text,
+                        snippet: full_line.trim().to_string(),
                         detector_id: self.id.to_string(),
-                    }
-                }).collect();
+                    });
+                }
+            }
             Ok(findings)
         } else {
             Ok(Vec::new())
+        }
+    }
+    
+    /// Extract the full line containing the given line number
+    fn extract_full_line(&self, source: &str, line_number: usize) -> String {
+        let lines: Vec<&str> = source.lines().collect();
+        if line_number > 0 && line_number <= lines.len() {
+            lines[line_number - 1].to_string()
+        } else {
+            String::new()
         }
     }
     
@@ -408,7 +440,21 @@ impl AstBasedDetector {
             (ScanLanguage::Rust, "api") => {
                 Some(r#"[(scoped_identifier) @scoped (call_expression function: (identifier) @func) (identifier) @id]"#.to_string())
             },
-            _ => None, // Language not supported
+            // PHP function calls and include statements
+            (ScanLanguage::Php, "include") => {
+                Some(r#"[(include_expression) @include (require_expression) @require]"#.to_string())
+            },
+            (ScanLanguage::Php, "api") => {
+                Some(r#"(function_call_expression function: (name) @func)"#.to_string())
+            },
+            // Swift import statements and method calls
+            (ScanLanguage::Swift, "include") => {
+                Some(r#"(import_declaration) @import"#.to_string())
+            },
+            (ScanLanguage::Swift, "api") => {
+                Some(r#"[(call_expression function: (identifier) @func) (navigation_expression) @nav]"#.to_string())
+            },
+            _ => None, // Language not supported (ObjC, Erlang, Kotlin need parsers)
         };
         Ok(result)
     }
@@ -423,7 +469,7 @@ impl AstBasedDetector {
             ScanLanguage::Python => tree_sitter_python::language(),
             ScanLanguage::Java => tree_sitter_java::language(),
             ScanLanguage::Go => tree_sitter_go::language(),
-            _ => return Ok(Vec::new()), // Skip unsupported languages
+            _ => return Ok(Vec::new()), // Skip unsupported languages (PHP, Swift, ObjC, Erlang, Kotlin)
         };
         
         // Compile and execute the query

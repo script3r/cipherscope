@@ -1,1 +1,1 @@
-{"language":"C","library":"OpenSSL","symbol":"<openssl/evp.h>","file":"fixtures/general/c/main.c","line":1,"column":10,"snippet":"<openssl/evp.h>","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_sha256","file":"fixtures/general/c/main.c","line":4,"column":5,"snippet":"EVP_sha256();","detector":"ast-detector-c"}

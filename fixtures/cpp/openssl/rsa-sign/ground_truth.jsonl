@@ -1,0 +1,5 @@
+{"language":"Cpp","library":"OpenSSL","symbol":"RSA_new","file":"fixtures/cpp/openssl/rsa-sign/main.cpp","line":8,"column":16,"snippet":"RSA *rsa = RSA_new();","detector":"ast-detector-cpp"}
+{"language":"Cpp","library":"OpenSSL","symbol":"RSA_generate_key_ex","file":"fixtures/cpp/openssl/rsa-sign/main.cpp","line":11,"column":5,"snippet":"RSA_generate_key_ex(rsa, 2048, bn, NULL);","detector":"ast-detector-cpp"}
+{"language":"Cpp","library":"OpenSSL","symbol":"RSA_sign","file":"fixtures/cpp/openssl/rsa-sign/main.cpp","line":22,"column":5,"snippet":"RSA_sign(NID_sha256, hash, SHA256_DIGEST_LENGTH,","detector":"ast-detector-cpp"}
+{"language":"Cpp","library":"OpenSSL","symbol":"RSA_verify","file":"fixtures/cpp/openssl/rsa-sign/main.cpp","line":26,"column":17,"snippet":"int valid = RSA_verify(NID_sha256, hash, SHA256_DIGEST_LENGTH,","detector":"ast-detector-cpp"}
+{"language":"Cpp","library":"OpenSSL","symbol":"RSA_free","file":"fixtures/cpp/openssl/rsa-sign/main.cpp","line":29,"column":5,"snippet":"RSA_free(rsa);","detector":"ast-detector-cpp"}

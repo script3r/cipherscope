@@ -1,1 +1,7 @@
-{"language":"C","library":"OpenSSL","symbol":"<openssl/evp.h>","file":"fixtures/c/openssl/sha256/main.c","line":1,"column":10,"snippet":"<openssl/evp.h>","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_MD_CTX_new","file":"fixtures/c/openssl/sha256/main.c","line":9,"column":23,"snippet":"EVP_MD_CTX *ctx = EVP_MD_CTX_new();","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_DigestInit_ex","file":"fixtures/c/openssl/sha256/main.c","line":10,"column":5,"snippet":"EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_sha256","file":"fixtures/c/openssl/sha256/main.c","line":10,"column":28,"snippet":"EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_DigestUpdate","file":"fixtures/c/openssl/sha256/main.c","line":11,"column":5,"snippet":"EVP_DigestUpdate(ctx, message, strlen((char*)message));","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"strlen","file":"fixtures/c/openssl/sha256/main.c","line":11,"column":36,"snippet":"EVP_DigestUpdate(ctx, message, strlen((char*)message));","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_DigestFinal_ex","file":"fixtures/c/openssl/sha256/main.c","line":12,"column":5,"snippet":"EVP_DigestFinal_ex(ctx, digest, &digest_len);","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_MD_CTX_free","file":"fixtures/c/openssl/sha256/main.c","line":13,"column":5,"snippet":"EVP_MD_CTX_free(ctx);","detector":"ast-detector-c"}

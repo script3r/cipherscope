@@ -1,1 +1,3 @@
-{"language":"Rust","library":"ring","symbol":"ring","file":"fixtures/rust/ring/hmac-sha256/main.rs","line":1,"column":5,"snippet":"ring","detector":"ast-detector-rust"}
+{"language":"Rust","library":"ring","symbol":"ring","file":"fixtures/rust/ring/hmac-sha256/main.rs","line":1,"column":5,"snippet":"use ring::hmac;","detector":"ast-detector-rust"}
+{"language":"Rust","library":"ring","symbol":"ring::hmac","file":"fixtures/rust/ring/hmac-sha256/main.rs","line":1,"column":5,"snippet":"use ring::hmac;","detector":"ast-detector-rust"}
+{"language":"Rust","library":"ring","symbol":"hmac","file":"fixtures/rust/ring/hmac-sha256/main.rs","line":1,"column":11,"snippet":"use ring::hmac;","detector":"ast-detector-rust"}

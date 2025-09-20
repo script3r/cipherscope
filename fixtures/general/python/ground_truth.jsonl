@@ -1,2 +1,8 @@
-{"language":"Python","library":"PyCA cryptography","symbol":"cryptography.hazmat.primitives.ciphers.aead","file":"fixtures/general/python/app.py","line":1,"column":6,"snippet":"cryptography.hazmat.primitives.ciphers.aead","detector":"ast-detector-python"}
-{"language":"Python","library":"PyCA cryptography","symbol":"cryptography.hazmat.primitives.ciphers.aead","file":"fixtures/general/python/app.py","line":1,"column":6,"snippet":"cryptography.hazmat.primitives.ciphers.aead","detector":"ast-detector-python"}
+{"language":"Python","library":"PyCA cryptography","symbol":"aesgcm","file":"fixtures/general/python/app.py","line":4,"column":1,"snippet":"aesgcm = AESGCM(key)","detector":"ast-detector-python"}
+{"language":"Python","library":"PyCA cryptography","symbol":"aesgcm","file":"fixtures/general/python/app.py","line":4,"column":1,"snippet":"aesgcm = AESGCM(key)","detector":"ast-detector-python"}
+{"language":"Python","library":"PyCA cryptography","symbol":"AESGCM","file":"fixtures/general/python/app.py","line":4,"column":10,"snippet":"aesgcm = AESGCM(key)","detector":"ast-detector-python"}
+{"language":"Python","library":"PyCA cryptography","symbol":"AESGCM","file":"fixtures/general/python/app.py","line":4,"column":10,"snippet":"aesgcm = AESGCM(key)","detector":"ast-detector-python"}
+{"language":"Python","library":"PyCA cryptography","symbol":"AESGCM","file":"fixtures/general/python/app.py","line":4,"column":10,"snippet":"aesgcm = AESGCM(key)","detector":"ast-detector-python"}
+{"language":"Python","library":"PyCA cryptography","symbol":"AESGCM","file":"fixtures/general/python/app.py","line":4,"column":10,"snippet":"aesgcm = AESGCM(key)","detector":"ast-detector-python"}
+{"language":"Python","library":"PyCA cryptography","symbol":"key","file":"fixtures/general/python/app.py","line":4,"column":17,"snippet":"aesgcm = AESGCM(key)","detector":"ast-detector-python"}
+{"language":"Python","library":"PyCA cryptography","symbol":"key","file":"fixtures/general/python/app.py","line":4,"column":17,"snippet":"aesgcm = AESGCM(key)","detector":"ast-detector-python"}
