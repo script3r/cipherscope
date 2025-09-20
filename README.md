@@ -45,7 +45,9 @@ cargo build --release
 
 ## Languages Supported
 
-C, C++, Go, Java, Python, Rust (AST-based detection)
+**AST-based detection**: C, C++, Go, Java, Python, Rust
+
+**Note**: Additional languages like PHP, Swift, Kotlin, Objective-C, and Erlang have fixture files but are not yet supported by AST-based detection due to tree-sitter parser compatibility issues. These can be added in future versions.
 
 ## How It Works (High-Level)
 

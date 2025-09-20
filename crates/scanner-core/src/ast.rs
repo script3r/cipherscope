@@ -55,7 +55,7 @@ impl AstDetector {
         parsers.insert(ScanLanguage::Python, Self::create_parser(tree_sitter_python::language())?);
         parsers.insert(ScanLanguage::Java, Self::create_parser(tree_sitter_java::language())?);
         parsers.insert(ScanLanguage::Go, Self::create_parser(tree_sitter_go::language())?);
-        // Note: JavaScript parser can be used for basic JS-like syntax if needed
+        // Note: PHP, Swift, Kotlin, Objective-C and Erlang disabled due to inconsistent tree-sitter APIs
         
         Ok(Self {
             parsers,
@@ -297,6 +297,7 @@ impl AstDetector {
                 match_type: AstMatchType::Library { name: "std-crypto".to_string() },
                 metadata: HashMap::new(),
             },
+            
         ]
     }
     
@@ -321,7 +322,7 @@ impl AstDetector {
             ScanLanguage::Python => tree_sitter_python::language(),
             ScanLanguage::Java => tree_sitter_java::language(),
             ScanLanguage::Go => tree_sitter_go::language(),
-            _ => return Ok(matches), // Skip unsupported languages
+            _ => return Ok(matches), // Skip unsupported languages (PHP, Swift, Kotlin, ObjC, Erlang)
         };
         
         // Execute each pattern that matches this language
