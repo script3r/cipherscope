@@ -55,7 +55,13 @@ impl AstDetector {
         parsers.insert(ScanLanguage::Python, Self::create_parser(tree_sitter_python::language())?);
         parsers.insert(ScanLanguage::Java, Self::create_parser(tree_sitter_java::language())?);
         parsers.insert(ScanLanguage::Go, Self::create_parser(tree_sitter_go::language())?);
-        // Note: PHP, Swift, Kotlin, Objective-C and Erlang disabled due to inconsistent tree-sitter APIs
+        
+        // Try to add PHP parser - check if it has the language() function
+        if let Ok(php_parser) = Self::try_create_php_parser() {
+            parsers.insert(ScanLanguage::Php, php_parser);
+        }
+        
+        // Note: Swift, Kotlin, Objective-C and Erlang disabled due to inconsistent tree-sitter APIs
         
         Ok(Self {
             parsers,
@@ -67,6 +73,15 @@ impl AstDetector {
         let mut parser = Parser::new();
         parser.set_language(&language)
             .map_err(|e| anyhow!("Failed to set parser language: {}", e))?;
+        Ok(parser)
+    }
+    
+    fn try_create_php_parser() -> Result<Parser> {
+        let mut parser = Parser::new();
+        // Try the standard language() function first
+        let language = tree_sitter_php::language();
+        parser.set_language(&language)
+            .map_err(|e| anyhow!("Failed to set PHP parser language: {}", e))?;
         Ok(parser)
     }
     
@@ -298,6 +313,18 @@ impl AstDetector {
                 metadata: HashMap::new(),
             },
             
+            // PHP OpenSSL function calls
+            AstPattern {
+                query: r#"
+                    (function_call_expression
+                      function: (name) @func
+                      (#match? @func "openssl_.*"))
+                "#.to_string(),
+                language: ScanLanguage::Php,
+                match_type: AstMatchType::Library { name: "OpenSSL".to_string() },
+                metadata: HashMap::new(),
+            },
+            
         ]
     }
     
@@ -322,7 +349,8 @@ impl AstDetector {
             ScanLanguage::Python => tree_sitter_python::language(),
             ScanLanguage::Java => tree_sitter_java::language(),
             ScanLanguage::Go => tree_sitter_go::language(),
-            _ => return Ok(matches), // Skip unsupported languages (PHP, Swift, Kotlin, ObjC, Erlang)
+            ScanLanguage::Php => tree_sitter_php::language(),
+            _ => return Ok(matches), // Skip unsupported languages (Swift, Kotlin, ObjC, Erlang)
         };
         
         // Execute each pattern that matches this language

@@ -38,4 +38,3 @@ tree-sitter-go = "0.21"
 # tree-sitter-swift = "0.7" 
 # tree-sitter-kotlin = "0.3"
 # Note: Additional languages disabled due to inconsistent tree-sitter APIs
-
