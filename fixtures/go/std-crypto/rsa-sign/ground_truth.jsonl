@@ -1,3 +1,0 @@
-{"language":"Go","library":"std-crypto","symbol":"\"crypto/rand\"","file":"fixtures/go/std-crypto/rsa-sign/main.go","line":5,"column":5,"snippet":"\"crypto/rand\"","detector":"ast-detector-go"}
-{"language":"Go","library":"std-crypto","symbol":"\"crypto/rsa\"","file":"fixtures/go/std-crypto/rsa-sign/main.go","line":6,"column":5,"snippet":"\"crypto/rsa\"","detector":"ast-detector-go"}
-{"language":"Go","library":"std-crypto","symbol":"\"crypto/sha256\"","file":"fixtures/go/std-crypto/rsa-sign/main.go","line":7,"column":5,"snippet":"\"crypto/sha256\"","detector":"ast-detector-go"}

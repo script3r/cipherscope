@@ -1,1 +1,0 @@
-{"language":"Go","library":"std-crypto","symbol":"\"crypto/sha256\"","file":"fixtures/go/std-crypto/sha256/main.go","line":4,"column":5,"snippet":"\"crypto/sha256\"","detector":"ast-detector-go"}

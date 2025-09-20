@@ -1,2 +1,0 @@
-{"language":"Go","library":"std-crypto","symbol":"\"crypto/aes\"","file":"fixtures/general/go/main.go","line":4,"column":2,"snippet":"\"crypto/aes\"","detector":"ast-detector-go"}
-{"language":"Go","library":"std-crypto","symbol":"\"crypto/cipher\"","file":"fixtures/general/go/main.go","line":5,"column":2,"snippet":"\"crypto/cipher\"","detector":"ast-detector-go"}

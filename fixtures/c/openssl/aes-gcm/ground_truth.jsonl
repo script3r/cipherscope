@@ -1,4 +1,4 @@
 {"language":"C","library":"OpenSSL","symbol":"<openssl/evp.h>","file":"fixtures/c/openssl/aes-gcm/main.c","line":1,"column":10,"snippet":"<openssl/evp.h>","detector":"ast-detector-c"}
 {"language":"C","library":"OpenSSL","symbol":"<openssl/rand.h>","file":"fixtures/c/openssl/aes-gcm/main.c","line":2,"column":10,"snippet":"<openssl/rand.h>","detector":"ast-detector-c"}
-{"language":"C","library":"crypto-lib","symbol":"AES","file":"fixtures/c/openssl/aes-gcm/main.c","line":20,"column":29,"snippet":"EVP_aes_256_gcm","detector":"ast-detector-c"}
-{"language":"C","library":"crypto-lib","symbol":"AES","file":"fixtures/c/openssl/aes-gcm/main.c","line":28,"column":29,"snippet":"EVP_aes_256_gcm","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_aes_256_gcm","file":"fixtures/c/openssl/aes-gcm/main.c","line":20,"column":29,"snippet":"EVP_aes_256_gcm","detector":"ast-detector-c"}
+{"language":"C","library":"OpenSSL","symbol":"EVP_aes_256_gcm","file":"fixtures/c/openssl/aes-gcm/main.c","line":28,"column":29,"snippet":"EVP_aes_256_gcm","detector":"ast-detector-c"}

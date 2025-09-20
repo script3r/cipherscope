@@ -1,1 +1,2 @@
-{"language":"Python","library":"cryptography","symbol":"cryptography.hazmat.primitives.ciphers.aead","file":"fixtures/general/python/app.py","line":1,"column":6,"snippet":"cryptography.hazmat.primitives.ciphers.aead","detector":"ast-detector-python"}
+{"language":"Python","library":"PyCA cryptography","symbol":"cryptography.hazmat.primitives.ciphers.aead","file":"fixtures/general/python/app.py","line":1,"column":6,"snippet":"cryptography.hazmat.primitives.ciphers.aead","detector":"ast-detector-python"}
+{"language":"Python","library":"PyCA cryptography","symbol":"cryptography.hazmat.primitives.ciphers.aead","file":"fixtures/general/python/app.py","line":1,"column":6,"snippet":"cryptography.hazmat.primitives.ciphers.aead","detector":"ast-detector-python"}

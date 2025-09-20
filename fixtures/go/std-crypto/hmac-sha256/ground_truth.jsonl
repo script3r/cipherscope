@@ -1,2 +1,0 @@
-{"language":"Go","library":"std-crypto","symbol":"\"crypto/hmac\"","file":"fixtures/go/std-crypto/hmac-sha256/main.go","line":4,"column":5,"snippet":"\"crypto/hmac\"","detector":"ast-detector-go"}
-{"language":"Go","library":"std-crypto","symbol":"\"crypto/sha256\"","file":"fixtures/go/std-crypto/hmac-sha256/main.go","line":5,"column":5,"snippet":"\"crypto/sha256\"","detector":"ast-detector-go"}
