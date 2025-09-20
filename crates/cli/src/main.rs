@@ -92,11 +92,6 @@ fn main() -> Result<()> {
             &[Language::Go],
             patterns.clone(),
         ).with_context(|| "Failed to create Go AST detector")?),
-        Box::new(AstBasedDetector::with_patterns(
-            "ast-detector-php",
-            &[Language::Php],
-            patterns.clone(),
-        ).with_context(|| "Failed to create PHP AST detector")?),
     ];
 
     let mut cfg = Config {

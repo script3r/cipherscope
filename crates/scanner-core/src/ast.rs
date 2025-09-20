@@ -56,12 +56,7 @@ impl AstDetector {
         parsers.insert(ScanLanguage::Java, Self::create_parser(tree_sitter_java::language())?);
         parsers.insert(ScanLanguage::Go, Self::create_parser(tree_sitter_go::language())?);
         
-        // Try to add PHP parser - check if it has the language() function
-        if let Ok(php_parser) = Self::try_create_php_parser() {
-            parsers.insert(ScanLanguage::Php, php_parser);
-        }
-        
-        // Note: Swift, Kotlin, Objective-C and Erlang disabled due to inconsistent tree-sitter APIs
+        // Note: PHP, Swift, Kotlin, Objective-C and Erlang disabled due to inconsistent tree-sitter APIs
         
         Ok(Self {
             parsers,
@@ -76,14 +71,6 @@ impl AstDetector {
         Ok(parser)
     }
     
-    fn try_create_php_parser() -> Result<Parser> {
-        let mut parser = Parser::new();
-        // Try the standard language() function first
-        let language = tree_sitter_php::language();
-        parser.set_language(&language)
-            .map_err(|e| anyhow!("Failed to set PHP parser language: {}", e))?;
-        Ok(parser)
-    }
     
     /// Load AST patterns from patterns.toml or use defaults
     pub fn load_patterns_from_file(patterns_file: &str) -> Result<Vec<AstPattern>> {
@@ -227,11 +214,16 @@ impl AstDetector {
                 metadata: HashMap::new(),
             },
             
-            // Rust AES constants
+            // Rust AES constants (more specific)
             AstPattern {
                 query: r#"
-                    (identifier) @id
-                    (#match? @id "AES_.*_GCM")
+                    (use_declaration
+                      argument: (scoped_use_list
+                        path: (scoped_identifier
+                          path: (identifier) @crate
+                          name: (identifier) @item
+                          (#eq? @crate "ring")
+                          (#match? @item "AES_.*_GCM"))))
                 "#.to_string(),
                 language: ScanLanguage::Rust,
                 match_type: AstMatchType::Algorithm { 
@@ -313,17 +305,6 @@ impl AstDetector {
                 metadata: HashMap::new(),
             },
             
-            // PHP OpenSSL function calls
-            AstPattern {
-                query: r#"
-                    (function_call_expression
-                      function: (name) @func
-                      (#match? @func "openssl_.*"))
-                "#.to_string(),
-                language: ScanLanguage::Php,
-                match_type: AstMatchType::Library { name: "OpenSSL".to_string() },
-                metadata: HashMap::new(),
-            },
             
         ]
     }
@@ -349,8 +330,7 @@ impl AstDetector {
             ScanLanguage::Python => tree_sitter_python::language(),
             ScanLanguage::Java => tree_sitter_java::language(),
             ScanLanguage::Go => tree_sitter_go::language(),
-            ScanLanguage::Php => tree_sitter_php::language(),
-            _ => return Ok(matches), // Skip unsupported languages (Swift, Kotlin, ObjC, Erlang)
+            _ => return Ok(matches), // Skip unsupported languages (PHP, Swift, Kotlin, ObjC, Erlang)
         };
         
         // Execute each pattern that matches this language
