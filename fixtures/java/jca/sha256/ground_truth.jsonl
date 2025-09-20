@@ -1,0 +1,4 @@
+{"language":"Java","library":"Java JCA/JCE","symbol":"md","file":"fixtures/java/jca/sha256/Main.java","line":7,"column":23,"snippet":"MessageDigest md = MessageDigest.getInstance(\"SHA-256\");","detector":"ast-detector-java"}
+{"language":"Java","library":"Java JCA/JCE","symbol":"MessageDigest","file":"fixtures/java/jca/sha256/Main.java","line":7,"column":28,"snippet":"MessageDigest md = MessageDigest.getInstance(\"SHA-256\");","detector":"ast-detector-java"}
+{"language":"Java","library":"Java JCA/JCE","symbol":"getInstance","file":"fixtures/java/jca/sha256/Main.java","line":7,"column":42,"snippet":"MessageDigest md = MessageDigest.getInstance(\"SHA-256\");","detector":"ast-detector-java"}
+{"language":"Java","library":"Java JCA/JCE","symbol":"getInstance","file":"fixtures/java/jca/sha256/Main.java","line":7,"column":42,"snippet":"MessageDigest md = MessageDigest.getInstance(\"SHA-256\");","detector":"ast-detector-java"}

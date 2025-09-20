@@ -1,0 +1,6 @@
+{"language":"Rust","library":"RustCrypto (common crates)","symbol":"sha2","file":"fixtures/rust/rust-crypto/hmac-sha256/main.rs","line":2,"column":5,"snippet":"use sha2::Sha256;","detector":"ast-detector-rust"}
+{"language":"Rust","library":"RustCrypto (common crates)","symbol":"sha2","file":"fixtures/rust/rust-crypto/hmac-sha256/main.rs","line":2,"column":5,"snippet":"use sha2::Sha256;","detector":"ast-detector-rust"}
+{"language":"Rust","library":"RustCrypto (common crates)","symbol":"sha2::Sha256","file":"fixtures/rust/rust-crypto/hmac-sha256/main.rs","line":2,"column":5,"snippet":"use sha2::Sha256;","detector":"ast-detector-rust"}
+{"language":"Rust","library":"RustCrypto (common crates)","symbol":"sha2::Sha256","file":"fixtures/rust/rust-crypto/hmac-sha256/main.rs","line":2,"column":5,"snippet":"use sha2::Sha256;","detector":"ast-detector-rust"}
+{"language":"Rust","library":"RustCrypto (common crates)","symbol":"Sha256","file":"fixtures/rust/rust-crypto/hmac-sha256/main.rs","line":2,"column":11,"snippet":"use sha2::Sha256;","detector":"ast-detector-rust"}
+{"language":"Rust","library":"RustCrypto (common crates)","symbol":"Sha256","file":"fixtures/rust/rust-crypto/hmac-sha256/main.rs","line":2,"column":11,"snippet":"use sha2::Sha256;","detector":"ast-detector-rust"}

@@ -1,0 +1,5 @@
+{"language":"Python","library":"PyCA cryptography","symbol":"hash_value","file":"fixtures/python/cryptography/sha256/main.py","line":8,"column":1,"snippet":"hash_value = digest.finalize()","detector":"ast-detector-python"}
+{"language":"Python","library":"PyCA cryptography","symbol":"digest","file":"fixtures/python/cryptography/sha256/main.py","line":8,"column":14,"snippet":"hash_value = digest.finalize()","detector":"ast-detector-python"}
+{"language":"Python","library":"PyCA cryptography","symbol":"digest","file":"fixtures/python/cryptography/sha256/main.py","line":8,"column":14,"snippet":"hash_value = digest.finalize()","detector":"ast-detector-python"}
+{"language":"Python","library":"PyCA cryptography","symbol":"finalize","file":"fixtures/python/cryptography/sha256/main.py","line":8,"column":21,"snippet":"hash_value = digest.finalize()","detector":"ast-detector-python"}
+{"language":"Python","library":"PyCA cryptography","symbol":"finalize","file":"fixtures/python/cryptography/sha256/main.py","line":8,"column":21,"snippet":"hash_value = digest.finalize()","detector":"ast-detector-python"}

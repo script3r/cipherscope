@@ -1,0 +1,9 @@
+{"language":"Rust","library":"ring","symbol":"ring","file":"fixtures/rust/ring/rsa-sign/main.rs","line":1,"column":5,"snippet":"use ring::rand::SystemRandom;","detector":"ast-detector-rust"}
+{"language":"Rust","library":"ring","symbol":"ring::rand","file":"fixtures/rust/ring/rsa-sign/main.rs","line":1,"column":5,"snippet":"use ring::rand::SystemRandom;","detector":"ast-detector-rust"}
+{"language":"Rust","library":"ring","symbol":"ring::rand::SystemRandom","file":"fixtures/rust/ring/rsa-sign/main.rs","line":1,"column":5,"snippet":"use ring::rand::SystemRandom;","detector":"ast-detector-rust"}
+{"language":"Rust","library":"ring","symbol":"rand","file":"fixtures/rust/ring/rsa-sign/main.rs","line":1,"column":11,"snippet":"use ring::rand::SystemRandom;","detector":"ast-detector-rust"}
+{"language":"Rust","library":"ring","symbol":"SystemRandom","file":"fixtures/rust/ring/rsa-sign/main.rs","line":1,"column":17,"snippet":"use ring::rand::SystemRandom;","detector":"ast-detector-rust"}
+{"language":"Rust","library":"ring","symbol":"ring","file":"fixtures/rust/ring/rsa-sign/main.rs","line":2,"column":5,"snippet":"use ring::signature::{self, KeyPair};","detector":"ast-detector-rust"}
+{"language":"Rust","library":"ring","symbol":"ring::signature","file":"fixtures/rust/ring/rsa-sign/main.rs","line":2,"column":5,"snippet":"use ring::signature::{self, KeyPair};","detector":"ast-detector-rust"}
+{"language":"Rust","library":"ring","symbol":"signature","file":"fixtures/rust/ring/rsa-sign/main.rs","line":2,"column":11,"snippet":"use ring::signature::{self, KeyPair};","detector":"ast-detector-rust"}
+{"language":"Rust","library":"ring","symbol":"KeyPair","file":"fixtures/rust/ring/rsa-sign/main.rs","line":2,"column":29,"snippet":"use ring::signature::{self, KeyPair};","detector":"ast-detector-rust"}
