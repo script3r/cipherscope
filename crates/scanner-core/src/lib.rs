@@ -26,19 +26,17 @@
 //!
 //! This architecture typically achieves 4+ GiB/s throughput on modern hardware.
 
-use aho_corasick::AhoCorasickBuilder;
-use anyhow::{anyhow, Context, Result};
+use anyhow::{anyhow, Result};
 use crossbeam_channel::{bounded, Receiver, Sender};
 use ignore::{WalkBuilder, WalkParallel};
 use rayon::prelude::*;
-use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::collections::{BTreeSet, HashMap};
+use std::collections::BTreeSet;
 use std::fs;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicUsize, Ordering};
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::thread;
 
 pub mod ast;
@@ -169,62 +167,7 @@ impl Emitter {
     }
 }
 
-// ---------------- Patterns & Config ----------------
-
-#[derive(Debug, Clone, Deserialize)]
-pub struct PatternsFile {
-    pub version: PatternsVersion,
-    #[serde(default)]
-    pub library: Vec<LibrarySpec>,
-}
-
-#[derive(Debug, Clone, Deserialize)]
-pub struct PatternsVersion {
-    pub schema: String,
-    pub updated: String,
-}
-
-#[derive(Debug, Clone, Deserialize)]
-pub struct LibrarySpec {
-    pub name: String,
-    pub languages: Vec<Language>,
-    #[serde(default)]
-    pub patterns: LibraryPatterns,
-    #[serde(default)]
-    pub algorithms: Vec<AlgorithmSpec>,
-}
-
-#[derive(Debug, Clone, Default, Deserialize)]
-pub struct LibraryPatterns {
-    #[serde(default)]
-    pub include: Vec<String>,
-    #[serde(default)]
-    pub import: Vec<String>,
-    #[serde(default)]
-    pub namespace: Vec<String>,
-    #[serde(default)]
-    pub apis: Vec<String>,
-}
-
-#[derive(Debug, Clone, Deserialize)]
-pub struct AlgorithmSpec {
-    pub name: String,
-    pub primitive: String, // "signature", "aead", "hash", "kem", "pke", "mac", "kdf", "prng"
-    #[serde(default)]
-    pub parameter_patterns: Vec<ParameterPattern>,
-    #[serde(rename = "nistQuantumSecurityLevel")]
-    pub nist_quantum_security_level: u8,
-    #[serde(default)]
-    pub symbol_patterns: Vec<String>, // Regex patterns to match this algorithm in findings
-}
-
-#[derive(Debug, Clone, Deserialize)]
-pub struct ParameterPattern {
-    pub name: String,    // e.g., "keySize", "curve", "outputSize"
-    pub pattern: String, // Regex pattern to extract the parameter value
-    #[serde(default)]
-    pub default_value: Option<serde_json::Value>, // Default value if not found
-}
+// ---------------- Config ----------------
 
 #[derive(Deserialize)]
 pub struct Config {
@@ -326,182 +269,14 @@ fn default_include_globs() -> Vec<String> {
     ]
 }
 
-// Compiled patterns for fast matching
+// Simple stub for PatternRegistry (kept for compatibility with existing Scanner interface)
 #[derive(Debug)]
-pub struct CompiledLibrary {
-    pub name: String,
-    pub languages: BTreeSet<Language>,
-    pub include: Vec<Regex>,
-    pub import: Vec<Regex>,
-    pub namespace: Vec<Regex>,
-    pub apis: Vec<Regex>,
-    pub prefilter_substrings: Vec<String>,
-    pub algorithms: Vec<CompiledAlgorithm>,
-}
-
-#[derive(Debug, Clone)]
-pub struct CompiledAlgorithm {
-    pub name: String,
-    pub primitive: String,
-    pub nist_quantum_security_level: u8,
-    pub symbol_patterns: Vec<Regex>,
-    pub parameter_patterns: Vec<CompiledParameterPattern>,
-}
-
-#[derive(Debug, Clone)]
-pub struct CompiledParameterPattern {
-    pub name: String,
-    pub pattern: Regex,
-    pub default_value: Option<serde_json::Value>,
-}
-
-#[derive(Debug)]
-pub struct PatternRegistry {
-    pub libs: Vec<CompiledLibrary>,
-    // Cache patterns per language for faster lookup
-    language_cache: HashMap<Language, Vec<usize>>, // indices into libs vector
-}
+pub struct PatternRegistry;
 
 impl PatternRegistry {
     pub fn empty() -> Self {
-        Self {
-            libs: Vec::new(),
-            language_cache: HashMap::new(),
-        }
+        Self
     }
-    
-    pub fn load(patterns_toml: &str) -> Result<Self> {
-        let pf: PatternsFile = toml::from_str(patterns_toml)?;
-        let libs = pf
-            .library
-            .into_iter()
-            .map(compile_library)
-            .collect::<Result<Vec<_>>>()?;
-
-        // Build language cache only if we have many libraries
-        let language_cache = if libs.len() > 50 {
-            let mut cache = HashMap::new();
-            for (idx, lib) in libs.iter().enumerate() {
-                for &lang in &lib.languages {
-                    cache.entry(lang).or_insert_with(Vec::new).push(idx);
-                }
-            }
-            cache
-        } else {
-            HashMap::new() // Empty cache for small numbers of libraries
-        };
-
-        Ok(Self {
-            libs,
-            language_cache,
-        })
-    }
-
-    pub fn for_language(&self, language: Language) -> Vec<&CompiledLibrary> {
-        // For small numbers of libraries, linear search is often faster than HashMap lookup
-        // Only use cache if we have many libraries (threshold: 50+)
-        if self.libs.len() > 50 {
-            // Use cached indices for O(1) lookup
-            if let Some(indices) = self.language_cache.get(&language) {
-                indices.iter().map(|&idx| &self.libs[idx]).collect()
-            } else {
-                Vec::new()
-            }
-        } else {
-            // Use linear search for small numbers of libraries
-            self.libs
-                .iter()
-                .filter(|l| l.languages.contains(&language))
-                .collect()
-        }
-    }
-}
-
-fn compile_library(lib: LibrarySpec) -> Result<CompiledLibrary> {
-    let include = compile_regexes(&lib.patterns.include)?;
-    let import = compile_regexes(&lib.patterns.import)?;
-    let namespace = compile_regexes(&lib.patterns.namespace)?;
-    let apis = compile_regexes(&lib.patterns.apis)?;
-    let prefilter_substrings = derive_prefilter_substrings(&lib.patterns);
-    let algorithms = compile_algorithms(&lib.algorithms)?;
-    Ok(CompiledLibrary {
-        name: lib.name,
-        languages: lib.languages.into_iter().collect(),
-        include,
-        import,
-        namespace,
-        apis,
-        prefilter_substrings,
-        algorithms,
-    })
-}
-
-fn compile_regexes(srcs: &[String]) -> Result<Vec<Regex>> {
-    srcs.iter()
-        .map(|s| {
-            let pat = format!("(?m){s}");
-            Regex::new(&pat).with_context(|| format!("bad pattern: {s}"))
-        })
-        .collect()
-}
-
-fn compile_algorithms(algorithms: &[AlgorithmSpec]) -> Result<Vec<CompiledAlgorithm>> {
-    algorithms
-        .iter()
-        .map(|algo| {
-            let symbol_patterns = compile_regexes(&algo.symbol_patterns)?;
-            let parameter_patterns = algo
-                .parameter_patterns
-                .iter()
-                .map(|param| {
-                    let pattern = Regex::new(&param.pattern)
-                        .with_context(|| format!("bad parameter pattern: {}", param.pattern))?;
-                    Ok(CompiledParameterPattern {
-                        name: param.name.clone(),
-                        pattern,
-                        default_value: param.default_value.clone(),
-                    })
-                })
-                .collect::<Result<Vec<_>>>()?;
-
-            Ok(CompiledAlgorithm {
-                name: algo.name.clone(),
-                primitive: algo.primitive.clone(),
-                nist_quantum_security_level: algo.nist_quantum_security_level,
-                symbol_patterns,
-                parameter_patterns,
-            })
-        })
-        .collect()
-}
-
-fn derive_prefilter_substrings(p: &LibraryPatterns) -> Vec<String> {
-    let mut set = BTreeSet::new();
-    let mut push_tokens = |s: &str| {
-        // Remove common regex anchors that pollute tokens
-        let cleaned = s.replace("\\b", "");
-        for tok in cleaned.split(|c: char| !c.is_alphanumeric() && c != '.' && c != '/' && c != '_')
-        {
-            let t = tok.trim();
-            // Lower the minimum length to 2 to catch important crypto API prefixes like "CC", "SHA" etc.
-            if t.len() >= 2 {
-                // CRITICAL FIX: Add both lowercase AND uppercase versions to catch all cases
-                set.insert(t.to_ascii_lowercase());
-                set.insert(t.to_ascii_uppercase());
-                set.insert(t.to_string()); // Also preserve original case
-            }
-        }
-    };
-    for s in p
-        .include
-        .iter()
-        .chain(&p.import)
-        .chain(&p.namespace)
-        .chain(&p.apis)
-    {
-        push_tokens(s);
-    }
-    set.into_iter().collect()
 }
 
 // ---------------- Comment Stripping ----------------
@@ -1357,199 +1132,9 @@ impl<'a> Scanner<'a> {
     }
 }
 
-fn prefilter_hit(det: &dyn Detector, stripped: &[u8]) -> bool {
+fn prefilter_hit(det: &dyn Detector, _stripped: &[u8]) -> bool {
+    // For AST-based detectors, we don't use prefiltering
     let pf = det.prefilter();
-    if pf.substrings.is_empty() {
-        return true;
-    }
-
-    // Try to use cached automaton if available (for PatternDetector)
-    if let Some(pattern_det) = det.as_any().downcast_ref::<PatternDetector>() {
-        if let Ok(Some(ac)) = pattern_det.get_cached_automaton(&pf.substrings) {
-            return ac.is_match(stripped);
-        }
-    }
-
-    // Fallback: build automaton (for other detector types)
-    let ac = AhoCorasickBuilder::new()
-        .ascii_case_insensitive(true)
-        .build(pf.substrings)
-        .expect("failed to build aho-corasick");
-    ac.is_match(stripped)
+    pf.substrings.is_empty() // AST detectors return empty prefilters
 }
 
-// ---------------- Generic Pattern-based Detector ----------------
-
-pub struct PatternDetector {
-    id: &'static str,
-    languages: &'static [Language],
-    registry: Arc<PatternRegistry>,
-    // Cache the prefilter for this detector
-    cached_prefilter: Option<Prefilter>,
-    // Cache the Aho-Corasick automaton to avoid rebuilding for every file
-    cached_automaton: Mutex<Option<aho_corasick::AhoCorasick>>,
-}
-
-impl PatternDetector {
-    pub fn new(
-        id: &'static str,
-        languages: &'static [Language],
-        registry: Arc<PatternRegistry>,
-    ) -> Self {
-        Self {
-            id,
-            languages,
-            registry,
-            cached_prefilter: None,
-            cached_automaton: Mutex::new(None),
-        }
-    }
-}
-
-impl PatternDetector {
-    fn get_cached_automaton(
-        &self,
-        substrings: &BTreeSet<String>,
-    ) -> Result<Option<aho_corasick::AhoCorasick>> {
-        if substrings.is_empty() {
-            return Ok(None);
-        }
-
-        let mut cached = self.cached_automaton.lock().unwrap();
-        if cached.is_none() {
-            let substrings_vec: Vec<&str> = substrings.iter().map(|s| s.as_str()).collect();
-            let ac = AhoCorasickBuilder::new()
-                .ascii_case_insensitive(true)
-                .build(substrings_vec)
-                .map_err(|e| anyhow!("failed to build aho-corasick: {e}"))?;
-            *cached = Some(ac);
-        }
-        Ok(cached.clone())
-    }
-
-    fn scan_with_preprocessed(
-        &self,
-        libs: Vec<&CompiledLibrary>,
-        stripped_s: &str,
-        index: &LineIndex,
-        unit: &ScanUnit,
-        em: &mut Emitter,
-    ) -> Result<()> {
-        for lib in libs {
-            // import/include/namespace first
-            let mut matched_import = false;
-            for re in lib.include.iter().chain(&lib.import).chain(&lib.namespace) {
-                if let Some(_m) = re.find(stripped_s) {
-                    matched_import = true;
-                    break;
-                }
-            }
-
-            // Find ALL API matches, not just the last one
-            let mut api_matches: Vec<(usize, String)> = Vec::new();
-            for re in &lib.apis {
-                for m in re.find_iter(stripped_s) {
-                    api_matches.push((m.start(), m.as_str().to_string()));
-                }
-            }
-
-            // Require anchor only if patterns define any; always require at least one API hit
-            let has_anchor_patterns =
-                !lib.include.is_empty() || !lib.import.is_empty() || !lib.namespace.is_empty();
-            let anchor_satisfied = if has_anchor_patterns {
-                matched_import
-            } else {
-                true
-            };
-
-            // Generate a finding for each API match instead of just one per library
-            if anchor_satisfied && !api_matches.is_empty() {
-                for (pos, sym) in api_matches {
-                    let span = index.to_line_col(pos);
-                    let snippet = extract_line(stripped_s, pos);
-                    let finding = Finding {
-                        language: unit.lang,
-                        library: lib.name.clone(),
-                        file: unit.path.clone(),
-                        span,
-                        symbol: sym,
-                        snippet,
-                        detector_id: self.id.to_string(),
-                    };
-                    let _ = em.send(finding);
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-impl Detector for PatternDetector {
-    fn id(&self) -> &'static str {
-        self.id
-    }
-    fn languages(&self) -> &'static [Language] {
-        self.languages
-    }
-    fn prefilter(&self) -> Prefilter {
-        // Use cached prefilter if available, otherwise compute and cache it
-        if let Some(ref cached) = self.cached_prefilter {
-            return cached.clone();
-        }
-
-        let mut substrings = BTreeSet::new();
-        for lib in self.registry.for_language(self.languages[0]) {
-            for s in &lib.prefilter_substrings {
-                substrings.insert(s.clone());
-            }
-        }
-
-        // Note: We can't actually cache here due to &self, but this is still faster
-        // than recomputing every time since we're using the cached language lookup
-        Prefilter {
-            extensions: BTreeSet::new(),
-            substrings,
-        }
-    }
-    fn scan(&self, unit: &ScanUnit, em: &mut Emitter) -> Result<()> {
-        let libs = self.registry.for_language(unit.lang);
-        if libs.is_empty() {
-            return Ok(());
-        }
-        let stripped = crate::strip_comments(unit.lang, &unit.bytes);
-        let stripped_s = String::from_utf8_lossy(&stripped);
-        let index = LineIndex::new(stripped_s.as_bytes());
-        self.scan_with_preprocessed(libs, &stripped_s, &index, unit, em)
-    }
-
-    fn scan_optimized(
-        &self,
-        unit: &ScanUnit,
-        stripped_s: &str,
-        index: &LineIndex,
-        em: &mut Emitter,
-    ) -> Result<()> {
-        let libs = self.registry.for_language(unit.lang);
-        if libs.is_empty() {
-            return Ok(());
-        }
-        self.scan_with_preprocessed(libs, stripped_s, index, unit, em)
-    }
-
-    fn as_any(&self) -> &dyn std::any::Any {
-        self
-    }
-}
-
-fn extract_line(s: &str, pos: usize) -> String {
-    let bytes = s.as_bytes();
-    let mut start = pos;
-    while start > 0 && bytes[start - 1] != b'\n' {
-        start -= 1;
-    }
-    let mut end = pos;
-    while end < bytes.len() && bytes[end] != b'\n' {
-        end += 1;
-    }
-    s[start..end].trim().to_string()
-}

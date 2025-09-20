@@ -7,13 +7,10 @@ license = "Apache-2.0"
 [dependencies]
 anyhow = { workspace = true }
 clap = { workspace = true }
-serde = { workspace = true }
 serde_json = { workspace = true }
-toml = { workspace = true }
 rayon = { workspace = true }
 indicatif = "0.17"
 scanner-core = { path = "../scanner-core" }
-cbom-generator = { path = "../cbom-generator" }
 
 [[bin]]
 name = "cipherscope"
