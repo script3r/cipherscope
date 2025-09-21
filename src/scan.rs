@@ -135,12 +135,12 @@ pub fn parse(lang: Language, content: &str) -> Result<Tree> {
         Language::Rust => ts_lang_rust(),
     };
     parser.set_language(&ts_lang).context("set language")?;
-    
+
     // Allow deprecated method for now - the new API is more complex
     // and the current method works fine for our needs
     #[allow(deprecated)]
     parser.set_timeout_micros(5_000_000); // 5 second timeout
-    
+
     parser.parse(content, None).context("parse")
 }
 
