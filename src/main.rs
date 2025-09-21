@@ -3,7 +3,6 @@ use std::io::{BufWriter, Write};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
-use std::time::Duration;
 
 use ahash::{AHashMap as HashMap, AHashSet as HashSet};
 use anyhow::{Context, Result};
@@ -293,55 +292,11 @@ fn main() -> Result<()> {
         pb.set_message("Scanning files...");
     }
 
-    // Track currently processing files to identify stuck ones
-    let processing_files = Arc::new(std::sync::Mutex::new(HashMap::<std::thread::ThreadId, PathBuf>::new()));
-    let processing_files_clone = processing_files.clone();
-    
-    // Spawn a monitor thread that reports stuck files
-    std::thread::spawn(move || {
-        loop {
-            std::thread::sleep(Duration::from_secs(30));
-            let files = processing_files_clone.lock().unwrap();
-            if !files.is_empty() {
-                eprintln!("\n=== FILES CURRENTLY BEING PROCESSED (>30s) ===");
-                for (thread_id, path) in files.iter() {
-                    eprintln!("  Thread {:?}: {}", thread_id, path.display());
-                }
-                eprintln!("===============================================\n");
-            }
-        }
-    });
-
     // Process files in parallel with rayon
     files_to_scan.into_par_iter().for_each(|path| {
-        let thread_id = std::thread::current().id();
-        
-        // Register this file as being processed
-        {
-            let mut files = processing_files.lock().unwrap();
-            files.insert(thread_id, path.clone());
-        }
-        
         // Process the file
-        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            process_file(&path, &patterns, &tx)
-        }));
-        
-        // Unregister this file
-        {
-            let mut files = processing_files.lock().unwrap();
-            files.remove(&thread_id);
-        }
-
-        // Handle result
-        match result {
-            Ok(Ok(())) => {}
-            Ok(Err(err)) => {
-                eprintln!("Error processing {}: {err:#}", path.display());
-            }
-            Err(_) => {
-                eprintln!("PANIC while processing {}", path.display());
-            }
+        if let Err(err) = process_file(&path, &patterns, &tx) {
+            eprintln!("Error processing {}: {err:#}", path.display());
         }
 
         scanned_count.fetch_add(1, Ordering::Relaxed);

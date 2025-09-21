@@ -136,7 +136,9 @@ pub fn parse(lang: Language, content: &str) -> Result<Tree> {
     };
     parser.set_language(&ts_lang).context("set language")?;
     
-    // Set a timeout to prevent the parser from hanging on malformed code
+    // Allow deprecated method for now - the new API is more complex
+    // and the current method works fine for our needs
+    #[allow(deprecated)]
     parser.set_timeout_micros(5_000_000); // 5 second timeout
     
     parser.parse(content, None).context("parse")
