@@ -13,7 +13,7 @@
 - **High Performance**: Scans large codebases quickly by leveraging parallelism.
 - **Language-Aware**: Uses Tree-sitter parsers to understand code structure, reducing false positives.
 - **Extensible Patterns**: Define custom patterns in a simple TOML file to find new libraries and algorithms.
-- **Multiple Language Support**: Scans C, C++, Java, Python, Go, Swift, Objective-C, and Rust.
+- **Multiple Language Support**: Scans C, C++, Java, Python, Go, Swift, PHP, Objective-C, and Rust.
 - **Flexible Output**: Outputs findings as JSONL to stdout or a file for easy integration with other tools.
 - **Cross-Platform**: Built in Rust, runs on macOS, Linux, and Windows.
 
@@ -103,3 +103,27 @@ The output is a stream of JSONL objects, where each object represents a single f
 ## Patterns
 
 `cipherscope` relies on a `patterns.toml` file to define what to look for. This file contains definitions for:
+- **Libraries**: Anchors used to detect specific crypto libraries, like import statements.
+- **Algorithms**: Symbols and function calls associated with specific algorithms (e.g., "AES-GCM") within a library.
+
+You can customize this file to add support for new libraries or improve detection for existing ones.
+
+## Development
+
+### Building from Source
+1. Clone the repository.
+2. Build the project using Cargo:
+   ```bash
+   cargo build --release
+   ```
+   The binary will be located at `./target/release/cipherscope`.
+
+### Running Tests
+To run the integration test suite:
+```bash
+cargo test
+```
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
