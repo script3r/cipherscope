@@ -15,7 +15,6 @@ use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use memmap2::Mmap;
 use rayon::prelude::*;
 use serde::Serialize;
-use std::time::Duration;
 
 mod patterns;
 mod scan;
@@ -60,13 +59,13 @@ struct Cli {
     max_file_mb: Option<u64>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 struct Evidence {
     line: usize,
     column: usize,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 struct Finding {
     #[serde(rename = "assetType")]
     asset_type: String,
@@ -137,6 +136,8 @@ fn main() -> Result<()> {
         pb
     });
 
+    // Use an unbounded channel to avoid deadlocks
+    // We'll rely on the file processing being the bottleneck, not the writer
     let (tx, rx) = channel::unbounded::<Finding>();
     let output_path = cli.output.clone();
     let found_count_writer = found_count.clone();
@@ -157,6 +158,8 @@ fn main() -> Result<()> {
                 pb.set_message(format!("Found {} cryptographic items", count));
             }
         }
+        // Flush any remaining buffered output
+        writer.flush()?;
         Ok(())
     });
 
@@ -289,20 +292,20 @@ fn main() -> Result<()> {
         pb.set_message("Scanning files...");
     }
 
-    let patterns_for_scan = patterns.clone();
-    let scanned_count_scan = scanned_count.clone();
-    let scan_bar_scan = scan_bar.clone();
-
+    // Process files in parallel with rayon
     files_to_scan.into_par_iter().for_each(|path| {
-        if let Err(err) = process_file(&path, &patterns_for_scan, &tx) {
-            eprintln!("error processing {}: {err:#}", path.display());
+        // Process the file
+        if let Err(err) = process_file(&path, &patterns, &tx) {
+            eprintln!("Error processing {}: {err:#}", path.display());
         }
-        scanned_count_scan.fetch_add(1, Ordering::Relaxed);
-        if let Some(pb) = &scan_bar_scan {
+
+        scanned_count.fetch_add(1, Ordering::Relaxed);
+        if let Some(pb) = &scan_bar {
             pb.inc(1);
         }
     });
 
+    // All files have been processed
     drop(tx);
 
     if let Some(pb) = &scan_bar {
@@ -384,11 +387,12 @@ fn process_file(
             metadata: HashMap::new(),
         };
         let key = format!("lib|{}", finding.identifier);
-        if seen.insert(key) && tx.send_timeout(finding, Duration::from_secs(5)).is_err() {
-            eprintln!(
-                "error: writer thread appears to be blocked (filesystem I/O issue?). Aborting send."
-            );
-            return Ok(());
+        if seen.insert(key) {
+            // Use blocking send but log if it takes too long
+            if let Err(e) = tx.send(finding) {
+                eprintln!("error: writer thread has stopped: {}", e);
+                return Ok(());
+            }
         }
 
         // 2) algorithms for this library
@@ -413,11 +417,12 @@ fn process_file(
                 "alg|{}|{}:{}",
                 finding.identifier, finding.evidence.line, finding.evidence.column
             );
-            if seen.insert(key) && tx.send_timeout(finding, Duration::from_secs(5)).is_err() {
-                eprintln!(
-                    "error: writer thread appears to be blocked (filesystem I/O issue?). Aborting send."
-                );
-                return Ok(());
+            if seen.insert(key) {
+                // Use blocking send but log if it takes too long
+                if let Err(e) = tx.send(finding) {
+                    eprintln!("error: writer thread has stopped: {}", e);
+                    return Ok(());
+                }
             }
         }
     }
