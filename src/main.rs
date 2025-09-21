@@ -3,6 +3,7 @@ use std::io::{BufWriter, Write};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
+use std::time::{Duration, Instant};
 
 use ahash::{AHashMap as HashMap, AHashSet as HashSet};
 use anyhow::{Context, Result};
@@ -287,6 +288,13 @@ fn main() -> Result<()> {
         .unwrap();
     let total_files = files_to_scan.len();
 
+    // Log the actual count to verify
+    eprintln!(
+        "Starting scan of {} files (discovery found {})",
+        total_files,
+        file_count.load(Ordering::Relaxed)
+    );
+
     if let Some(pb) = &scan_bar {
         pb.set_length(total_files as u64);
         pb.set_message("Scanning files...");
@@ -296,10 +304,36 @@ fn main() -> Result<()> {
     let scanned_count_scan = scanned_count.clone();
     let scan_bar_scan = scan_bar.clone();
 
+    // Use a custom thread pool with explicit panic handling
     files_to_scan.into_par_iter().for_each(|path| {
-        if let Err(err) = process_file(&path, &patterns_for_scan, &tx) {
-            eprintln!("error processing {}: {err:#}", path.display());
+        let start = Instant::now();
+
+        // Catch any panics that might occur during processing
+        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            process_file(&path, &patterns_for_scan, &tx)
+        }));
+
+        match result {
+            Ok(Ok(())) => {
+                // File processed successfully
+            }
+            Ok(Err(err)) => {
+                eprintln!("Error processing {}: {err:#}", path.display());
+            }
+            Err(_) => {
+                eprintln!("PANIC while processing {}", path.display());
+            }
         }
+
+        let elapsed = start.elapsed();
+        if elapsed > Duration::from_secs(5) {
+            eprintln!(
+                "Slow file ({:.1}s): {}",
+                elapsed.as_secs_f32(),
+                path.display()
+            );
+        }
+
         scanned_count_scan.fetch_add(1, Ordering::Relaxed);
         if let Some(pb) = &scan_bar_scan {
             pb.inc(1);
