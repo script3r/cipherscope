@@ -102,7 +102,8 @@ pub struct AlgorithmHit<'a> {
 pub fn language_from_path(path: &std::path::Path) -> Option<Language> {
     let ext = path.extension()?.to_str()?.to_ascii_lowercase();
     match ext.as_str() {
-        "c" | "h" => Some(Language::C),
+        "c" => Some(Language::C),
+        "h" => Some(Language::Cpp), // Parse .h as C++ since it's backwards compatible with C
         "cc" | "cpp" | "cxx" | "hpp" | "hh" | "hxx" => Some(Language::Cpp),
         "java" => Some(Language::Java),
         "py" => Some(Language::Python),
@@ -134,6 +135,10 @@ pub fn parse(lang: Language, content: &str) -> Result<Tree> {
         Language::Rust => ts_lang_rust(),
     };
     parser.set_language(&ts_lang).context("set language")?;
+    
+    // Set a timeout to prevent the parser from hanging on malformed code
+    parser.set_timeout_micros(5_000_000); // 5 second timeout
+    
     parser.parse(content, None).context("parse")
 }
 
