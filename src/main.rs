@@ -304,43 +304,80 @@ fn main() -> Result<()> {
     let scanned_count_scan = scanned_count.clone();
     let scan_bar_scan = scan_bar.clone();
 
-    // Use a custom thread pool with explicit panic handling
-    files_to_scan.into_par_iter().for_each(|path| {
-        let start = Instant::now();
-
-        // Catch any panics that might occur during processing
-        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            process_file(&path, &patterns_for_scan, &tx)
-        }));
-
-        match result {
-            Ok(Ok(())) => {
-                // File processed successfully
-            }
-            Ok(Err(err)) => {
-                eprintln!("Error processing {}: {err:#}", path.display());
-            }
-            Err(_) => {
-                eprintln!("PANIC while processing {}", path.display());
-            }
+    // Create a work queue for better control
+    let work_queue = Arc::new(std::sync::Mutex::new(files_to_scan));
+    let num_threads = cli.threads;
+    
+    eprintln!("Starting {} worker threads...", num_threads);
+    
+    // Spawn worker threads explicitly
+    let handles: Vec<_> = (0..num_threads)
+        .map(|thread_id| {
+            let work_queue = work_queue.clone();
+            let patterns = patterns_for_scan.clone();
+            let tx = tx.clone();
+            let scanned_count = scanned_count_scan.clone();
+            let scan_bar = scan_bar_scan.clone();
+            
+            std::thread::spawn(move || {
+                loop {
+                    // Get next file to process
+                    let path = {
+                        let mut queue = work_queue.lock().unwrap();
+                        if queue.is_empty() {
+                            break;
+                        }
+                        queue.pop()
+                    };
+                    
+                    if let Some(path) = path {
+                        let start = Instant::now();
+                        
+                        // Process the file
+                        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                            process_file(&path, &patterns, &tx)
+                        }));
+                        
+                        match result {
+                            Ok(Ok(())) => {
+                                // File processed successfully
+                            }
+                            Ok(Err(err)) => {
+                                eprintln!("Thread {}: Error processing {}: {err:#}", 
+                                         thread_id, path.display());
+                            }
+                            Err(_) => {
+                                eprintln!("Thread {}: PANIC while processing {}", 
+                                         thread_id, path.display());
+                            }
+                        }
+                        
+                        let elapsed = start.elapsed();
+                        if elapsed > Duration::from_secs(5) {
+                            eprintln!("Thread {}: Slow file ({:.1}s): {}", 
+                                     thread_id, elapsed.as_secs_f32(), path.display());
+                        }
+                        
+                        scanned_count.fetch_add(1, Ordering::Relaxed);
+                        if let Some(pb) = &scan_bar {
+                            pb.inc(1);
+                        }
+                    }
+                }
+                eprintln!("Thread {} finished", thread_id);
+            })
+        })
+        .collect();
+    
+    // Wait for all threads to complete
+    eprintln!("Waiting for all worker threads to complete...");
+    for (i, handle) in handles.into_iter().enumerate() {
+        if let Err(e) = handle.join() {
+            eprintln!("Thread {} panicked: {:?}", i, e);
         }
-
-        let elapsed = start.elapsed();
-        if elapsed > Duration::from_secs(5) {
-            eprintln!(
-                "Slow file ({:.1}s): {}",
-                elapsed.as_secs_f32(),
-                path.display()
-            );
-        }
-
-        scanned_count_scan.fetch_add(1, Ordering::Relaxed);
-        if let Some(pb) = &scan_bar_scan {
-            pb.inc(1);
-        }
-    });
-
-    eprintln!("All files submitted for processing. Scanned so far: {} / {}", 
+    }
+    
+    eprintln!("All worker threads completed. Scanned: {} / {}", 
               scanned_count.load(Ordering::Relaxed), total_files);
     
     // IMPORTANT: We must drop tx AFTER the parallel iterator completes
@@ -430,25 +467,10 @@ fn process_file(
         };
         let key = format!("lib|{}", finding.identifier);
         if seen.insert(key) {
-            // Try to send with retries to avoid deadlock
-            let mut retries = 0;
-            loop {
-                match tx.try_send(finding.clone()) {
-                    Ok(()) => break,
-                    Err(channel::TrySendError::Full(_)) => {
-                        // Channel is full, wait a bit and retry
-                        retries += 1;
-                        if retries > 100 {
-                            eprintln!("Warning: Channel full for >10s, skipping finding");
-                            break;
-                        }
-                        std::thread::sleep(Duration::from_millis(100));
-                    }
-                    Err(channel::TrySendError::Disconnected(_)) => {
-                        eprintln!("error: writer thread has stopped");
-                        return Ok(());
-                    }
-                }
+            // Use blocking send but log if it takes too long
+            if let Err(e) = tx.send(finding) {
+                eprintln!("error: writer thread has stopped: {}", e);
+                return Ok(());
             }
         }
 
@@ -475,25 +497,10 @@ fn process_file(
                 finding.identifier, finding.evidence.line, finding.evidence.column
             );
             if seen.insert(key) {
-                // Try to send with retries to avoid deadlock
-                let mut retries = 0;
-                loop {
-                    match tx.try_send(finding.clone()) {
-                        Ok(()) => break,
-                        Err(channel::TrySendError::Full(_)) => {
-                            // Channel is full, wait a bit and retry
-                            retries += 1;
-                            if retries > 100 {
-                                eprintln!("Warning: Channel full for >10s, skipping finding");
-                                break;
-                            }
-                            std::thread::sleep(Duration::from_millis(100));
-                        }
-                        Err(channel::TrySendError::Disconnected(_)) => {
-                            eprintln!("error: writer thread has stopped");
-                            return Ok(());
-                        }
-                    }
+                // Use blocking send but log if it takes too long
+                if let Err(e) = tx.send(finding) {
+                    eprintln!("error: writer thread has stopped: {}", e);
+                    return Ok(());
                 }
             }
         }
