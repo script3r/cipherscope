@@ -232,7 +232,9 @@ fn main() -> Result<()> {
                 match entry {
                     Ok(e) if e.file_type().map(|t| t.is_file()).unwrap_or(false) => {
                         // Skip files larger than the configured limit (if any)
-                        if let (Some(limit), Ok(meta)) = (max_bytes, e.metadata()) && meta.len() > limit {
+                        if let (Some(limit), Ok(meta)) = (max_bytes, e.metadata())
+                            && meta.len() > limit
+                        {
                             skipped_oversize.fetch_add(1, Ordering::Relaxed);
                             if let Some(pb) = &discovery_bar {
                                 let found = file_count.load(Ordering::Relaxed);
@@ -246,7 +248,9 @@ fn main() -> Result<()> {
                         }
 
                         let path = e.path().to_path_buf();
-                        if let Some(lang) = scan::language_from_path(&path) && patterns.supports_language(lang) {
+                        if let Some(lang) = scan::language_from_path(&path)
+                            && patterns.supports_language(lang)
+                        {
                             files.lock().unwrap().push(path);
                             let count = file_count.fetch_add(1, Ordering::Relaxed) + 1;
                             if let Some(pb) = &discovery_bar {
@@ -380,9 +384,7 @@ fn process_file(
             metadata: HashMap::new(),
         };
         let key = format!("lib|{}", finding.identifier);
-        if seen.insert(key)
-            && tx.send_timeout(finding, Duration::from_secs(5)).is_err()
-        {
+        if seen.insert(key) && tx.send_timeout(finding, Duration::from_secs(5)).is_err() {
             eprintln!(
                 "error: writer thread appears to be blocked (filesystem I/O issue?). Aborting send."
             );
@@ -411,9 +413,7 @@ fn process_file(
                 "alg|{}|{}:{}",
                 finding.identifier, finding.evidence.line, finding.evidence.column
             );
-            if seen.insert(key)
-                && tx.send_timeout(finding, Duration::from_secs(5)).is_err()
-            {
+            if seen.insert(key) && tx.send_timeout(finding, Duration::from_secs(5)).is_err() {
                 eprintln!(
                     "error: writer thread appears to be blocked (filesystem I/O issue?). Aborting send."
                 );
