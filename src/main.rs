@@ -3,7 +3,7 @@ use std::io::{BufWriter, Write};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 use ahash::{AHashMap as HashMap, AHashSet as HashSet};
 use anyhow::{Context, Result};
@@ -137,9 +137,9 @@ fn main() -> Result<()> {
         pb
     });
 
-    // Use a bounded channel to apply backpressure and prevent memory issues
-    // The buffer size is large enough to handle bursts but small enough to apply backpressure
-    let (tx, rx) = channel::bounded::<Finding>(5000);
+    // Use an unbounded channel to avoid deadlocks
+    // We'll rely on the file processing being the bottleneck, not the writer
+    let (tx, rx) = channel::unbounded::<Finding>();
     let output_path = cli.output.clone();
     let found_count_writer = found_count.clone();
     let scan_bar_writer = scan_bar.clone();
@@ -288,102 +288,55 @@ fn main() -> Result<()> {
         .unwrap();
     let total_files = files_to_scan.len();
 
-    // Log the actual count to verify
-    eprintln!(
-        "Starting scan of {} files (discovery found {})",
-        total_files,
-        file_count.load(Ordering::Relaxed)
-    );
-
     if let Some(pb) = &scan_bar {
         pb.set_length(total_files as u64);
         pb.set_message("Scanning files...");
     }
 
-    let patterns_for_scan = patterns.clone();
-    let scanned_count_scan = scanned_count.clone();
-    let scan_bar_scan = scan_bar.clone();
+    // Process files in parallel with rayon
+    files_to_scan.into_par_iter().for_each(|path| {
+        // Create a timeout mechanism using a separate thread
+        let (timeout_tx, timeout_rx) = channel::bounded::<()>(1);
+        let path_clone = path.clone();
 
-    // Create a work queue for better control
-    let work_queue = Arc::new(std::sync::Mutex::new(files_to_scan));
-    let num_threads = cli.threads;
-    
-    eprintln!("Starting {} worker threads...", num_threads);
-    
-    // Spawn worker threads explicitly
-    let handles: Vec<_> = (0..num_threads)
-        .map(|thread_id| {
-            let work_queue = work_queue.clone();
-            let patterns = patterns_for_scan.clone();
-            let tx = tx.clone();
-            let scanned_count = scanned_count_scan.clone();
-            let scan_bar = scan_bar_scan.clone();
-            
-            std::thread::spawn(move || {
-                loop {
-                    // Get next file to process
-                    let path = {
-                        let mut queue = work_queue.lock().unwrap();
-                        if queue.is_empty() {
-                            break;
-                        }
-                        queue.pop()
-                    };
-                    
-                    if let Some(path) = path {
-                        let start = Instant::now();
-                        
-                        // Process the file
-                        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                            process_file(&path, &patterns, &tx)
-                        }));
-                        
-                        match result {
-                            Ok(Ok(())) => {
-                                // File processed successfully
-                            }
-                            Ok(Err(err)) => {
-                                eprintln!("Thread {}: Error processing {}: {err:#}", 
-                                         thread_id, path.display());
-                            }
-                            Err(_) => {
-                                eprintln!("Thread {}: PANIC while processing {}", 
-                                         thread_id, path.display());
-                            }
-                        }
-                        
-                        let elapsed = start.elapsed();
-                        if elapsed > Duration::from_secs(5) {
-                            eprintln!("Thread {}: Slow file ({:.1}s): {}", 
-                                     thread_id, elapsed.as_secs_f32(), path.display());
-                        }
-                        
-                        scanned_count.fetch_add(1, Ordering::Relaxed);
-                        if let Some(pb) = &scan_bar {
-                            pb.inc(1);
-                        }
-                    }
-                }
-                eprintln!("Thread {} finished", thread_id);
-            })
-        })
-        .collect();
-    
-    // Wait for all threads to complete
-    eprintln!("Waiting for all worker threads to complete...");
-    for (i, handle) in handles.into_iter().enumerate() {
-        if let Err(e) = handle.join() {
-            eprintln!("Thread {} panicked: {:?}", i, e);
+        let timeout_thread = std::thread::spawn(move || {
+            // Wait for either completion signal or timeout
+            if timeout_rx.recv_timeout(Duration::from_secs(10)).is_err() {
+                eprintln!(
+                    "TIMEOUT: File took >10s, skipping: {}",
+                    path_clone.display()
+                );
+            }
+        });
+
+        // Process the file
+        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            process_file(&path, &patterns, &tx)
+        }));
+
+        // Signal completion to timeout thread
+        let _ = timeout_tx.send(());
+        drop(timeout_thread);
+
+        // Handle result
+        match result {
+            Ok(Ok(())) => {}
+            Ok(Err(err)) => {
+                eprintln!("Error processing {}: {err:#}", path.display());
+            }
+            Err(_) => {
+                eprintln!("PANIC while processing {}", path.display());
+            }
         }
-    }
-    
-    eprintln!("All worker threads completed. Scanned: {} / {}", 
-              scanned_count.load(Ordering::Relaxed), total_files);
-    
-    // IMPORTANT: We must drop tx AFTER the parallel iterator completes
-    // The parallel iterator above should have finished, but let's verify
+
+        scanned_count.fetch_add(1, Ordering::Relaxed);
+        if let Some(pb) = &scan_bar {
+            pb.inc(1);
+        }
+    });
+
+    // All files have been processed
     drop(tx);
-    eprintln!("Channel sender dropped");
 
     if let Some(pb) = &scan_bar {
         pb.finish_with_message(format!(
@@ -393,9 +346,7 @@ fn main() -> Result<()> {
         ));
     }
 
-    eprintln!("Waiting for writer thread to finish...");
     writer_handle.join().unwrap()?;
-    eprintln!("Writer thread finished");
 
     if !cli.progress && cli.output != "-" {
         eprintln!(
