@@ -293,30 +293,45 @@ fn main() -> Result<()> {
         pb.set_message("Scanning files...");
     }
 
+    // Track currently processing files to identify stuck ones
+    let processing_files = Arc::new(std::sync::Mutex::new(HashMap::<std::thread::ThreadId, PathBuf>::new()));
+    let processing_files_clone = processing_files.clone();
+    
+    // Spawn a monitor thread that reports stuck files
+    std::thread::spawn(move || {
+        loop {
+            std::thread::sleep(Duration::from_secs(30));
+            let files = processing_files_clone.lock().unwrap();
+            if !files.is_empty() {
+                eprintln!("\n=== FILES CURRENTLY BEING PROCESSED (>30s) ===");
+                for (thread_id, path) in files.iter() {
+                    eprintln!("  Thread {:?}: {}", thread_id, path.display());
+                }
+                eprintln!("===============================================\n");
+            }
+        }
+    });
+
     // Process files in parallel with rayon
     files_to_scan.into_par_iter().for_each(|path| {
-        // Create a timeout mechanism using a separate thread
-        let (timeout_tx, timeout_rx) = channel::bounded::<()>(1);
-        let path_clone = path.clone();
-
-        let timeout_thread = std::thread::spawn(move || {
-            // Wait for either completion signal or timeout
-            if timeout_rx.recv_timeout(Duration::from_secs(10)).is_err() {
-                eprintln!(
-                    "TIMEOUT: File took >10s, skipping: {}",
-                    path_clone.display()
-                );
-            }
-        });
-
+        let thread_id = std::thread::current().id();
+        
+        // Register this file as being processed
+        {
+            let mut files = processing_files.lock().unwrap();
+            files.insert(thread_id, path.clone());
+        }
+        
         // Process the file
         let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
             process_file(&path, &patterns, &tx)
         }));
-
-        // Signal completion to timeout thread
-        let _ = timeout_tx.send(());
-        drop(timeout_thread);
+        
+        // Unregister this file
+        {
+            let mut files = processing_files.lock().unwrap();
+            files.remove(&thread_id);
+        }
 
         // Handle result
         match result {
