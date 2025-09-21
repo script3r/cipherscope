@@ -15,7 +15,6 @@ use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use memmap2::Mmap;
 use rayon::prelude::*;
 use serde::Serialize;
-use std::time::Duration;
 
 mod patterns;
 mod scan;
@@ -137,7 +136,9 @@ fn main() -> Result<()> {
         pb
     });
 
-    let (tx, rx) = channel::unbounded::<Finding>();
+    // Use a bounded channel to apply backpressure and prevent memory issues
+    // The buffer size is large enough to handle bursts but small enough to apply backpressure
+    let (tx, rx) = channel::bounded::<Finding>(5000);
     let output_path = cli.output.clone();
     let found_count_writer = found_count.clone();
     let scan_bar_writer = scan_bar.clone();
@@ -157,6 +158,8 @@ fn main() -> Result<()> {
                 pb.set_message(format!("Found {} cryptographic items", count));
             }
         }
+        // Flush any remaining buffered output
+        writer.flush()?;
         Ok(())
     });
 
@@ -384,11 +387,12 @@ fn process_file(
             metadata: HashMap::new(),
         };
         let key = format!("lib|{}", finding.identifier);
-        if seen.insert(key) && tx.send_timeout(finding, Duration::from_secs(5)).is_err() {
-            eprintln!(
-                "error: writer thread appears to be blocked (filesystem I/O issue?). Aborting send."
-            );
-            return Ok(());
+        if seen.insert(key) {
+            // Use blocking send - the bounded channel will apply backpressure naturally
+            if let Err(e) = tx.send(finding) {
+                eprintln!("error: writer thread has stopped: {}", e);
+                return Ok(());
+            }
         }
 
         // 2) algorithms for this library
@@ -413,11 +417,12 @@ fn process_file(
                 "alg|{}|{}:{}",
                 finding.identifier, finding.evidence.line, finding.evidence.column
             );
-            if seen.insert(key) && tx.send_timeout(finding, Duration::from_secs(5)).is_err() {
-                eprintln!(
-                    "error: writer thread appears to be blocked (filesystem I/O issue?). Aborting send."
-                );
-                return Ok(());
+            if seen.insert(key) {
+                // Use blocking send - the bounded channel will apply backpressure naturally
+                if let Err(e) = tx.send(finding) {
+                    eprintln!("error: writer thread has stopped: {}", e);
+                    return Ok(());
+                }
             }
         }
     }
