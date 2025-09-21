@@ -1,0 +1,4 @@
+{"assetType": "library", "evidence": {"column": 1, "line": 3}, "identifier": "Go std crypto", "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 14, "line": 13}, "identifier": "AES-GCM", "metadata": {"keySize": 32, "primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 12, "line": 14}, "identifier": "AES-GCM", "metadata": {"keySize": 32, "primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 14, "line": 13}, "identifier": "AES", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}

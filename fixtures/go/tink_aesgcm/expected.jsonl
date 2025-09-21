@@ -1,0 +1,6 @@
+{"assetType": "library", "evidence": {"column": 1, "line": 3}, "identifier": "Google Tink (Go)", "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 20, "line": 48}, "identifier": "AES-CTR-HMAC", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 23, "line": 58}, "identifier": "ChaCha20-Poly1305", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 13, "line": 21}, "identifier": "AES-GCM", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 21, "line": 72}, "identifier": "HMAC-SHA256", "metadata": {"primitive": "mac"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 12, "line": 76}, "identifier": "HMAC-SHA256", "metadata": {"primitive": "mac"}, "path": "FIXME"}

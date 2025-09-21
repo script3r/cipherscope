@@ -1,0 +1,2 @@
+{"assetType": "library", "evidence": {"column": 1, "line": 1}, "identifier": "OpenSSL", "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 34, "line": 2}, "identifier": "SHA-256", "metadata": {"primitive": "hash"}, "path": "FIXME"}

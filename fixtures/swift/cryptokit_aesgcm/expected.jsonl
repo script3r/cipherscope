@@ -1,0 +1,3 @@
+{"assetType": "library", "evidence": {"column": 1, "line": 1}, "identifier": "CryptoKit", "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 13, "line": 5}, "identifier": "AES-GCM", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 19, "line": 6}, "identifier": "AES-GCM", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}

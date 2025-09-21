@@ -1,0 +1,3 @@
+{"assetType": "library", "evidence": {"column": 1, "line": 5}, "identifier": "Java JCA/JCE", "path": "FIXME"}
+{"assetType": "library", "evidence": {"column": 1, "line": 4}, "identifier": "Google Tink (Java)", "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 37, "line": 13}, "identifier": "AES-GCM", "metadata": {"keySize": 256, "primitive": "symmetric"}, "path": "FIXME"}

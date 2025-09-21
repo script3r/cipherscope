@@ -1,0 +1,3 @@
+{"assetType": "library", "evidence": {"column": 1, "line": 5}, "identifier": "Google Tink (C++)", "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 33, "line": 25}, "identifier": "AES-GCM", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 9, "line": 26}, "identifier": "AES-GCM", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}

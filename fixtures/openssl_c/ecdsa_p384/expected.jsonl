@@ -1,0 +1,3 @@
+{"assetType": "library", "evidence": {"column": 1, "line": 1}, "identifier": "OpenSSL", "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 25, "line": 2}, "identifier": "ECDSA", "metadata": {"curve": "NID_secp384r1", "primitive": "signature"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 25, "line": 2}, "identifier": "ECDSA-P384", "metadata": {"primitive": "signature"}, "path": "FIXME"}
