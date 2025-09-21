@@ -60,13 +60,13 @@ struct Cli {
     max_file_mb: Option<u64>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 struct Evidence {
     line: usize,
     column: usize,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 struct Finding {
     #[serde(rename = "assetType")]
     asset_type: String,
@@ -340,7 +340,13 @@ fn main() -> Result<()> {
         }
     });
 
+    eprintln!("All files submitted for processing. Scanned so far: {} / {}", 
+              scanned_count.load(Ordering::Relaxed), total_files);
+    
+    // IMPORTANT: We must drop tx AFTER the parallel iterator completes
+    // The parallel iterator above should have finished, but let's verify
     drop(tx);
+    eprintln!("Channel sender dropped");
 
     if let Some(pb) = &scan_bar {
         pb.finish_with_message(format!(
@@ -350,7 +356,9 @@ fn main() -> Result<()> {
         ));
     }
 
+    eprintln!("Waiting for writer thread to finish...");
     writer_handle.join().unwrap()?;
+    eprintln!("Writer thread finished");
 
     if !cli.progress && cli.output != "-" {
         eprintln!(
@@ -422,10 +430,25 @@ fn process_file(
         };
         let key = format!("lib|{}", finding.identifier);
         if seen.insert(key) {
-            // Use blocking send - the bounded channel will apply backpressure naturally
-            if let Err(e) = tx.send(finding) {
-                eprintln!("error: writer thread has stopped: {}", e);
-                return Ok(());
+            // Try to send with retries to avoid deadlock
+            let mut retries = 0;
+            loop {
+                match tx.try_send(finding.clone()) {
+                    Ok(()) => break,
+                    Err(channel::TrySendError::Full(_)) => {
+                        // Channel is full, wait a bit and retry
+                        retries += 1;
+                        if retries > 100 {
+                            eprintln!("Warning: Channel full for >10s, skipping finding");
+                            break;
+                        }
+                        std::thread::sleep(Duration::from_millis(100));
+                    }
+                    Err(channel::TrySendError::Disconnected(_)) => {
+                        eprintln!("error: writer thread has stopped");
+                        return Ok(());
+                    }
+                }
             }
         }
 
@@ -452,10 +475,25 @@ fn process_file(
                 finding.identifier, finding.evidence.line, finding.evidence.column
             );
             if seen.insert(key) {
-                // Use blocking send - the bounded channel will apply backpressure naturally
-                if let Err(e) = tx.send(finding) {
-                    eprintln!("error: writer thread has stopped: {}", e);
-                    return Ok(());
+                // Try to send with retries to avoid deadlock
+                let mut retries = 0;
+                loop {
+                    match tx.try_send(finding.clone()) {
+                        Ok(()) => break,
+                        Err(channel::TrySendError::Full(_)) => {
+                            // Channel is full, wait a bit and retry
+                            retries += 1;
+                            if retries > 100 {
+                                eprintln!("Warning: Channel full for >10s, skipping finding");
+                                break;
+                            }
+                            std::thread::sleep(Duration::from_millis(100));
+                        }
+                        Err(channel::TrySendError::Disconnected(_)) => {
+                            eprintln!("error: writer thread has stopped");
+                            return Ok(());
+                        }
+                    }
                 }
             }
         }
