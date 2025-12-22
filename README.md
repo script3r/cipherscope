@@ -6,29 +6,29 @@
 
 [![CI](https://github.com/script3r/cipherscope/actions/workflows/ci.yml/badge.svg)](https://github.com/script3r/cipherscope/actions/workflows/ci.yml)
 
-`cipherscope` is a fast, command-line tool for scanning source code to detect the usage of cryptographic libraries and algorithms. It uses static analysis powered by Tree-sitter for high-precision, language-aware scanning.
+`cipherscope` is a high-performance, command-line tool for scanning source code to detect the usage of cryptographic libraries and algorithms. It uses language-aware static analysis powered by [Tree-sitter](https://tree-sitter.github.io/tree-sitter/) for high precision.
 
-## Features
+## Key Features
 
-- **High Performance**: Scans large codebases quickly by leveraging parallelism.
-- **Language-Aware**: Uses Tree-sitter parsers to understand code structure, reducing false positives.
-- **Extensible Patterns**: Define custom patterns in a simple TOML file to find new libraries and algorithms.
-- **Multiple Language Support**: Scans C, C++, Java, Python, Go, Swift, PHP, Objective-C, and Rust.
-- **Flexible Output**: Outputs findings as JSONL to stdout or a file for easy integration with other tools.
-- **Cross-Platform**: Built in Rust, runs on macOS, Linux, and Windows.
+- **High Performance**: Parallelized scanning of large codebases.
+- **Language-Aware**: Uses Tree-sitter parsers to reduce false positives by understanding code structure.
+- **Extensible Patterns**: Easily add new libraries and algorithms via a simple TOML configuration.
+- **Broad Language Support**: Currently supports C, C++, Java, Python, Go, Swift, PHP, Objective-C, and Rust.
+- **Developer Friendly**: JSONL output for easy integration with CI/CD pipelines and security tools.
+- **Cross-Platform**: Native binaries for macOS, Linux, and Windows.
 
 ## How It Works
 
-`cipherscope` works in two main phases: file discovery and scanning.
+`cipherscope` operates in two main phases:
 
-1.  **Discovery**: The tool walks the specified directory tree in parallel to find files matching the extensions of supported programming languages. It respects `.gitignore` files and can skip oversized files to keep the discovery process fast.
+1.  **Discovery**: It walks the specified root directories in parallel, identifying source files based on their extensions. It respects `.gitignore` rules and can be configured to skip files that exceed a certain size to maintain speed.
 
-2.  **Scanning**: Each discovered file is then processed, also in parallel:
-    a.  **Parsing**: The file content is parsed into an Abstract Syntax Tree (AST) using the appropriate Tree-sitter grammar for its language.
-    b.  **Library Anchoring**: It looks for "library anchors" in the AST, which are typically `import` or `include` statements that match patterns defined in `patterns.toml`. This quickly identifies which cryptographic libraries might be in use.
-    c.  **Algorithm Detection**: If a library anchor is found, the scanner then searches for specific algorithm patterns associated with that library. These patterns target function calls, constants, and other symbols to identify cryptographic primitives.
+2.  **Scanning**: Discovered files are processed in a thread pool:
+    a.  **Parsing**: Each file is parsed into an Abstract Syntax Tree (AST) using the relevant Tree-sitter grammar.
+    b.  **Anchoring**: The scanner looks for "library anchors" (e.g., `import` or `#include` statements) that match known cryptographic libraries defined in `patterns.toml`.
+    c.  **Algorithm Detection**: If an anchor is found, the scanner performs a deeper search within that file for specific algorithm usage patterns, such as function calls and constants.
 
-All findings are streamed as JSONL to the output, allowing you to see results in real-time.
+All results are streamed as JSONL to the output, allowing for real-time monitoring and processing.
 
 ## Installation
 
@@ -41,21 +41,20 @@ cargo install --path .
 
 ## Usage
 
-Scan a directory for cryptographic assets:
 ```bash
-cipherscope --roots /path/to/your/code --output results.jsonl
+cipherscope [OPTIONS]
 ```
 
-### Command-Line Arguments
+### Options
 
-- `-r, --roots <PATHS>`: One or more root directories to scan. Defaults to the current directory (`.`).
-- `-e, --exclude <GLOBS>`: One or more glob patterns to exclude from the scan. For example, `vendor/**` or `*.min.js`.
-- `-p, --patterns <PATH>`: Path to the `patterns.toml` file. Defaults to `patterns.toml` in the current directory.
-- `-o, --output <PATH>`: Output file path for the JSONL results. Defaults to stdout (`-`).
-- `--threads <NUM>`: The maximum number of parallel threads to use. Defaults to the number of available CPU cores.
-- `-v, --progress`: Show progress bars during the scan.
-- `--gitignore`: Respect `.gitignore` files (enabled by default).
-- `--max-file-mb <MB>`: Skip files larger than this size (in megabytes) during discovery. Default: 1.
+- `-r, --roots <PATHS>`: One or more root directories to scan (default: `.`).
+- `-e, --exclude <GLOBS>`: Glob patterns to exclude from the scan (e.g., `vendor/**`).
+- `-p, --patterns <PATH>`: Path to the `patterns.toml` file (default: `patterns.toml`).
+- `-o, --output <PATH>`: Output file path for JSONL results (default: stdout).
+- `--threads <NUM>`: Maximum number of parallel threads to use.
+- `-v, --progress`: Enable progress bars for discovery and scanning.
+- `--gitignore`: Respect `.gitignore` files (default: true).
+- `--max-file-mb <MB>`: Skip files larger than this size in megabytes (default: 1).
 
 ### Examples
 

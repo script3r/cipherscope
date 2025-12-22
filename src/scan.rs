@@ -4,85 +4,28 @@ use tree_sitter::{Language as TsLanguage, Node, Parser, Point, Tree};
 
 use crate::patterns::{Language, ParameterPattern, PatternSet};
 
-#[cfg(feature = "lang-c")]
-fn ts_lang_c() -> TsLanguage {
-    tree_sitter_c::LANGUAGE.into()
-}
-#[cfg(not(feature = "lang-c"))]
-fn ts_lang_c() -> TsLanguage {
-    unreachable!("lang-c feature disabled")
-}
-
-#[cfg(feature = "lang-cpp")]
-fn ts_lang_cpp() -> TsLanguage {
-    tree_sitter_cpp::LANGUAGE.into()
-}
-#[cfg(not(feature = "lang-cpp"))]
-fn ts_lang_cpp() -> TsLanguage {
-    unreachable!("lang-cpp feature disabled")
+macro_rules! define_ts_lang {
+    ($name:ident, $feature:literal, $grammar:expr) => {
+        #[cfg(feature = $feature)]
+        fn $name() -> TsLanguage {
+            $grammar.into()
+        }
+        #[cfg(not(feature = $feature))]
+        fn $name() -> TsLanguage {
+            unreachable!(concat!($feature, " feature disabled"))
+        }
+    };
 }
 
-#[cfg(feature = "lang-java")]
-fn ts_lang_java() -> TsLanguage {
-    tree_sitter_java::LANGUAGE.into()
-}
-#[cfg(not(feature = "lang-java"))]
-fn ts_lang_java() -> TsLanguage {
-    unreachable!("lang-java feature disabled")
-}
-
-#[cfg(feature = "lang-python")]
-fn ts_lang_python() -> TsLanguage {
-    tree_sitter_python::LANGUAGE.into()
-}
-#[cfg(not(feature = "lang-python"))]
-fn ts_lang_python() -> TsLanguage {
-    unreachable!("lang-python feature disabled")
-}
-
-#[cfg(feature = "lang-go")]
-fn ts_lang_go() -> TsLanguage {
-    tree_sitter_go::LANGUAGE.into()
-}
-#[cfg(not(feature = "lang-go"))]
-fn ts_lang_go() -> TsLanguage {
-    unreachable!("lang-go feature disabled")
-}
-
-#[cfg(feature = "lang-swift")]
-fn ts_lang_swift() -> TsLanguage {
-    tree_sitter_swift::LANGUAGE.into()
-}
-#[cfg(feature = "lang-php")]
-fn ts_lang_php() -> TsLanguage {
-    tree_sitter_php::LANGUAGE_PHP.into()
-}
-#[cfg(not(feature = "lang-php"))]
-fn ts_lang_php() -> TsLanguage {
-    unreachable!("lang-php feature disabled")
-}
-#[cfg(not(feature = "lang-swift"))]
-fn ts_lang_swift() -> TsLanguage {
-    unreachable!("lang-swift feature disabled")
-}
-
-#[cfg(feature = "lang-objc")]
-fn ts_lang_objc() -> TsLanguage {
-    tree_sitter_objc::LANGUAGE.into()
-}
-#[cfg(not(feature = "lang-objc"))]
-fn ts_lang_objc() -> TsLanguage {
-    unreachable!("lang-objc feature disabled")
-}
-
-#[cfg(feature = "lang-rust")]
-fn ts_lang_rust() -> TsLanguage {
-    tree_sitter_rust::LANGUAGE.into()
-}
-#[cfg(not(feature = "lang-rust"))]
-fn ts_lang_rust() -> TsLanguage {
-    unreachable!("lang-rust feature disabled")
-}
+define_ts_lang!(ts_lang_c, "lang-c", tree_sitter_c::LANGUAGE);
+define_ts_lang!(ts_lang_cpp, "lang-cpp", tree_sitter_cpp::LANGUAGE);
+define_ts_lang!(ts_lang_java, "lang-java", tree_sitter_java::LANGUAGE);
+define_ts_lang!(ts_lang_python, "lang-python", tree_sitter_python::LANGUAGE);
+define_ts_lang!(ts_lang_go, "lang-go", tree_sitter_go::LANGUAGE);
+define_ts_lang!(ts_lang_swift, "lang-swift", tree_sitter_swift::LANGUAGE);
+define_ts_lang!(ts_lang_php, "lang-php", tree_sitter_php::LANGUAGE_PHP);
+define_ts_lang!(ts_lang_objc, "lang-objc", tree_sitter_objc::LANGUAGE);
+define_ts_lang!(ts_lang_rust, "lang-rust", tree_sitter_rust::LANGUAGE);
 
 #[derive(Clone, Copy, Debug)]
 pub struct LibraryHit<'a> {
