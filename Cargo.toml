@@ -2,6 +2,12 @@
 name = "cipherscope"
 version = "0.1.0"
 edition = "2024"
+description = "A high-performance, language-aware tool for scanning source code to detect cryptographic libraries and algorithms usage."
+license = "MIT"
+repository = "https://github.com/script3r/cipherscope"
+readme = "README.md"
+keywords = ["crypto", "static-analysis", "security", "inventory", "tree-sitter"]
+categories = ["development-tools", "command-line-utilities"]
 
 [dependencies]
 anyhow = "1.0"
