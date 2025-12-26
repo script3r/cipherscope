@@ -218,31 +218,29 @@ pub fn find_algorithms<'a>(
                     matched = true;
                     break;
                 }
-                if text != match_text {
-                    if let Some(m) = re.find(match_text) {
-                        if let Some((_, map)) = resolved.as_ref() {
-                            let start = m.start();
-                            let end = m.end().min(map.len());
-                            if start < map.len() {
-                                let mut mapped = map[start];
-                                let slice = &map[start..end];
-                                for i in 0..slice.len() {
-                                    let prev = i.checked_sub(1).map(|p| slice[p]);
-                                    let next = slice.get(i + 1).copied();
-                                    if prev == Some(slice[i])
-                                        || next == Some(slice[i])
-                                        || prev.is_some_and(|p| slice[i] != p + 1)
-                                    {
-                                        mapped = slice[i];
-                                        break;
-                                    }
+                if text != match_text && let Some(m) = re.find(match_text) {
+                    if let Some((_, map)) = resolved.as_ref() {
+                        let start = m.start();
+                        let end = m.end().min(map.len());
+                        if start < map.len() {
+                            let mut mapped = map[start];
+                            let slice = &map[start..end];
+                            for i in 0..slice.len() {
+                                let prev = i.checked_sub(1).map(|p| slice[p]);
+                                let next = slice.get(i + 1).copied();
+                                if prev == Some(slice[i])
+                                    || next == Some(slice[i])
+                                    || prev.is_some_and(|p| slice[i] != p + 1)
+                                {
+                                    mapped = slice[i];
+                                    break;
                                 }
-                                match_offset = Some(mapped);
                             }
+                            match_offset = Some(mapped);
                         }
-                        matched = true;
-                        break;
                     }
+                    matched = true;
+                    break;
                 }
             }
             if matched {
@@ -336,8 +334,10 @@ pub fn find_algorithms<'a>(
     if matches!(lang, Language::Swift)
         && let Some(lib) = patterns.libraries.iter().find(|l| l.name == library_name)
     {
-        let mut seen_on_line: HashSet<(&str, usize)> =
-            result.iter().map(|hit| (hit.algorithm_name, hit.line)).collect();
+        let mut seen_on_line: HashSet<(&str, usize)> = result
+            .iter()
+            .map(|hit| (hit.algorithm_name, hit.line))
+            .collect();
         let present_algs: HashSet<&str> = result.iter().map(|hit| hit.algorithm_name).collect();
         for alg in &lib.algorithms {
             if present_algs.contains(alg.name.as_str()) {
