@@ -218,7 +218,9 @@ pub fn find_algorithms<'a>(
                     matched = true;
                     break;
                 }
-                if text != match_text && let Some(m) = re.find(match_text) {
+                if text != match_text
+                    && let Some(m) = re.find(match_text)
+                {
                     if let Some((_, map)) = resolved.as_ref() {
                         let start = m.start();
                         let end = m.end().min(map.len());
