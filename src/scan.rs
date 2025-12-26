@@ -301,16 +301,12 @@ fn collect_constants(lang: Language, content: &str) -> HashMap<String, String> {
             r"(?m)^\s*(?:public|private|protected)?\s*(?:static\s+)?final\s+(?:int|long|String)\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^;]+);",
         ],
         Language::Go => &[r"(?m)^\s*const\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^\n]+)$"],
-        Language::Python => &[
-            r"(?m)^\s*([A-Z_][A-Z0-9_]*)\s*=\s*([^#\n]+)",
-        ],
+        Language::Python => &[r"(?m)^\s*([A-Z_][A-Z0-9_]*)\s*=\s*([^#\n]+)"],
         Language::Php => &[
             r"(?m)^\s*const\s+([A-Z_][A-Z0-9_]*)\s*=\s*([^;]+);",
             r#"define\(\s*['"]([A-Z_][A-Z0-9_]*)['"]\s*,\s*([^)]+)\)"#,
         ],
-        Language::Rust => &[
-            r"(?m)^\s*const\s+([A-Za-z_][A-Za-z0-9_]*)\s*:[^=]+=\s*([^;]+);",
-        ],
+        Language::Rust => &[r"(?m)^\s*const\s+([A-Za-z_][A-Za-z0-9_]*)\s*:[^=]+=\s*([^;]+);"],
         _ => &[],
     };
 
@@ -492,7 +488,7 @@ fn dedupe_more_specific<'a>(hits: Vec<AlgorithmHit<'a>>) -> Vec<AlgorithmHit<'a>
             if p_i != p_j {
                 continue;
             }
-            if is_more_specific(&hits[j].algorithm_name, &hits[i].algorithm_name) {
+            if is_more_specific(hits[j].algorithm_name, hits[i].algorithm_name) {
                 drop[i] = true;
                 break;
             }
@@ -506,9 +502,7 @@ fn dedupe_more_specific<'a>(hits: Vec<AlgorithmHit<'a>>) -> Vec<AlgorithmHit<'a>
 }
 
 fn primitive_of<'a>(hit: &'a AlgorithmHit<'a>) -> Option<&'a str> {
-    hit.metadata
-        .get("primitive")
-        .and_then(|v| v.as_str())
+    hit.metadata.get("primitive").and_then(|v| v.as_str())
 }
 
 fn is_more_specific(specific: &str, generic: &str) -> bool {
@@ -534,5 +528,7 @@ fn is_more_specific(specific: &str, generic: &str) -> bool {
 
     tokens_specific_no_num == tokens_generic_no_num
         && tokens_specific.len() > tokens_generic.len()
-        && tokens_specific.iter().any(|t| t.chars().all(|c| c.is_ascii_digit()))
+        && tokens_specific
+            .iter()
+            .any(|t| t.chars().all(|c| c.is_ascii_digit()))
 }
