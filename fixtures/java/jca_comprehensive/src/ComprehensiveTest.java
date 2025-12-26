@@ -370,6 +370,12 @@ public class ComprehensiveTest {
         PBEKeySpec pbeSpec512 = new PBEKeySpec(password, salt, 10000, 256);
         SecretKey pbkdf2Sha512Key = pbkdf2Sha512.generateSecret(pbeSpec512);
     }
+
+    private static final int AES_KEY_SIZE_CONST = 192;
+
+    public static void testAesKeySizeConst() throws Exception {
+        KeyGenerator.getInstance("AES").init(AES_KEY_SIZE_CONST);
+    }
     
     public static void main(String[] args) throws Exception {
         testSymmetricCiphers();

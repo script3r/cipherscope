@@ -588,3 +588,9 @@ if __name__ == "__main__":
     test_mac_algorithms()
     test_kdf_algorithms()
     print("All cryptography tests completed")
+
+RSA_KEY_SIZE_CONST = 3072
+
+
+def test_rsa_key_size_const():
+    rsa.generate_private_key(public_exponent=65537, key_size=RSA_KEY_SIZE_CONST)

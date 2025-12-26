@@ -1,5 +1,6 @@
 use ahash::{AHashMap as HashMap, AHashSet as HashSet};
 use anyhow::{Context, Result};
+use regex::Regex;
 use tree_sitter::{Language as TsLanguage, Node, Parser, Point, Tree};
 
 use crate::patterns::{Language, ParameterPattern, PatternSet};
@@ -156,12 +157,23 @@ pub fn find_algorithms<'a>(
     let Some(lib) = patterns.libraries.iter().find(|l| l.name == library_name) else {
         return result;
     };
+    let constants = collect_constants(lang, content);
     // Collect raw hits
     let mut hits_by_alg: HashMap<&str, Vec<(AlgorithmHit<'a>, bool)>> = HashMap::new();
     for node in code_symbol_nodes(lang, tree.root_node()) {
         let text = node.utf8_text(content.as_bytes()).unwrap_or("");
+        let resolved_text = if constants.is_empty() {
+            None
+        } else {
+            Some(replace_constants(text, &constants))
+        };
+        let match_text = resolved_text.as_deref().unwrap_or(text);
         for alg in &lib.algorithms {
-            if alg.symbol_regexes.iter().any(|re| re.is_match(text)) {
+            if alg
+                .symbol_regexes
+                .iter()
+                .any(|re| re.is_match(text) || re.is_match(match_text))
+            {
                 let mut metadata = HashMap::new();
                 // Add primitive if present
                 if let Some(primitive) = &alg.primitive {
@@ -169,7 +181,8 @@ pub fn find_algorithms<'a>(
                 }
                 let mut had_param_capture = false;
                 for pp in &alg.parameter_patterns {
-                    if let Some(val) = extract_parameter(pp, text) {
+                    let source_text = match_text;
+                    if let Some(val) = extract_parameter(pp, source_text) {
                         metadata.insert(pp.name.as_str(), val);
                         had_param_capture = true;
                     } else if let Some(default_val) = &pp.default_value {
@@ -275,6 +288,131 @@ fn extract_parameter(pp: &ParameterPattern, text: &str) -> Option<serde_json::Va
         return Some(serde_json::Value::String(g.to_string()));
     }
     None
+}
+
+fn collect_constants(lang: Language, content: &str) -> HashMap<String, String> {
+    let mut constants = HashMap::new();
+    let patterns: &[&str] = match lang {
+        Language::C | Language::Cpp | Language::Objc => &[
+            r"(?m)^\s*#\s*define\s+([A-Za-z_][A-Za-z0-9_]*)\s+([^\n]+)$",
+            r"(?m)^\s*(?:static\s+)?const\s+[^=;]+?\b([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^;]+);",
+        ],
+        Language::Java => &[
+            r"(?m)^\s*(?:public|private|protected)?\s*(?:static\s+)?final\s+(?:int|long|String)\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^;]+);",
+        ],
+        Language::Go => &[r"(?m)^\s*const\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^\n]+)$"],
+        Language::Python => &[
+            r"(?m)^\s*([A-Z_][A-Z0-9_]*)\s*=\s*([^#\n]+)",
+        ],
+        Language::Php => &[
+            r"(?m)^\s*const\s+([A-Z_][A-Z0-9_]*)\s*=\s*([^;]+);",
+            r#"define\(\s*['"]([A-Z_][A-Z0-9_]*)['"]\s*,\s*([^)]+)\)"#,
+        ],
+        Language::Rust => &[
+            r"(?m)^\s*const\s+([A-Za-z_][A-Za-z0-9_]*)\s*:[^=]+=\s*([^;]+);",
+        ],
+        _ => &[],
+    };
+
+    for pattern in patterns {
+        let re = Regex::new(pattern).expect("valid regex");
+        for caps in re.captures_iter(content) {
+            let Some(name) = caps.get(1).map(|m| m.as_str()) else {
+                continue;
+            };
+            let Some(raw_value) = caps.get(2).map(|m| m.as_str()) else {
+                continue;
+            };
+            if let Some(value) = normalize_const_value(raw_value) {
+                constants.insert(name.to_string(), value);
+            }
+        }
+    }
+
+    constants
+}
+
+fn normalize_const_value(raw: &str) -> Option<String> {
+    let mut value = raw.trim();
+    if let Some((before, _)) = value.split_once("//") {
+        value = before.trim();
+    }
+    if let Some((before, _)) = value.split_once("/*") {
+        value = before.trim();
+    }
+    value = value.trim_end_matches(';').trim_end_matches(',').trim();
+    while value.starts_with('(') && value.ends_with(')') && value.len() > 2 {
+        value = value[1..value.len() - 1].trim();
+    }
+    if value.is_empty() {
+        return None;
+    }
+    if value.starts_with('"') || value.starts_with('\'') {
+        return Some(value.to_string());
+    }
+
+    let mut digits = String::new();
+    for ch in value.chars() {
+        if ch.is_ascii_digit() {
+            digits.push(ch);
+        } else {
+            break;
+        }
+    }
+    if !digits.is_empty() {
+        let suffix = value[digits.len()..].trim();
+        if suffix.is_empty() || suffix.chars().all(|c| c.is_ascii_alphabetic()) {
+            return Some(digits);
+        }
+    }
+
+    if is_identifier(value) {
+        return Some(value.to_string());
+    }
+
+    None
+}
+
+fn is_identifier(value: &str) -> bool {
+    let mut chars = value.chars();
+    let Some(first) = chars.next() else {
+        return false;
+    };
+    if !(first == '_' || first.is_ascii_alphabetic()) {
+        return false;
+    }
+    chars.all(|c| c == '_' || c.is_ascii_alphanumeric())
+}
+
+fn replace_constants(text: &str, constants: &HashMap<String, String>) -> String {
+    if constants.is_empty() {
+        return text.to_string();
+    }
+
+    let mut resolved = String::with_capacity(text.len());
+    let mut token = String::new();
+    let flush_token = |token: &mut String, resolved: &mut String| {
+        if token.is_empty() {
+            return;
+        }
+        if let Some(value) = constants.get(token) {
+            resolved.push_str(value);
+        } else {
+            resolved.push_str(token);
+        }
+        token.clear();
+    };
+
+    for ch in text.chars() {
+        if ch == '_' || ch.is_ascii_alphanumeric() {
+            token.push(ch);
+        } else {
+            flush_token(&mut token, &mut resolved);
+            resolved.push(ch);
+        }
+    }
+    flush_token(&mut token, &mut resolved);
+    resolved
 }
 
 fn import_like_nodes<'a>(lang: Language, root: Node<'a>) -> Vec<Node<'a>> {

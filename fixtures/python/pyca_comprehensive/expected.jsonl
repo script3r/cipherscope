@@ -195,3 +195,4 @@
 {"assetType": "algorithm", "evidence": {"column": 24, "line": 214}, "identifier": "X448", "metadata": {"primitive": "keyexchange"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 19, "line": 138}, "identifier": "SEED", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 9, "line": 139}, "identifier": "SEED", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 596}, "identifier": "RSA", "metadata": {"keySize": 3072, "primitive": "signature"}, "path": "FIXME"}

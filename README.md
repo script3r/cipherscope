@@ -6,12 +6,13 @@
 
 [![CI](https://github.com/script3r/cipherscope/actions/workflows/ci.yml/badge.svg)](https://github.com/script3r/cipherscope/actions/workflows/ci.yml)
 
-`cipherscope` is a high-performance, command-line tool for scanning source code to detect the usage of cryptographic libraries and algorithms. It uses language-aware static analysis powered by [Tree-sitter](https://tree-sitter.github.io/tree-sitter/) for high precision.
+`cipherscope` is a high-performance, command-line tool for scanning source code to detect the usage of cryptographic libraries and algorithms. The goal is to enable building an efficient, comprehensive cryptographic inventory. It uses language-aware static analysis powered by [Tree-sitter](https://tree-sitter.github.io/tree-sitter/) for high precision.
 
 ## Key Features
 
 - **High Performance**: Parallelized scanning of large codebases.
 - **Language-Aware**: Uses Tree-sitter parsers to reduce false positives by understanding code structure.
+- **Inventory-First**: Focused on assembling a reliable crypto usage inventory across large repos.
 - **Extensible Patterns**: Easily add new libraries and algorithms via a simple TOML configuration.
 - **Broad Language Support**: Currently supports C, C++, Java, Python, Go, Swift, PHP, Objective-C, and Rust.
 - **Developer Friendly**: JSONL output for easy integration with CI/CD pipelines and security tools.
@@ -29,6 +30,7 @@
     c.  **Algorithm Detection**: If an anchor is found, the scanner performs a deeper search within that file for specific algorithm usage patterns, such as function calls and constants.
 
 All results are streamed as JSONL to the output, allowing for real-time monitoring and processing.
+For a deeper architecture overview, see `DESIGN.md`.
 
 ## Installation
 

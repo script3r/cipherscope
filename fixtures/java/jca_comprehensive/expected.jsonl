@@ -68,10 +68,6 @@
 {"assetType": "algorithm", "evidence": {"column": 32, "line": 88}, "identifier": "RSA", "metadata": {"keySize": 2048, "primitive": "signature"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 35, "line": 127}, "identifier": "RSA", "metadata": {"keySize": 2048, "primitive": "signature"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 28, "line": 201}, "identifier": "RSA", "metadata": {"keySize": 2048, "primitive": "signature"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 34, "line": 12}, "identifier": "AES", "metadata": {"keySize": 256, "primitive": "symmetric"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 25, "line": 17}, "identifier": "AES", "metadata": {"keySize": 256, "primitive": "symmetric"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 25, "line": 22}, "identifier": "AES", "metadata": {"keySize": 256, "primitive": "symmetric"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 25, "line": 27}, "identifier": "AES", "metadata": {"keySize": 256, "primitive": "symmetric"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 25, "line": 27}, "identifier": "AES-ECB", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 29, "line": 143}, "identifier": "SHA-1", "metadata": {"primitive": "hash"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 29, "line": 162}, "identifier": "SHA-1", "metadata": {"primitive": "hash"}, "path": "FIXME"}
@@ -94,3 +90,4 @@
 {"assetType": "algorithm", "evidence": {"column": 30, "line": 219}, "identifier": "Ed448", "metadata": {"primitive": "signature"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 9, "line": 192}, "identifier": "ECDSA-P521", "metadata": {"primitive": "signature"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 31, "line": 149}, "identifier": "SHA256withRSA", "metadata": {"primitive": "signature"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 9, "line": 377}, "identifier": "AES", "metadata": {"keySize": 192, "primitive": "symmetric"}, "path": "FIXME"}

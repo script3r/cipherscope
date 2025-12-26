@@ -143,3 +143,4 @@
 {"assetType": "algorithm", "evidence": {"column": 18, "line": 271}, "identifier": "SHA3-256", "metadata": {"primitive": "hash"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 6, "line": 276}, "identifier": "SHA3-256", "metadata": {"primitive": "hash"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 18, "line": 403}, "identifier": "SHA3-256", "metadata": {"primitive": "hash"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 2, "line": 462}, "identifier": "RSA", "metadata": {"keySize": 3072, "primitive": "signature"}, "path": "FIXME"}
