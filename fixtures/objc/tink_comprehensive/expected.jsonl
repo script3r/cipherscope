@@ -1,17 +1,17 @@
-{"assetType": "library", "evidence": {"column": 1, "line": 10}, "identifier": "Google Tink (Objective-C)", "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 33, "line": 74}, "identifier": "Ed25519", "metadata": {"primitive": "signature"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 33, "line": 70}, "identifier": "ECDSA-P384", "metadata": {"primitive": "signature"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 27, "line": 88}, "identifier": "HPKE", "metadata": {"primitive": "hybrid"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 28, "line": 87}, "identifier": "ECIES-P256-HKDF", "metadata": {"primitive": "hybrid"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 33, "line": 26}, "identifier": "AES-GCM", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 33, "line": 42}, "identifier": "XChaCha20-Poly1305", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 33, "line": 82}, "identifier": "RSA-SSA-PKCS1", "metadata": {"primitive": "signature"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 33, "line": 78}, "identifier": "RSA-SSA-PSS", "metadata": {"primitive": "signature"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 33, "line": 30}, "identifier": "AES-EAX", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 33, "line": 34}, "identifier": "AES-CTR-HMAC", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 33, "line": 38}, "identifier": "ChaCha20-Poly1305", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 33, "line": 42}, "identifier": "XChaCha20-Poly1305", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 33, "line": 46}, "identifier": "AES-GCM-SIV", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 33, "line": 52}, "identifier": "HMAC-SHA256", "metadata": {"primitive": "mac"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 33, "line": 56}, "identifier": "HMAC-SHA256", "metadata": {"primitive": "mac"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 33, "line": 34}, "identifier": "AES-CTR-HMAC", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 33, "line": 30}, "identifier": "AES-EAX", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 27, "line": 88}, "identifier": "HPKE", "metadata": {"primitive": "hybrid"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 33, "line": 46}, "identifier": "AES-GCM-SIV", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 33, "line": 60}, "identifier": "HMAC-SHA512", "metadata": {"primitive": "mac"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 33, "line": 66}, "identifier": "ECDSA-P256", "metadata": {"primitive": "signature"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 28, "line": 87}, "identifier": "ECIES-P256-HKDF", "metadata": {"primitive": "hybrid"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 33, "line": 70}, "identifier": "ECDSA-P384", "metadata": {"primitive": "signature"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 33, "line": 74}, "identifier": "Ed25519", "metadata": {"primitive": "signature"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 33, "line": 78}, "identifier": "RSA-SSA-PSS", "metadata": {"primitive": "signature"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 33, "line": 82}, "identifier": "RSA-SSA-PKCS1", "metadata": {"primitive": "signature"}, "path": "FIXME"}
+{"assetType": "library", "evidence": {"column": 1, "line": 10}, "identifier": "Google Tink (Objective-C)", "path": "FIXME"}

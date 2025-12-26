@@ -1,42 +1,40 @@
-{"assetType": "library", "evidence": {"column": 1, "line": 19}, "identifier": "OpenSSL", "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 178}, "identifier": "SHA-512", "metadata": {"primitive": "hash"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 51}, "identifier": "ChaCha20", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 59}, "identifier": "Blowfish", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 35}, "identifier": "AES-GCM", "metadata": {"keySize": 128, "primitive": "symmetric"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 40}, "identifier": "AES-GCM", "metadata": {"keySize": 256, "primitive": "symmetric"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 29}, "identifier": "AES-CBC", "metadata": {"keySize": 128, "primitive": "symmetric"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 32}, "identifier": "AES-CBC", "metadata": {"keySize": 256, "primitive": "symmetric"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 193}, "identifier": "SHA3-384", "metadata": {"primitive": "hash"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 226}, "identifier": "PBKDF2", "metadata": {"iterations": 10000, "primitive": "kdf"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 158}, "identifier": "SHA-1", "metadata": {"primitive": "hash"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 163}, "identifier": "SHA-224", "metadata": {"primitive": "hash"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 12, "line": 137}, "identifier": "DSA", "metadata": {"primitive": "signature"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 29}, "identifier": "AES", "metadata": {"keySize": 128, "primitive": "symmetric"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 32}, "identifier": "AES", "metadata": {"keySize": 256, "primitive": "symmetric"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 234}, "identifier": "Scrypt", "metadata": {"N": 16384, "primitive": "kdf"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 26, "line": 238}, "identifier": "HKDF", "metadata": {"primitive": "kdf"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 239}, "identifier": "HKDF", "metadata": {"primitive": "kdf"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 240}, "identifier": "HKDF", "metadata": {"primitive": "kdf"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 173}, "identifier": "SHA-384", "metadata": {"primitive": "hash"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 106}, "identifier": "ECDSA-P384", "metadata": {"primitive": "signature"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 62}, "identifier": "RC4", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 198}, "identifier": "SHA3-512", "metadata": {"primitive": "hash"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 183}, "identifier": "SHA3-224", "metadata": {"primitive": "hash"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 168}, "identifier": "SHA-256", "metadata": {"primitive": "hash"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 226}, "identifier": "SHA-256", "metadata": {"primitive": "hash"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 30, "line": 227}, "identifier": "SHA-256", "metadata": {"primitive": "hash"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 240}, "identifier": "SHA-256", "metadata": {"primitive": "hash"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 98}, "identifier": "ECDSA-P256", "metadata": {"primitive": "signature"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 188}, "identifier": "SHA3-256", "metadata": {"primitive": "hash"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 203}, "identifier": "BLAKE2b", "metadata": {"primitive": "hash"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 12, "line": 72}, "identifier": "RSA", "metadata": {"keySize": 2048, "primitive": "signature"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 12, "line": 80}, "identifier": "RSA", "metadata": {"keySize": 2048, "primitive": "signature"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 12, "line": 88}, "identifier": "RSA", "metadata": {"keySize": 2048, "primitive": "signature"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 45}, "identifier": "3DES", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 122}, "identifier": "DH", "metadata": {"keySize": 2048, "primitive": "keyexchange"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 213}, "identifier": "MD5", "metadata": {"primitive": "hash"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 26, "line": 238}, "identifier": "HKDF", "metadata": {"primitive": "kdf"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 30, "line": 227}, "identifier": "SHA-256", "metadata": {"primitive": "hash"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 106}, "identifier": "ECDSA-P384", "metadata": {"primitive": "signature"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 5, "line": 114}, "identifier": "ECDSA-P521", "metadata": {"primitive": "signature"}, "path": "FIXME"}
-{"assetType": "algorithm", "evidence": {"column": 5, "line": 54}, "identifier": "ChaCha20-Poly1305", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 122}, "identifier": "DH", "metadata": {"keySize": 2048, "primitive": "keyexchange"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 158}, "identifier": "SHA-1", "metadata": {"primitive": "hash"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 163}, "identifier": "SHA-224", "metadata": {"primitive": "hash"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 168}, "identifier": "SHA-256", "metadata": {"primitive": "hash"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 173}, "identifier": "SHA-384", "metadata": {"primitive": "hash"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 178}, "identifier": "SHA-512", "metadata": {"primitive": "hash"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 183}, "identifier": "SHA3-224", "metadata": {"primitive": "hash"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 188}, "identifier": "SHA3-256", "metadata": {"primitive": "hash"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 193}, "identifier": "SHA3-384", "metadata": {"primitive": "hash"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 198}, "identifier": "SHA3-512", "metadata": {"primitive": "hash"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 203}, "identifier": "BLAKE2b", "metadata": {"primitive": "hash"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 5, "line": 208}, "identifier": "BLAKE2s", "metadata": {"primitive": "hash"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 213}, "identifier": "MD5", "metadata": {"primitive": "hash"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 226}, "identifier": "PBKDF2", "metadata": {"iterations": 10000, "primitive": "kdf"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 226}, "identifier": "SHA-256", "metadata": {"primitive": "hash"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 234}, "identifier": "Scrypt", "metadata": {"N": 16384, "primitive": "kdf"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 239}, "identifier": "HKDF", "metadata": {"primitive": "kdf"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 240}, "identifier": "HKDF", "metadata": {"primitive": "kdf"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 240}, "identifier": "SHA-256", "metadata": {"primitive": "hash"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 29}, "identifier": "AES-CBC", "metadata": {"keySize": 128, "primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 32}, "identifier": "AES-CBC", "metadata": {"keySize": 256, "primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 35}, "identifier": "AES-GCM", "metadata": {"keySize": 128, "primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 40}, "identifier": "AES-GCM", "metadata": {"keySize": 256, "primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 45}, "identifier": "3DES", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 5, "line": 45}, "identifier": "DES", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 5, "line": 48}, "identifier": "DES", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 51}, "identifier": "ChaCha20", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 54}, "identifier": "ChaCha20-Poly1305", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 59}, "identifier": "Blowfish", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 62}, "identifier": "RC4", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 5, "line": 98}, "identifier": "ECDSA-P256", "metadata": {"primitive": "signature"}, "path": "FIXME"}
+{"assetType": "library", "evidence": {"column": 1, "line": 19}, "identifier": "OpenSSL", "path": "FIXME"}

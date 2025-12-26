@@ -257,7 +257,7 @@ pub fn find_algorithms<'a>(
         }
     }
 
-    result
+    dedupe_more_specific(result)
 }
 
 fn line_col_from_offset(content: &str, byte_idx: usize) -> (usize, usize) {
@@ -468,4 +468,71 @@ fn code_symbol_nodes<'a>(lang: Language, root: Node<'a>) -> Vec<Node<'a>> {
         }
     }
     nodes
+}
+
+fn dedupe_more_specific<'a>(hits: Vec<AlgorithmHit<'a>>) -> Vec<AlgorithmHit<'a>> {
+    let mut drop = vec![false; hits.len()];
+    for i in 0..hits.len() {
+        if drop[i] {
+            continue;
+        }
+        for j in 0..hits.len() {
+            if i == j || drop[j] {
+                continue;
+            }
+            if hits[i].line != hits[j].line {
+                continue;
+            }
+            let Some(p_i) = primitive_of(&hits[i]) else {
+                continue;
+            };
+            let Some(p_j) = primitive_of(&hits[j]) else {
+                continue;
+            };
+            if p_i != p_j {
+                continue;
+            }
+            if is_more_specific(&hits[j].algorithm_name, &hits[i].algorithm_name) {
+                drop[i] = true;
+                break;
+            }
+        }
+    }
+
+    hits.into_iter()
+        .enumerate()
+        .filter_map(|(idx, hit)| if drop[idx] { None } else { Some(hit) })
+        .collect()
+}
+
+fn primitive_of<'a>(hit: &'a AlgorithmHit<'a>) -> Option<&'a str> {
+    hit.metadata
+        .get("primitive")
+        .and_then(|v| v.as_str())
+}
+
+fn is_more_specific(specific: &str, generic: &str) -> bool {
+    if specific == generic {
+        return false;
+    }
+    if specific.starts_with(generic) && specific.as_bytes().get(generic.len()) == Some(&b'-') {
+        return true;
+    }
+
+    let tokens_specific: Vec<&str> = specific.split('-').collect();
+    let tokens_generic: Vec<&str> = generic.split('-').collect();
+    let tokens_specific_no_num: Vec<&str> = tokens_specific
+        .iter()
+        .copied()
+        .filter(|t| !t.chars().all(|c| c.is_ascii_digit()))
+        .collect();
+    let tokens_generic_no_num: Vec<&str> = tokens_generic
+        .iter()
+        .copied()
+        .filter(|t| !t.chars().all(|c| c.is_ascii_digit()))
+        .collect();
+
+    tokens_specific_no_num == tokens_generic_no_num
+        && tokens_specific.len() > tokens_generic.len()
+        && tokens_specific.iter().any(|t| t.chars().all(|c| c.is_ascii_digit()))
 }

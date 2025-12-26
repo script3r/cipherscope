@@ -41,6 +41,14 @@ flowchart TD
 }
 ```
 
+## Dedupe Policy
+To reduce overcounting on a single callsite, Cipherscope applies a simple same-line dedupe rule after matching:
+- If two algorithms share the same `primitive` and line, drop the generic identifier when a more specific variant is present.
+- A more specific identifier is one that either:
+  - starts with the generic identifier plus a `-` (e.g., `AES-GCM` over `AES`), or
+  - shares the same non-numeric tokens but adds numeric detail (e.g., `ECDSA-P256` over `ECDSA`).
+- Different primitives on the same line are kept.
+
 ## Patterns and Extensibility
 Patterns live in `patterns.toml`:
 - Libraries define anchors and API regexes.

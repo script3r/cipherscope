@@ -1,2 +1,2 @@
-{"assetType": "library", "evidence": {"column": 1, "line": 1}, "identifier": "OpenSSL", "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 2, "line": 10}, "identifier": "AES-GCM", "metadata": {"keySize": 256, "primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "library", "evidence": {"column": 1, "line": 1}, "identifier": "OpenSSL", "path": "FIXME"}

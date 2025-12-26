@@ -1,2 +1,2 @@
-{"assetType": "library", "evidence": {"column": 1, "line": 6}, "identifier": "Google Tink (Objective-C)", "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 33, "line": 20}, "identifier": "AES-GCM", "metadata": {"primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "library", "evidence": {"column": 1, "line": 6}, "identifier": "Google Tink (Objective-C)", "path": "FIXME"}
