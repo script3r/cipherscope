@@ -37,7 +37,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "RSA_generate_key_ex\\s*\\([^,]+,\\s*(\\d{4})"
-default_value = 2048
 
 [[library.algorithms]]
 name = "DSA"
@@ -60,7 +59,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "curve"
 pattern = "EC_KEY_new_by_curve_name\\s*\\(\\s*(NID_(?:X9_62_prime256v1|secp384r1|secp521r1))"
-default_value = "P-256"
 
 [[library.algorithms]]
 name = "AES-GCM"
@@ -72,7 +70,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "EVP_aes_(\\d+)_gcm"
-default_value = 256
 
 [[library.algorithms]]
 name = "AES"
@@ -90,7 +87,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "EVP_aes_(\\d+)"
-default_value = 256
 
 [[library.algorithms]]
 name = "RSA"
@@ -103,11 +99,9 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "RSA_generate_key_ex\\s*\\([^,]+,\\s*(\\d{4})"
-default_value = 2048
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "aes_(\\d+)"
-default_value = 256
 
 [[library.algorithms]]
 name = "SHA-256"
@@ -507,7 +501,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "EVP_aes_(\\d+)_cbc"
-default_value = 256
 
 [[library.algorithms]]
 name = "ECDSA-P256"
@@ -546,7 +539,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "EVP_PKEY_CTX_set_dh_paramgen_prime_len\\s*\\([^,]+,\\s*(\\d+)"
-default_value = 2048
 
 [[library.algorithms]]
 name = "PBKDF2"
@@ -558,7 +550,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "iterations"
 pattern = "PKCS5_PBKDF2_HMAC\\([^,]+,[^,]+,[^,]+,[^,]+,\\s*(\\d+)"
-default_value = 10000
 
 [[library.algorithms]]
 name = "Scrypt"
@@ -570,7 +561,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "N"
 pattern = "EVP_PBE_scrypt\\([^,]+,[^,]+,[^,]+,[^,]+,\\s*(\\d+)"
-default_value = 16384
 
 [[library.algorithms]]
 name = "HKDF"
@@ -1637,7 +1627,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "mode"
 pattern = "(GCM|CBC|CTR|CFB|OFB)<AES>"
-default_value = "CBC"
 
 [[library.algorithms]]
 name = "DES"
@@ -2403,7 +2392,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "RSA_PrivateKey\\s*\\([^,]*,\\s*(\\d+)"
-default_value = 2048
 
 [[library.algorithms]]
 name = "AES-GCM"
@@ -2416,7 +2404,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "AES-(\\d+)/GCM"
-default_value = 256
 
 [[library.algorithms]]
 name = "AES"
@@ -2431,7 +2418,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "AES-(\\d+)"
-default_value = 256
 
 [[library.algorithms]]
 name = "DES"
@@ -2788,7 +2774,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "RSAKeyGenParameterSpec\\s*\\(\\s*(\\d+)"
-default_value = 2048
 
 [[library.algorithms]]
 name = "AES"
@@ -2802,7 +2787,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "init\\s*\\(\\s*(\\d+)"
-default_value = 256
 
 [[library.algorithms]]
 name = "DES"
@@ -2814,7 +2798,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "mode"
 pattern = "Cipher\\.getInstance\\s*\\([^)]*DES/(ECB|CBC)"
-default_value = "CBC"
 
 [[library.algorithms]]
 name = "3DES"
@@ -2826,7 +2809,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "mode"
 pattern = "Cipher\\.getInstance\\s*\\([^)]*DESede/(ECB|CBC)"
-default_value = "CBC"
 
 [[library.algorithms]]
 name = "Blowfish"
@@ -2879,7 +2861,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "curve"
 pattern = "initialize\\s*\\(\\s*(256|384|521)"
-default_value = "P-256"
 
 [[library.algorithms]]
 name = "SHA-256"
@@ -3257,7 +3238,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "initialize\\s*\\([^)]*?(\\d{4})"
-default_value = 2048
 
 [[library.algorithms]]
 name = "ECDSA"
@@ -3498,7 +3478,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "AES(\\d+)_GCM"
-default_value = 256
 
 [[library.algorithms]]
 name = "AES-CTR-HMAC"
@@ -3626,12 +3605,7 @@ primitive = "symmetric"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bcipher\\.NewGCM",
-  "\\baes\\.NewCipher",
 ]
-[[library.algorithms.parameter_patterns]]
-name = "keySize"
-pattern = "make\\(\\[\\]byte,\\s*(16|24|32)\\)"
-default_value = 32
 
 [[library.algorithms]]
 name = "SHA-256"
@@ -3663,7 +3637,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "GenerateKey\\s*\\([^,]*,\\s*(\\d+)"
-default_value = 2048
 
 [[library.algorithms]]
 name = "ECDSA"
@@ -3679,7 +3652,6 @@ name = "AES-GCM"
 primitive = "symmetric"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
-  "\\baes\\.NewCipher",
   "\\bcipher\\.NewGCM",
 ]
 
@@ -3799,7 +3771,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "chacha20poly1305\\.Key\\s*\\{[^}]*\\}"
-default_value = 32
 
 [[library.algorithms]]
 name = "Argon2"
@@ -4258,7 +4229,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "curve"
 pattern = "\\bp(256|384|521)"
-default_value = "P-256"
 
 [[library.algorithms]]
 name = "Ed25519"
@@ -4380,7 +4350,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "(?:new|generate).*?(\\d{4})|RsaPrivateKey::new.*?(\\d{4})"
-default_value = 2048
 
 [[library.algorithms]]
 name = "AES-GCM"
@@ -4392,7 +4361,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "Aes(\\d+)Gcm"
-default_value = 256
 
 [[library.algorithms]]
 name = "ChaCha20Poly1305"
@@ -4404,7 +4372,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = ".*"
-default_value = 256
 
 [[library.algorithms]]
 name = "SHA-256"
@@ -4416,7 +4383,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "outputSize"
 pattern = "Sha(\\d+)"
-default_value = 256
 
 [[library.algorithms]]
 name = "SHA-512"
@@ -4428,7 +4394,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "outputSize"
 pattern = "Sha(\\d+)"
-default_value = 512
 
 [[library.algorithms]]
 name = "BLAKE3"
@@ -4448,7 +4413,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "curve"
 pattern = ".*"
-default_value = "Curve25519"
 
 [[library.algorithms]]
 name = "ECDSA"
@@ -4460,7 +4424,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "curve"
 pattern = "p(\\d+)"
-default_value = "P-256"
 
 # =========================
 # Swift
@@ -4872,7 +4835,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "RSAKeyGenParameterSpec\\s*\\(\\s*(\\d+)"
-default_value = 2048
 
 [[library.algorithms]]
 name = "AES"
@@ -4885,7 +4847,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "init\\s*\\(\\s*(\\d+)"
-default_value = 256
 
 [[library.algorithms]]
 name = "ECDSA"
@@ -4898,7 +4859,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "curve"
 pattern = "initialize\\s*\\(\\s*(256|384|521)"
-default_value = "P-256"
 
 [[library.algorithms]]
 name = "SHA-256"
@@ -4973,7 +4933,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "key_size\\s*=\\s*(\\d+)"
-default_value = 2048
 
 [[library.algorithms]]
 name = "Fernet"
@@ -4986,7 +4945,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "algorithm"
 pattern = ".*"
-default_value = "AES-128-CBC + HMAC-SHA256"
 
 [[library.algorithms]]
 name = "SHA-256"
@@ -5405,7 +5363,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "generate\\s*\\(\\s*(\\d+)"
-default_value = 2048
 
 [[library.algorithms]]
 name = "AES"
@@ -5418,7 +5375,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "AES\\.new\\s*\\(\\s*['\"][A-Za-z0-9_-]*aes-(\\d+)[A-Za-z0-9_-]*['\"]"
-default_value = 256
 
 [[library.algorithms]]
 name = "SHA-256"
@@ -5538,8 +5494,7 @@ symbol_patterns = [
 ]
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
-pattern = "openssl_(?:encrypt|decrypt)\\s*\\([^,)]*['\"]aes-(\\d+)-cbc"
-default_value = 256
+pattern = "openssl_(?:encrypt|decrypt)\\s*\\([^,)]*,\\s*['\"]aes-(\\d+)-cbc"
 
 [[library.algorithms]]
 name = "AES-CFB"
@@ -5555,8 +5510,7 @@ symbol_patterns = [
 ]
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
-pattern = "openssl_(?:encrypt|decrypt)\\s*\\([^,)]*['\"]aes-(\\d+)-cfb"
-default_value = 256
+pattern = "openssl_(?:encrypt|decrypt)\\s*\\([^,)]*,\\s*['\"]aes-(\\d+)-cfb"
 
 [[library.algorithms]]
 name = "AES-CTR"
@@ -5568,8 +5522,7 @@ symbol_patterns = [
 ]
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
-pattern = "openssl_(?:encrypt|decrypt)\\s*\\([^,)]*['\"]aes-(\\d+)-ctr"
-default_value = 256
+pattern = "openssl_(?:encrypt|decrypt)\\s*\\([^,)]*,\\s*['\"]aes-(\\d+)-ctr"
 
 [[library.algorithms]]
 name = "AES-OFB"
@@ -5581,8 +5534,7 @@ symbol_patterns = [
 ]
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
-pattern = "openssl_(?:encrypt|decrypt)\\s*\\([^,)]*['\"]aes-(\\d+)-ofb"
-default_value = 256
+pattern = "openssl_(?:encrypt|decrypt)\\s*\\([^,)]*,\\s*['\"]aes-(\\d+)-ofb"
 
 [[library.algorithms]]
 name = "AES-XTS"
@@ -5594,8 +5546,7 @@ symbol_patterns = [
 ]
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
-pattern = "openssl_(?:encrypt|decrypt)\\s*\\([^,)]*['\"]aes-(\\d+)-xts"
-default_value = 256
+pattern = "openssl_(?:encrypt|decrypt)\\s*\\([^,)]*,\\s*['\"]aes-(\\d+)-xts"
 
 [[library.algorithms]]
 name = "AES-CCM"
@@ -5607,8 +5558,7 @@ symbol_patterns = [
 ]
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
-pattern = "openssl_(?:encrypt|decrypt)\\s*\\([^,)]*['\"]aes-(\\d+)-ccm"
-default_value = 256
+pattern = "openssl_(?:encrypt|decrypt)\\s*\\([^,)]*,\\s*['\"]aes-(\\d+)-ccm"
 
 [[library.algorithms]]
 name = "AES-OCB"
@@ -5620,8 +5570,7 @@ symbol_patterns = [
 ]
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
-pattern = "openssl_(?:encrypt|decrypt)\\s*\\([^,)]*['\"]aes-(\\d+)-ocb"
-default_value = 256
+pattern = "openssl_(?:encrypt|decrypt)\\s*\\([^,)]*,\\s*['\"]aes-(\\d+)-ocb"
 
 [[library.algorithms]]
 name = "SHA-256"
@@ -5649,8 +5598,7 @@ symbol_patterns = [
 ]
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
-pattern = "openssl_(?:encrypt|decrypt)\\s*\\([^,)]*['\"]aes-(\\d+)-gcm"
-default_value = 256
+pattern = "openssl_(?:encrypt|decrypt)\\s*\\([^,)]*,\\s*['\"]aes-(\\d+)-gcm"
 
 [[library.algorithms]]
 name = "ChaCha20-Poly1305"
@@ -5698,8 +5646,7 @@ symbol_patterns = [
 ]
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
-pattern = "openssl_(?:encrypt|decrypt)\\s*\\([^,)]*['\"]camellia-(\\d+)"
-default_value = 256
+pattern = "openssl_(?:encrypt|decrypt)\\s*\\([^,)]*,\\s*['\"]camellia-(\\d+)"
 
 [[library.algorithms]]
 name = "ARIA"
@@ -5711,8 +5658,7 @@ symbol_patterns = [
 ]
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
-pattern = "openssl_(?:encrypt|decrypt)\\s*\\([^,)]*['\"]aria-(\\d+)"
-default_value = 256
+pattern = "openssl_(?:encrypt|decrypt)\\s*\\([^,)]*,\\s*['\"]aria-(\\d+)"
 
 [[library.algorithms]]
 name = "SEED"
@@ -6334,7 +6280,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "mode"
 pattern = "kCCOption[A-Za-z0-9_]*"
-default_value = "CBC"
 
 [[library.algorithms]]
 name = "SHA-256"
@@ -6620,7 +6565,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "EVP_aes_(\\d+)_gcm"
-default_value = 256
 
 [[library.algorithms]]
 name = "AES"
@@ -6633,7 +6577,6 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "EVP_aes_(\\d+)"
-default_value = 256
 
 [[library.algorithms]]
 name = "RSA"

@@ -1,3 +1,3 @@
-{"assetType": "algorithm", "evidence": {"column": 37, "line": 13}, "identifier": "AES-GCM", "metadata": {"keySize": 256, "primitive": "symmetric"}, "path": "FIXME"}
-{"assetType": "library", "evidence": {"column": 1, "line": 4}, "identifier": "Google Tink (Java)", "path": "FIXME"}
-{"assetType": "library", "evidence": {"column": 1, "line": 5}, "identifier": "Java JCA/JCE", "path": "FIXME"}
+{"assetType": "library", "identifier": "Java JCA/JCE", "path": "FIXME", "evidence": {"line": 5, "column": 1}}
+{"assetType": "library", "identifier": "Google Tink (Java)", "path": "FIXME", "evidence": {"line": 4, "column": 1}}
+{"assetType": "algorithm", "identifier": "AES-GCM", "path": "FIXME", "evidence": {"line": 13, "column": 37}, "metadata": {"keySize": 256, "primitive": "symmetric"}}

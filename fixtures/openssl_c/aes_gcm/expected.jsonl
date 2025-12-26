@@ -1,2 +1,2 @@
-{"assetType": "algorithm", "evidence": {"column": 2, "line": 10}, "identifier": "AES-GCM", "metadata": {"keySize": 256, "primitive": "symmetric"}, "path": "FIXME"}
-{"assetType": "library", "evidence": {"column": 1, "line": 1}, "identifier": "OpenSSL", "path": "FIXME"}
+{"assetType": "library", "identifier": "OpenSSL", "path": "FIXME", "evidence": {"line": 1, "column": 1}}
+{"assetType": "algorithm", "identifier": "AES-GCM", "path": "FIXME", "evidence": {"line": 10, "column": 2}, "metadata": {"primitive": "symmetric", "keySize": 256}}

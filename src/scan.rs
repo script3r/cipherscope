@@ -157,6 +157,12 @@ pub fn find_algorithms<'a>(
     let Some(lib) = patterns.libraries.iter().find(|l| l.name == library_name) else {
         return result;
     };
+    let mut primitive_by_alg: HashMap<String, String> = HashMap::new();
+    for alg in &lib.algorithms {
+        if let Some(primitive) = &alg.primitive {
+            primitive_by_alg.insert(alg.name.clone(), primitive.clone());
+        }
+    }
     let constants = collect_constants(lang, content);
     // Collect raw hits
     let mut hits_by_alg: HashMap<&str, Vec<(AlgorithmHit<'a>, bool)>> = HashMap::new();
@@ -257,7 +263,42 @@ pub fn find_algorithms<'a>(
         }
     }
 
-    dedupe_more_specific(result)
+    dedupe_more_specific(result, &primitive_by_alg)
+}
+
+pub fn dedupe_more_specific_hits<'a>(hits: Vec<AlgorithmHit<'a>>) -> Vec<AlgorithmHit<'a>> {
+    let mut drop = vec![false; hits.len()];
+    for i in 0..hits.len() {
+        if drop[i] {
+            continue;
+        }
+        for j in 0..hits.len() {
+            if i == j || drop[j] {
+                continue;
+            }
+            if hits[i].line != hits[j].line {
+                continue;
+            }
+            let Some(p_i) = primitive_of_metadata(&hits[i]) else {
+                continue;
+            };
+            let Some(p_j) = primitive_of_metadata(&hits[j]) else {
+                continue;
+            };
+            if p_i != p_j {
+                continue;
+            }
+            if is_more_specific(hits[j].algorithm_name, hits[i].algorithm_name) {
+                drop[i] = true;
+                break;
+            }
+        }
+    }
+
+    hits.into_iter()
+        .enumerate()
+        .filter_map(|(idx, hit)| if drop[idx] { None } else { Some(hit) })
+        .collect()
 }
 
 fn line_col_from_offset(content: &str, byte_idx: usize) -> (usize, usize) {
@@ -466,7 +507,10 @@ fn code_symbol_nodes<'a>(lang: Language, root: Node<'a>) -> Vec<Node<'a>> {
     nodes
 }
 
-fn dedupe_more_specific<'a>(hits: Vec<AlgorithmHit<'a>>) -> Vec<AlgorithmHit<'a>> {
+fn dedupe_more_specific<'a>(
+    hits: Vec<AlgorithmHit<'a>>,
+    primitive_by_alg: &HashMap<String, String>,
+) -> Vec<AlgorithmHit<'a>> {
     let mut drop = vec![false; hits.len()];
     for i in 0..hits.len() {
         if drop[i] {
@@ -479,13 +523,7 @@ fn dedupe_more_specific<'a>(hits: Vec<AlgorithmHit<'a>>) -> Vec<AlgorithmHit<'a>
             if hits[i].line != hits[j].line {
                 continue;
             }
-            let Some(p_i) = primitive_of(&hits[i]) else {
-                continue;
-            };
-            let Some(p_j) = primitive_of(&hits[j]) else {
-                continue;
-            };
-            if p_i != p_j {
+            if !primitives_compatible(&hits[i], &hits[j], primitive_by_alg) {
                 continue;
             }
             if is_more_specific(hits[j].algorithm_name, hits[i].algorithm_name) {
@@ -501,8 +539,32 @@ fn dedupe_more_specific<'a>(hits: Vec<AlgorithmHit<'a>>) -> Vec<AlgorithmHit<'a>
         .collect()
 }
 
-fn primitive_of<'a>(hit: &'a AlgorithmHit<'a>) -> Option<&'a str> {
+fn primitive_of<'a>(
+    hit: &'a AlgorithmHit<'a>,
+    primitive_by_alg: &'a HashMap<String, String>,
+) -> Option<&'a str> {
+    hit.metadata
+        .get("primitive")
+        .and_then(|v| v.as_str())
+        .or_else(|| primitive_by_alg.get(hit.algorithm_name).map(|s| s.as_str()))
+}
+
+fn primitive_of_metadata<'a>(hit: &'a AlgorithmHit<'a>) -> Option<&'a str> {
     hit.metadata.get("primitive").and_then(|v| v.as_str())
+}
+
+fn primitives_compatible<'a>(
+    left: &'a AlgorithmHit<'a>,
+    right: &'a AlgorithmHit<'a>,
+    primitive_by_alg: &'a HashMap<String, String>,
+) -> bool {
+    match (
+        primitive_of(left, primitive_by_alg),
+        primitive_of(right, primitive_by_alg),
+    ) {
+        (Some(p_left), Some(p_right)) => p_left == p_right,
+        _ => true,
+    }
 }
 
 fn is_more_specific(specific: &str, generic: &str) -> bool {
@@ -531,4 +593,160 @@ fn is_more_specific(specific: &str, generic: &str) -> bool {
         && tokens_specific
             .iter()
             .any(|t| t.chars().all(|c| c.is_ascii_digit()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{AlgorithmHit, dedupe_more_specific_hits};
+    use ahash::AHashMap as HashMap;
+    use serde_json::Value;
+
+    fn hit(
+        algorithm_name: &'static str,
+        line: usize,
+        column: usize,
+        primitive: Option<&'static str>,
+    ) -> AlgorithmHit<'static> {
+        let mut metadata: HashMap<&'static str, Value> = HashMap::new();
+        if let Some(p) = primitive {
+            metadata.insert("primitive", Value::String(p.to_string()));
+        }
+        AlgorithmHit {
+            algorithm_name,
+            line,
+            column,
+            metadata,
+        }
+    }
+
+    #[test]
+    fn dedupe_drops_generic_when_more_specific_same_line() {
+        let hits = vec![
+            hit("AES", 10, 5, Some("symmetric")),
+            hit("AES-CBC", 10, 5, Some("symmetric")),
+        ];
+        let out = dedupe_more_specific_hits(hits);
+        assert_eq!(out.len(), 1);
+        assert_eq!(out[0].algorithm_name, "AES-CBC");
+    }
+
+    #[test]
+    fn dedupe_keeps_generic_on_different_lines() {
+        let hits = vec![
+            hit("AES", 10, 5, Some("symmetric")),
+            hit("AES-CBC", 11, 5, Some("symmetric")),
+        ];
+        let out = dedupe_more_specific_hits(hits);
+        assert_eq!(out.len(), 2);
+    }
+
+    #[test]
+    fn dedupe_keeps_different_primitives() {
+        let hits = vec![
+            hit("AES", 10, 5, Some("symmetric")),
+            hit("AES-CTR", 10, 5, Some("asymmetric")),
+        ];
+        let out = dedupe_more_specific_hits(hits);
+        assert_eq!(out.len(), 2);
+    }
+
+    #[test]
+    fn dedupe_handles_numeric_specificity() {
+        let hits = vec![
+            hit("ECDSA", 20, 3, Some("signature")),
+            hit("ECDSA-P256", 20, 3, Some("signature")),
+        ];
+        let out = dedupe_more_specific_hits(hits);
+        assert_eq!(out.len(), 1);
+        assert_eq!(out[0].algorithm_name, "ECDSA-P256");
+    }
+
+    #[test]
+    fn dedupe_requires_primitive_metadata() {
+        let hits = vec![
+            hit("AES", 10, 5, None),
+            hit("AES-CBC", 10, 5, Some("symmetric")),
+        ];
+        let out = dedupe_more_specific_hits(hits);
+        assert_eq!(out.len(), 2);
+    }
+
+    #[test]
+    fn dedupe_keeps_multiple_specific_variants() {
+        let hits = vec![
+            hit("AES", 10, 5, Some("symmetric")),
+            hit("AES-CBC", 10, 6, Some("symmetric")),
+            hit("AES-CTR", 10, 7, Some("symmetric")),
+        ];
+        let out = dedupe_more_specific_hits(hits);
+        assert_eq!(out.len(), 2);
+        let names: Vec<&str> = out.iter().map(|h| h.algorithm_name).collect();
+        assert!(names.contains(&"AES-CBC"));
+        assert!(names.contains(&"AES-CTR"));
+    }
+
+    #[test]
+    fn dedupe_keeps_duplicate_specific_hits() {
+        let hits = vec![
+            hit("AES", 10, 10, Some("symmetric")),
+            hit("AES-CBC", 10, 5, Some("symmetric")),
+            hit("AES-CBC", 10, 20, Some("symmetric")),
+        ];
+        let out = dedupe_more_specific_hits(hits);
+        assert_eq!(out.len(), 2);
+        let mut cbc_hits = out
+            .iter()
+            .filter(|h| h.algorithm_name == "AES-CBC")
+            .collect::<Vec<_>>();
+        assert_eq!(cbc_hits.len(), 2);
+        cbc_hits.sort_by_key(|h| h.column);
+        assert_eq!(cbc_hits[0].column, 5);
+        assert_eq!(cbc_hits[1].column, 20);
+    }
+
+    #[test]
+    fn dedupe_avoids_prefix_collisions() {
+        let hits = vec![
+            hit("AES", 10, 5, Some("symmetric")),
+            hit("RSAES-OAEP", 10, 8, Some("asymmetric")),
+        ];
+        let out = dedupe_more_specific_hits(hits);
+        assert_eq!(out.len(), 2);
+    }
+
+    #[test]
+    fn dedupe_allows_cross_library_overlap() {
+        let hits = vec![
+            hit("AES", 10, 5, Some("symmetric")),
+            hit("AES-CBC", 10, 6, Some("symmetric")),
+            hit("AES", 10, 8, Some("hash")),
+        ];
+        let out = dedupe_more_specific_hits(hits);
+        assert_eq!(out.len(), 2);
+        let names: Vec<(&str, &str)> = out
+            .iter()
+            .map(|h| {
+                (
+                    h.algorithm_name,
+                    h.metadata
+                        .get("primitive")
+                        .and_then(|v| v.as_str())
+                        .unwrap_or(""),
+                )
+            })
+            .collect();
+        assert!(names.contains(&("AES-CBC", "symmetric")));
+        assert!(names.contains(&("AES", "hash")));
+    }
+
+    #[test]
+    fn dedupe_after_constant_resolution_like_hit() {
+        let hits = vec![
+            hit("AES", 12, 3, Some("symmetric")),
+            hit("AES-GCM", 12, 3, Some("symmetric")),
+        ];
+        let out = dedupe_more_specific_hits(hits);
+        assert_eq!(out.len(), 1);
+        assert_eq!(out[0].algorithm_name, "AES-GCM");
+    }
 }

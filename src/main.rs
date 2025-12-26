@@ -373,6 +373,7 @@ fn process_file(
     }
 
     let mut seen: HashSet<String> = HashSet::new();
+    let mut alg_hits_all = Vec::new();
 
     for lib in lib_hits {
         let evidence = Evidence {
@@ -397,32 +398,35 @@ fn process_file(
 
         // 2) algorithms for this library
         let alg_hits = scan::find_algorithms(lang, content, &tree, patterns, lib.library_name);
-        for alg in alg_hits {
-            let mut metadata = HashMap::new();
-            for (k, v) in alg.metadata {
-                metadata.insert(k.to_string(), v);
-            }
-            let evidence = Evidence {
-                line: alg.line,
-                column: alg.column,
-            };
-            let finding = Finding {
-                asset_type: "algorithm".to_string(),
-                identifier: alg.algorithm_name.to_string(),
-                path: absolute_path.to_string_lossy().to_string(),
-                evidence,
-                metadata,
-            };
-            let key = format!(
-                "alg|{}|{}:{}",
-                finding.identifier, finding.evidence.line, finding.evidence.column
-            );
-            if seen.insert(key) {
-                // Use blocking send but log if it takes too long
-                if let Err(e) = tx.send(finding) {
-                    eprintln!("error: writer thread has stopped: {}", e);
-                    return Ok(());
-                }
+        alg_hits_all.extend(alg_hits);
+    }
+
+    let alg_hits_all = scan::dedupe_more_specific_hits(alg_hits_all);
+    for alg in alg_hits_all {
+        let mut metadata = HashMap::new();
+        for (k, v) in alg.metadata {
+            metadata.insert(k.to_string(), v);
+        }
+        let evidence = Evidence {
+            line: alg.line,
+            column: alg.column,
+        };
+        let finding = Finding {
+            asset_type: "algorithm".to_string(),
+            identifier: alg.algorithm_name.to_string(),
+            path: absolute_path.to_string_lossy().to_string(),
+            evidence,
+            metadata,
+        };
+        let key = format!(
+            "alg|{}|{}:{}",
+            finding.identifier, finding.evidence.line, finding.evidence.column
+        );
+        if seen.insert(key) {
+            // Use blocking send but log if it takes too long
+            if let Err(e) = tx.send(finding) {
+                eprintln!("error: writer thread has stopped: {}", e);
+                return Ok(());
             }
         }
     }
