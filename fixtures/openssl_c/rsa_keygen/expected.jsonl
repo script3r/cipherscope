@@ -1,2 +1,3 @@
-{"assetType": "library", "evidence": {"column": 1, "line": 2}, "identifier": "OpenSSL", "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 79, "line": 3}, "identifier": "RSA", "metadata": {"keySize": 2048, "primitive": "signature"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 94, "line": 6}, "identifier": "RSA", "metadata": {"keySize": 3072, "primitive": "signature"}, "path": "FIXME"}
+{"assetType": "library", "evidence": {"column": 1, "line": 2}, "identifier": "OpenSSL", "path": "FIXME"}

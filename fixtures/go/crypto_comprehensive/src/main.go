@@ -455,3 +455,9 @@ func main() {
 	aesKey192 := make([]byte, 24) // 192-bit key
 	rand.Read(aesKey192)
 }
+
+const rsaKeySizeConst = 3072
+
+func testRsaKeySizeConst() {
+	rsa.GenerateKey(rand.Reader, rsaKeySizeConst)
+}

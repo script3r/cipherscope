@@ -1,2 +1,3 @@
-{"assetType": "library", "evidence": {"column": 1, "line": 1}, "identifier": "OpenSSL (PHP)", "path": "FIXME"}
 {"assetType": "algorithm", "evidence": {"column": 15, "line": 7}, "identifier": "AES-GCM", "metadata": {"keySize": 256, "primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "algorithm", "evidence": {"column": 16, "line": 11}, "identifier": "AES-GCM", "metadata": {"keySize": 256, "primitive": "symmetric"}, "path": "FIXME"}
+{"assetType": "library", "evidence": {"column": 1, "line": 1}, "identifier": "OpenSSL (PHP)", "path": "FIXME"}
