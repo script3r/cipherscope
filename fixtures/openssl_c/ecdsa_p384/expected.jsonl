@@ -1,2 +1,2 @@
-{"assetType": "library", "identifier": "OpenSSL", "path": "FIXME", "evidence": {"line": 1, "column": 1}}
-{"assetType": "algorithm", "identifier": "ECDSA-P384", "path": "FIXME", "evidence": {"line": 2, "column": 25}, "metadata": {"primitive": "signature"}}
+{"assetType": "library", "identifier": "OpenSSL", "path": "fixtures/openssl_c/ecdsa_p384/src/test.c", "evidence": {"line": 1, "column": 1}}
+{"assetType": "algorithm", "identifier": "ECDSA-P384", "path": "fixtures/openssl_c/ecdsa_p384/src/test.c", "evidence": {"line": 2, "column": 50}, "metadata": {"primitive": "signature"}}

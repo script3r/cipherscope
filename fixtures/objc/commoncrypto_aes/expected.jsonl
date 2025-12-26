@@ -1,2 +1,2 @@
-{"assetType": "library", "identifier": "CommonCrypto (Objective-C)", "path": "FIXME", "evidence": {"line": 2, "column": 1}}
-{"assetType": "algorithm", "identifier": "AES", "path": "FIXME", "evidence": {"line": 12, "column": 30}, "metadata": {"primitive": "symmetric"}}
+{"assetType": "library", "identifier": "CommonCrypto (Objective-C)", "path": "fixtures/objc/commoncrypto_aes/src/Test.m", "evidence": {"line": 2, "column": 1}}
+{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/objc/commoncrypto_aes/src/Test.m", "evidence": {"line": 12, "column": 30}, "metadata": {"primitive": "symmetric"}}

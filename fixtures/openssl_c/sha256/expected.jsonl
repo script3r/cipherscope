@@ -1,2 +1,2 @@
-{"assetType": "library", "identifier": "OpenSSL", "path": "FIXME", "evidence": {"line": 1, "column": 1}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "FIXME", "evidence": {"line": 2, "column": 34}, "metadata": {"primitive": "hash"}}
+{"assetType": "library", "identifier": "OpenSSL", "path": "fixtures/openssl_c/sha256/src/test.c", "evidence": {"line": 1, "column": 1}}
+{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/openssl_c/sha256/src/test.c", "evidence": {"line": 2, "column": 34}, "metadata": {"primitive": "hash"}}

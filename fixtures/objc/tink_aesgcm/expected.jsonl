@@ -1,2 +1,2 @@
-{"assetType": "library", "identifier": "Google Tink (Objective-C)", "path": "FIXME", "evidence": {"line": 6, "column": 1}}
-{"assetType": "algorithm", "identifier": "AES-GCM", "path": "FIXME", "evidence": {"line": 20, "column": 33}, "metadata": {"primitive": "symmetric"}}
+{"assetType": "library", "identifier": "Google Tink (Objective-C)", "path": "fixtures/objc/tink_aesgcm/src/TinkExample.m", "evidence": {"line": 6, "column": 1}}
+{"assetType": "algorithm", "identifier": "AES-GCM", "path": "fixtures/objc/tink_aesgcm/src/TinkExample.m", "evidence": {"line": 20, "column": 33}, "metadata": {"primitive": "symmetric"}}

@@ -1,3 +1,3 @@
-{"assetType": "library", "identifier": "OpenSSL", "path": "FIXME", "evidence": {"line": 2, "column": 1}}
-{"assetType": "algorithm", "identifier": "RSA", "path": "FIXME", "evidence": {"line": 3, "column": 79}, "metadata": {"primitive": "signature", "keySize": 2048}}
-{"assetType": "algorithm", "identifier": "RSA", "path": "FIXME", "evidence": {"line": 6, "column": 94}, "metadata": {"primitive": "signature", "keySize": 3072}}
+{"assetType": "library", "identifier": "OpenSSL", "path": "fixtures/openssl_c/rsa_keygen/src/test.c", "evidence": {"line": 2, "column": 1}}
+{"assetType": "algorithm", "identifier": "RSA", "path": "fixtures/openssl_c/rsa_keygen/src/test.c", "evidence": {"line": 3, "column": 79}, "metadata": {"primitive": "signature", "keySize": 2048}}
+{"assetType": "algorithm", "identifier": "RSA", "path": "fixtures/openssl_c/rsa_keygen/src/test.c", "evidence": {"line": 6, "column": 94}, "metadata": {"primitive": "signature", "keySize": 3072}}

@@ -1,3 +1,3 @@
-{"assetType": "library", "identifier": "PyCA cryptography", "path": "FIXME", "evidence": {"line": 1, "column": 1}}
-{"assetType": "algorithm", "identifier": "AES-GCM", "path": "FIXME", "evidence": {"line": 4, "column": 7}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES-GCM", "path": "FIXME", "evidence": {"line": 5, "column": 10}, "metadata": {"primitive": "symmetric"}}
+{"assetType": "library", "identifier": "PyCA cryptography", "path": "fixtures/python/pyca_aesgcm/src/test.py", "evidence": {"line": 1, "column": 1}}
+{"assetType": "algorithm", "identifier": "AES-GCM", "path": "fixtures/python/pyca_aesgcm/src/test.py", "evidence": {"line": 4, "column": 7}, "metadata": {"primitive": "symmetric"}}
+{"assetType": "algorithm", "identifier": "AES-GCM", "path": "fixtures/python/pyca_aesgcm/src/test.py", "evidence": {"line": 5, "column": 10}, "metadata": {"primitive": "symmetric"}}

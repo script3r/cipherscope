@@ -1,17 +1,17 @@
-{"assetType": "library", "identifier": "Google Tink (Objective-C)", "path": "FIXME", "evidence": {"line": 10, "column": 1}}
-{"assetType": "algorithm", "identifier": "AES-GCM", "path": "FIXME", "evidence": {"line": 26, "column": 33}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "Ed25519", "path": "FIXME", "evidence": {"line": 74, "column": 33}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "AES-CTR-HMAC", "path": "FIXME", "evidence": {"line": 34, "column": 33}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "HMAC-SHA256", "path": "FIXME", "evidence": {"line": 52, "column": 33}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HMAC-SHA256", "path": "FIXME", "evidence": {"line": 56, "column": 33}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HPKE", "path": "FIXME", "evidence": {"line": 88, "column": 27}, "metadata": {"primitive": "hybrid"}}
-{"assetType": "algorithm", "identifier": "XChaCha20-Poly1305", "path": "FIXME", "evidence": {"line": 42, "column": 33}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "HMAC-SHA512", "path": "FIXME", "evidence": {"line": 60, "column": 33}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "AES-EAX", "path": "FIXME", "evidence": {"line": 30, "column": 33}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "RSA-SSA-PKCS1", "path": "FIXME", "evidence": {"line": 82, "column": 33}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "ECDSA-P384", "path": "FIXME", "evidence": {"line": 70, "column": 33}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "ECDSA-P256", "path": "FIXME", "evidence": {"line": 66, "column": 33}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "ECIES-P256-HKDF", "path": "FIXME", "evidence": {"line": 87, "column": 28}, "metadata": {"primitive": "hybrid"}}
-{"assetType": "algorithm", "identifier": "RSA-SSA-PSS", "path": "FIXME", "evidence": {"line": 78, "column": 33}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "AES-GCM-SIV", "path": "FIXME", "evidence": {"line": 46, "column": 33}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "ChaCha20-Poly1305", "path": "FIXME", "evidence": {"line": 38, "column": 33}, "metadata": {"primitive": "symmetric"}}
+{"assetType": "library", "identifier": "Google Tink (Objective-C)", "path": "fixtures/objc/tink_comprehensive/src/TinkComprehensive.m", "evidence": {"line": 10, "column": 1}}
+{"assetType": "algorithm", "identifier": "HMAC-SHA512", "path": "fixtures/objc/tink_comprehensive/src/TinkComprehensive.m", "evidence": {"line": 60, "column": 33}, "metadata": {"primitive": "mac"}}
+{"assetType": "algorithm", "identifier": "RSA-SSA-PKCS1", "path": "fixtures/objc/tink_comprehensive/src/TinkComprehensive.m", "evidence": {"line": 82, "column": 33}, "metadata": {"primitive": "signature"}}
+{"assetType": "algorithm", "identifier": "ECDSA-P384", "path": "fixtures/objc/tink_comprehensive/src/TinkComprehensive.m", "evidence": {"line": 70, "column": 33}, "metadata": {"primitive": "signature"}}
+{"assetType": "algorithm", "identifier": "RSA-SSA-PSS", "path": "fixtures/objc/tink_comprehensive/src/TinkComprehensive.m", "evidence": {"line": 78, "column": 33}, "metadata": {"primitive": "signature"}}
+{"assetType": "algorithm", "identifier": "HMAC-SHA256", "path": "fixtures/objc/tink_comprehensive/src/TinkComprehensive.m", "evidence": {"line": 52, "column": 33}, "metadata": {"primitive": "mac"}}
+{"assetType": "algorithm", "identifier": "HMAC-SHA256", "path": "fixtures/objc/tink_comprehensive/src/TinkComprehensive.m", "evidence": {"line": 56, "column": 33}, "metadata": {"primitive": "mac"}}
+{"assetType": "algorithm", "identifier": "HPKE", "path": "fixtures/objc/tink_comprehensive/src/TinkComprehensive.m", "evidence": {"line": 88, "column": 27}, "metadata": {"primitive": "hybrid"}}
+{"assetType": "algorithm", "identifier": "ECDSA-P256", "path": "fixtures/objc/tink_comprehensive/src/TinkComprehensive.m", "evidence": {"line": 66, "column": 33}, "metadata": {"primitive": "signature"}}
+{"assetType": "algorithm", "identifier": "AES-GCM-SIV", "path": "fixtures/objc/tink_comprehensive/src/TinkComprehensive.m", "evidence": {"line": 46, "column": 33}, "metadata": {"primitive": "symmetric"}}
+{"assetType": "algorithm", "identifier": "Ed25519", "path": "fixtures/objc/tink_comprehensive/src/TinkComprehensive.m", "evidence": {"line": 74, "column": 33}, "metadata": {"primitive": "signature"}}
+{"assetType": "algorithm", "identifier": "ECIES-P256-HKDF", "path": "fixtures/objc/tink_comprehensive/src/TinkComprehensive.m", "evidence": {"line": 87, "column": 28}, "metadata": {"primitive": "hybrid"}}
+{"assetType": "algorithm", "identifier": "AES-GCM", "path": "fixtures/objc/tink_comprehensive/src/TinkComprehensive.m", "evidence": {"line": 26, "column": 33}, "metadata": {"primitive": "symmetric"}}
+{"assetType": "algorithm", "identifier": "ChaCha20-Poly1305", "path": "fixtures/objc/tink_comprehensive/src/TinkComprehensive.m", "evidence": {"line": 38, "column": 33}, "metadata": {"primitive": "symmetric"}}
+{"assetType": "algorithm", "identifier": "XChaCha20-Poly1305", "path": "fixtures/objc/tink_comprehensive/src/TinkComprehensive.m", "evidence": {"line": 42, "column": 33}, "metadata": {"primitive": "symmetric"}}
+{"assetType": "algorithm", "identifier": "AES-CTR-HMAC", "path": "fixtures/objc/tink_comprehensive/src/TinkComprehensive.m", "evidence": {"line": 34, "column": 33}, "metadata": {"primitive": "symmetric"}}
+{"assetType": "algorithm", "identifier": "AES-EAX", "path": "fixtures/objc/tink_comprehensive/src/TinkComprehensive.m", "evidence": {"line": 30, "column": 33}, "metadata": {"primitive": "symmetric"}}

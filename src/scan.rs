@@ -200,18 +200,52 @@ pub fn find_algorithms<'a>(
     let mut hits_by_alg: HashMap<&str, Vec<(AlgorithmHit<'a>, bool)>> = HashMap::new();
     for node in code_symbol_nodes(lang, tree.root_node()) {
         let text = node.utf8_text(content.as_bytes()).unwrap_or("");
-        let resolved_text = if constants.is_empty() {
+        let resolved = if constants.is_empty() {
             None
         } else {
-            Some(replace_constants(text, &constants))
+            Some(replace_constants_with_map(text, &constants))
         };
-        let match_text = resolved_text.as_deref().unwrap_or(text);
+        let match_text = resolved
+            .as_ref()
+            .map(|(resolved_text, _)| resolved_text.as_str())
+            .unwrap_or(text);
         for alg in &lib.algorithms {
-            if alg
-                .symbol_regexes
-                .iter()
-                .any(|re| re.is_match(text) || re.is_match(match_text))
-            {
+            let mut match_offset = None;
+            let mut matched = false;
+            for re in &alg.symbol_regexes {
+                if let Some(m) = re.find(text) {
+                    match_offset = Some(m.start());
+                    matched = true;
+                    break;
+                }
+                if text != match_text {
+                    if let Some(m) = re.find(match_text) {
+                        if let Some((_, map)) = resolved.as_ref() {
+                            let start = m.start();
+                            let end = m.end().min(map.len());
+                            if start < map.len() {
+                                let mut mapped = map[start];
+                                let slice = &map[start..end];
+                                for i in 0..slice.len() {
+                                    let prev = i.checked_sub(1).map(|p| slice[p]);
+                                    let next = slice.get(i + 1).copied();
+                                    if prev == Some(slice[i])
+                                        || next == Some(slice[i])
+                                        || prev.is_some_and(|p| slice[i] != p + 1)
+                                    {
+                                        mapped = slice[i];
+                                        break;
+                                    }
+                                }
+                                match_offset = Some(mapped);
+                            }
+                        }
+                        matched = true;
+                        break;
+                    }
+                }
+            }
+            if matched {
                 let mut metadata = HashMap::new();
                 // Add primitive if present
                 if let Some(primitive) = &alg.primitive {
@@ -230,10 +264,13 @@ pub fn find_algorithms<'a>(
                     }
                 }
                 let Point { row, column } = node.start_position();
+                let (line, column) = match_offset
+                    .map(|offset| line_col_from_offset(content, node.start_byte() + offset))
+                    .unwrap_or((row + 1, column + 1));
                 let hit = AlgorithmHit {
                     algorithm_name: &alg.name,
-                    line: row + 1,
-                    column: column + 1,
+                    line,
+                    column,
                     metadata,
                 };
                 hits_by_alg
@@ -279,6 +316,38 @@ pub fn find_algorithms<'a>(
                     if seen_on_line.insert((&alg.name, line)) {
                         let mut metadata = HashMap::new();
                         // Add primitive if present
+                        if let Some(primitive) = &alg.primitive {
+                            metadata
+                                .insert("primitive", serde_json::Value::String(primitive.clone()));
+                        }
+                        result.push(AlgorithmHit {
+                            algorithm_name: &alg.name,
+                            line,
+                            column,
+                            metadata,
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    // Swift fallback: regex scan for missing algorithms.
+    if matches!(lang, Language::Swift)
+        && let Some(lib) = patterns.libraries.iter().find(|l| l.name == library_name)
+    {
+        let mut seen_on_line: HashSet<(&str, usize)> =
+            result.iter().map(|hit| (hit.algorithm_name, hit.line)).collect();
+        let present_algs: HashSet<&str> = result.iter().map(|hit| hit.algorithm_name).collect();
+        for alg in &lib.algorithms {
+            if present_algs.contains(alg.name.as_str()) {
+                continue;
+            }
+            for re in &alg.symbol_regexes {
+                for m in re.find_iter(content) {
+                    let (line, column) = line_col_from_offset(content, m.start());
+                    if seen_on_line.insert((&alg.name, line)) {
+                        let mut metadata = HashMap::new();
                         if let Some(primitive) = &alg.primitive {
                             metadata
                                 .insert("primitive", serde_json::Value::String(primitive.clone()));
@@ -453,35 +522,64 @@ fn is_identifier(value: &str) -> bool {
     chars.all(|c| c == '_' || c.is_ascii_alphanumeric())
 }
 
-fn replace_constants(text: &str, constants: &HashMap<String, String>) -> String {
+fn replace_constants_with_map(
+    text: &str,
+    constants: &HashMap<String, String>,
+) -> (String, Vec<usize>) {
     if constants.is_empty() {
-        return text.to_string();
+        let map = (0..text.len()).collect::<Vec<_>>();
+        return (text.to_string(), map);
     }
 
     let mut resolved = String::with_capacity(text.len());
+    let mut map = Vec::with_capacity(text.len());
     let mut token = String::new();
-    let flush_token = |token: &mut String, resolved: &mut String| {
-        if token.is_empty() {
-            return;
+    let mut token_start = None;
+
+    let flush_token = |resolved: &mut String,
+                       map: &mut Vec<usize>,
+                       token: &mut String,
+                       token_start: &mut Option<usize>,
+                       end: usize| {
+        if let Some(start) = token_start.take() {
+            if let Some(value) = constants.get(token) {
+                resolved.push_str(value);
+                for _ in 0..value.len() {
+                    map.push(start);
+                }
+            } else {
+                resolved.push_str(&text[start..end]);
+                for idx in start..end {
+                    map.push(idx);
+                }
+            }
+            token.clear();
         }
-        if let Some(value) = constants.get(token) {
-            resolved.push_str(value);
-        } else {
-            resolved.push_str(token);
-        }
-        token.clear();
     };
 
-    for ch in text.chars() {
+    for (idx, ch) in text.char_indices() {
         if ch == '_' || ch.is_ascii_alphanumeric() {
+            if token_start.is_none() {
+                token_start = Some(idx);
+            }
             token.push(ch);
         } else {
-            flush_token(&mut token, &mut resolved);
+            flush_token(&mut resolved, &mut map, &mut token, &mut token_start, idx);
             resolved.push(ch);
+            for b in 0..ch.len_utf8() {
+                map.push(idx + b);
+            }
         }
     }
-    flush_token(&mut token, &mut resolved);
-    resolved
+    flush_token(
+        &mut resolved,
+        &mut map,
+        &mut token,
+        &mut token_start,
+        text.len(),
+    );
+
+    (resolved, map)
 }
 
 fn import_like_nodes<'a>(lang: Language, root: Node<'a>) -> Vec<Node<'a>> {
@@ -522,7 +620,7 @@ fn code_symbol_nodes<'a>(lang: Language, root: Node<'a>) -> Vec<Node<'a>> {
             Language::Java => matches!(kind, "method_invocation"),
             Language::Python => matches!(kind, "call" | "attribute"),
             Language::Go => matches!(kind, "call_expression"),
-            Language::Swift => matches!(kind, "call_expression"),
+            Language::Swift => matches!(kind, "call_expression" | "member_access_expression"),
             Language::Php => matches!(kind, "function_call_expression"),
             Language::Objc => matches!(kind, "call_expression" | "selector" | "identifier"),
             Language::Rust => matches!(kind, "call_expression" | "macro_invocation"),

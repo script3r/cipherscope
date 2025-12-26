@@ -33,10 +33,17 @@ nistQuantumSecurityLevel = 0
 symbol_patterns = [
   "\\bRSA_",
   "\\bEVP_PKEY_RSA",
+  "\\bEVP_PKEY_CTX_set_rsa_keygen_bits\\s*\\(",
 ]
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
 pattern = "RSA_generate_key_ex\\s*\\([^,]+,\\s*(\\d{4})"
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "EVP_PKEY_CTX_set_rsa_keygen_bits\\s*\\([^,]+,\\s*(\\d+)"
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "EVP_PKEY_CTX_set_rsa_keygen_bits\\s*\\([^,]+,\\s*(\\d+)"
 
 [[library.algorithms]]
 name = "DSA"
@@ -95,6 +102,7 @@ nistQuantumSecurityLevel = 0
 symbol_patterns = [
   "\\bEVP_PKEY_RSA",
   "\\bRSA_",
+  "\\bEVP_PKEY_CTX_set_rsa_keygen_bits\\s*\\(",
 ]
 [[library.algorithms.parameter_patterns]]
 name = "keySize"
@@ -300,7 +308,6 @@ name = "DES"
 primitive = "symmetric"
 nistQuantumSecurityLevel = 0
 symbol_patterns = [
-  "\\bEVP_des_\\w+\\s*\\(",
   # Explicit EVP DES mode calls
   "\\bEVP_des_(?:cbc|ecb|cfb|ofb)\\s*\\(",
   "\\bDES_set_key\\s*\\(",
@@ -602,7 +609,7 @@ primitive = "symmetric"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bcrypto_secretbox",
-  "\\bcrypto_box",
+  "\\bcrypto_box_(?:easy|open_easy|detached|open_detached|seal|seal_open|afternm|open_afternm|easy_afternm|open_easy_afternm)",
 ]
 
 [[library.algorithms]]
@@ -626,7 +633,7 @@ name = "AES-256-GCM"
 primitive = "symmetric"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
-  "\\bcrypto_aead_aes256gcm",
+  "\\bcrypto_aead_aes256gcm_(?:keygen|encrypt|decrypt)",
 ]
 
 [[library.algorithms]]
@@ -5079,40 +5086,7 @@ name = "ECDSA"
 primitive = "signature"
 nistQuantumSecurityLevel = 0
 symbol_patterns = [
-  "\\bec\\.generate_private_key\\(",
   "\\bec\\.ECDSA\\(",
-]
-
-[[library.algorithms]]
-name = "ECDSA-P256"
-primitive = "signature"
-nistQuantumSecurityLevel = 1
-symbol_patterns = [
-  "\\bec\\.SECP256R1\\(",
-]
-
-[[library.algorithms]]
-name = "ECDSA-P384"
-primitive = "signature"
-nistQuantumSecurityLevel = 2
-symbol_patterns = [
-  "\\bec\\.SECP384R1\\(",
-]
-
-[[library.algorithms]]
-name = "ECDSA-P521"
-primitive = "signature"
-nistQuantumSecurityLevel = 3
-symbol_patterns = [
-  "\\bec\\.SECP521R1\\(",
-]
-
-[[library.algorithms]]
-name = "secp256k1"
-primitive = "signature"
-nistQuantumSecurityLevel = 1
-symbol_patterns = [
-  "\\bec\\.SECP256K1\\(",
 ]
 
 [[library.algorithms]]
@@ -6280,6 +6254,9 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "mode"
 pattern = "kCCOption[A-Za-z0-9_]*"
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "kCCKeySizeAES(128|192|256)"
 
 [[library.algorithms]]
 name = "SHA-256"
@@ -6413,6 +6390,9 @@ nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bkCCAlgorithmAES128",
 ]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "kCCKeySizeAES(128|192|256)"
 
 [[library.algorithms]]
 name = "RC2"
@@ -6472,6 +6452,9 @@ nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bkCCOptionECBMode",
 ]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "kCCKeySizeAES(128|192|256)"
 
 [[library.algorithms]]
 name = "AES-CBC"
@@ -6480,6 +6463,9 @@ nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bkCCModeCBC",
 ]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "kCCKeySizeAES(128|192|256)"
 
 [[library.algorithms]]
 name = "AES-CFB"
@@ -6488,6 +6474,9 @@ nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bkCCModeCFB",
 ]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "kCCKeySizeAES(128|192|256)"
 
 [[library.algorithms]]
 name = "AES-CTR"
@@ -6496,6 +6485,9 @@ nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bkCCModeCTR",
 ]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "kCCKeySizeAES(128|192|256)"
 
 [[library.algorithms]]
 name = "AES-OFB"
@@ -6504,6 +6496,9 @@ nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bkCCModeOFB",
 ]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "kCCKeySizeAES(128|192|256)"
 
 [[library.algorithms]]
 name = "AES-GCM"
@@ -6513,6 +6508,9 @@ symbol_patterns = [
   "\\bkCCModeGCM",
   "\\bCCCryptorGCM",
 ]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "kCCKeySizeAES(128|192|256)"
 
 [[library.algorithms]]
 name = "HMAC"
