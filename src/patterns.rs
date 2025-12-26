@@ -1,6 +1,7 @@
 use anyhow::{Context, Result};
-use regex::Regex;
+use regex::{Regex, RegexSet};
 use serde::Deserialize;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Language {
@@ -75,6 +76,8 @@ struct RawParameterPattern {
 #[derive(Debug, Clone)]
 pub struct PatternSet {
     pub libraries: Vec<Library>,
+    pub include_sets: HashMap<Language, RegexSet>,
+    pub api_sets: HashMap<Language, RegexSet>,
 }
 
 #[derive(Debug, Clone)]
@@ -168,7 +171,39 @@ impl PatternSet {
                 algorithms,
             });
         }
-        Ok(Self { libraries })
+        let mut include_patterns: HashMap<Language, Vec<String>> = HashMap::new();
+        let mut api_patterns: HashMap<Language, Vec<String>> = HashMap::new();
+        for lib in &libraries {
+            for lang in &lib.languages {
+                let include_entry = include_patterns.entry(*lang).or_default();
+                for re in &lib.include_regexes {
+                    include_entry.push(re.as_str().to_string());
+                }
+                let api_entry = api_patterns.entry(*lang).or_default();
+                for re in &lib.api_regexes {
+                    api_entry.push(re.as_str().to_string());
+                }
+            }
+        }
+
+        let mut include_sets = HashMap::new();
+        let mut api_sets = HashMap::new();
+        for (lang, patterns) in include_patterns {
+            if !patterns.is_empty() {
+                include_sets.insert(lang, RegexSet::new(patterns)?);
+            }
+        }
+        for (lang, patterns) in api_patterns {
+            if !patterns.is_empty() {
+                api_sets.insert(lang, RegexSet::new(patterns)?);
+            }
+        }
+
+        Ok(Self {
+            libraries,
+            include_sets,
+            api_sets,
+        })
     }
 
     pub fn supports_language(&self, lang: Language) -> bool {

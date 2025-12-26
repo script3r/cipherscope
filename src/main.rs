@@ -358,12 +358,16 @@ fn process_file(
         }
     };
 
-    // Get absolute path for output
-    let absolute_path = path.canonicalize().unwrap_or_else(|_| path.to_path_buf());
+    // Avoid per-file canonicalize overhead; preserve original path for output
+    let absolute_path = path.to_path_buf();
 
     let Some(lang) = scan::language_from_path(path) else {
         return Ok(());
     };
+    if !scan::has_anchor_hint(lang, content, patterns) {
+        return Ok(());
+    }
+
     let tree = scan::parse(lang, content)?;
 
     // 1) library anchors

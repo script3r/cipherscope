@@ -49,3 +49,12 @@ lang-rust = ["tree-sitter-rust"]
 [dev-dependencies]
 assert_cmd = "2.0"
 tempfile = "3.10"
+criterion = "0.5"
+
+[[bench]]
+name = "scan_bench"
+harness = false
+
+[[bench]]
+name = "scan_large_bench"
+harness = false

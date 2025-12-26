@@ -1,6 +1,6 @@
 use ahash::{AHashMap as HashMap, AHashSet as HashSet};
 use anyhow::{Context, Result};
-use regex::Regex;
+use regex::{Regex, RegexSet};
 use tree_sitter::{Language as TsLanguage, Node, Parser, Point, Tree};
 
 use crate::patterns::{Language, ParameterPattern, PatternSet};
@@ -105,6 +105,9 @@ pub fn find_library_anchors<'a>(
     patterns: &'a PatternSet,
 ) -> Vec<LibraryHit<'a>> {
     let mut hits = Vec::new();
+    let mut include_patterns = Vec::new();
+    let mut include_owners = Vec::new();
+
     for lib in &patterns.libraries {
         if !lib.languages.contains(&lang) {
             continue;
@@ -118,21 +121,50 @@ pub fn find_library_anchors<'a>(
                     column: 1,
                 });
             }
-        } else {
-            for node in import_like_nodes(lang, tree.root_node()) {
-                let text = node.utf8_text(content.as_bytes()).unwrap_or("");
-                if lib.include_regexes.iter().any(|re| re.is_match(text)) {
-                    let Point { row, column } = node.start_position();
-                    hits.push(LibraryHit {
-                        library_name: &lib.name,
-                        line: row + 1,
-                        column: column + 1,
-                    });
-                }
+            continue;
+        }
+        for re in &lib.include_regexes {
+            include_patterns.push(re.as_str().to_string());
+            include_owners.push(&lib.name);
+        }
+    }
+
+    if include_patterns.is_empty() {
+        return hits;
+    }
+
+    let include_set = RegexSet::new(&include_patterns).expect("valid include regexes");
+    for node in import_like_nodes(lang, tree.root_node()) {
+        let text = node.utf8_text(content.as_bytes()).unwrap_or("");
+        let matches = include_set.matches(text);
+        if matches.matched_any() {
+            let Point { row, column } = node.start_position();
+            for idx in matches.iter() {
+                hits.push(LibraryHit {
+                    library_name: include_owners[idx],
+                    line: row + 1,
+                    column: column + 1,
+                });
             }
         }
     }
     hits
+}
+
+pub fn has_anchor_hint(lang: Language, content: &str, patterns: &PatternSet) -> bool {
+    if let Some(include_set) = patterns.include_sets.get(&lang)
+        && include_set.is_match(content)
+    {
+        return true;
+    }
+
+    if let Some(api_set) = patterns.api_sets.get(&lang)
+        && api_set.is_match(content)
+    {
+        return true;
+    }
+
+    false
 }
 
 /// After a library has been identified, this function scans the AST for specific

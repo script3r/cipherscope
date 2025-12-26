@@ -25,9 +25,10 @@
 1.  **Discovery**: It walks the specified root directories in parallel, identifying source files based on their extensions. It respects `.gitignore` rules and can be configured to skip files that exceed a certain size to maintain speed.
 
 2.  **Scanning**: Discovered files are processed in a thread pool:
-    a.  **Parsing**: Each file is parsed into an Abstract Syntax Tree (AST) using the relevant Tree-sitter grammar.
-    b.  **Anchoring**: The scanner looks for "library anchors" (e.g., `import` or `#include` statements) that match known cryptographic libraries defined in `patterns.toml`.
-    c.  **Algorithm Detection**: If an anchor is found, the scanner performs a deeper search within that file for specific algorithm usage patterns, such as function calls and constants.
+    a.  **Anchor Hint**: A fast regex pre-scan checks for any potential library/API anchors. Files with no hints are skipped before AST parsing.
+    b.  **Parsing**: Each file that passes the hint is parsed into an Abstract Syntax Tree (AST) using the relevant Tree-sitter grammar.
+    c.  **Anchoring**: The scanner looks for "library anchors" (e.g., `import` or `#include` statements) that match known cryptographic libraries defined in `patterns.toml`.
+    d.  **Algorithm Detection**: If an anchor is found, the scanner performs a deeper search within that file for specific algorithm usage patterns, such as function calls and constants.
 
 All results are streamed as JSONL to the output, allowing for real-time monitoring and processing.
 For a deeper architecture overview, see `DESIGN.md`.
@@ -124,6 +125,14 @@ To run the integration test suite:
 ```bash
 cargo test
 ```
+
+### Performance Micro-Benchmark
+Run the scanning micro-benchmark (fixtures + repo mix, single-threaded and full CPU):
+```bash
+cargo bench --bench scan_bench
+```
+The benchmark shells out to the `cipherscope` binary and writes output to a temp file
+to keep timing focused on scanning throughput.
 
 ## License
 
