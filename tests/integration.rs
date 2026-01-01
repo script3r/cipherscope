@@ -3,7 +3,7 @@ use std::{
     path::{Path, PathBuf},
     process::Command,
 };
-use tempfile::NamedTempFile;
+use tempfile::{NamedTempFile, TempDir};
 
 fn normalize_path_in_value(mut v: serde_json::Value) -> serde_json::Value {
     if let Some(obj) = v.as_object_mut()
@@ -204,4 +204,73 @@ fn multiple_roots_work() {
 
     assert!(!actual.is_empty());
     assert_eq!(actual, expected1);
+}
+
+#[test]
+fn max_file_mb_skips_large_files() {
+    let repo_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let tmp_dir = TempDir::new().unwrap();
+    let root = tmp_dir.path();
+
+    let patterns_path = root.join("patterns.toml");
+    fs::write(
+        &patterns_path,
+        r#"
+[[library]]
+name = "TestLib"
+languages = ["Rust"]
+[library.patterns]
+include = ["TestLib"]
+apis = ["TestLib"]
+
+[[library.algorithms]]
+name = "TEST-ALG"
+symbol_patterns = ["test_algo"]
+"#,
+    )
+    .unwrap();
+
+    let small_path = root.join("small.rs");
+    fs::write(&small_path, "use TestLib;\nfn main() { test_algo(); }\n").unwrap();
+
+    let big_path = root.join("big.rs");
+    let mut big_content = String::from("use TestLib;\nfn main() { test_algo(); }\n");
+    big_content.push_str(&"a".repeat(1024 * 1024));
+    fs::write(&big_path, big_content).unwrap();
+
+    let tmp_out = NamedTempFile::new().unwrap();
+    let out_path = tmp_out.path().to_path_buf();
+
+    let status = Command::new(env!("CARGO_BIN_EXE_cipherscope"))
+        .current_dir(&repo_root)
+        .args([
+            "--roots",
+            root.to_str().unwrap(),
+            "--patterns",
+            patterns_path.to_str().unwrap(),
+            "--output",
+            out_path.to_str().unwrap(),
+            "--max-file-mb",
+            "1",
+        ])
+        .status()
+        .unwrap();
+    assert!(
+        status.success(),
+        "scanner failed for max_file_mb_skips_large_files"
+    );
+
+    let output = fs::read_to_string(&out_path).unwrap();
+    let mut paths = Vec::new();
+    for line in output.lines().filter(|l| !l.trim().is_empty()) {
+        let val: serde_json::Value = serde_json::from_str(line).unwrap();
+        let path = val
+            .get("path")
+            .and_then(|v| v.as_str())
+            .unwrap_or("")
+            .to_string();
+        paths.push(path);
+    }
+    assert!(!paths.is_empty());
+    assert!(paths.iter().all(|p| p.ends_with("small.rs")));
 }

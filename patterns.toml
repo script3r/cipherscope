@@ -716,6 +716,170 @@ symbol_patterns = [
 ]
 
 [[library]]
+name = "liboqs"
+languages = ["C", "C++"]
+[library.patterns]
+include = [
+  "^\\s*#\\s*include\\s*<oqs/oqs\\.h>",
+  "^\\s*#\\s*include\\s*<oqs/kem\\.h>",
+  "^\\s*#\\s*include\\s*<oqs/sig\\.h>",
+]
+apis = [
+  "\\bOQS_KEM_[A-Za-z0-9_]+\\s*\\(",
+  "\\bOQS_SIG_[A-Za-z0-9_]+\\s*\\(",
+  "\\bOQS_KEM_[A-Za-z0-9_]+\\b",
+  "\\bOQS_SIG_[A-Za-z0-9_]+\\b",
+]
+
+# Algorithm definitions for liboqs
+[[library.algorithms]]
+name = "Kyber-512"
+primitive = "keyexchange"
+nistQuantumSecurityLevel = 1
+symbol_patterns = [
+  "\\bOQS_KEM_(?:alg_)?kyber_512\\b",
+  "\\bkyber_512\\b",
+]
+
+[[library.algorithms]]
+name = "Kyber-768"
+primitive = "keyexchange"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bOQS_KEM_(?:alg_)?kyber_768\\b",
+  "\\bkyber_768\\b",
+]
+
+[[library.algorithms]]
+name = "Kyber-1024"
+primitive = "keyexchange"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bOQS_KEM_(?:alg_)?kyber_1024\\b",
+  "\\bkyber_1024\\b",
+]
+
+[[library.algorithms]]
+name = "Dilithium2"
+primitive = "signature"
+nistQuantumSecurityLevel = 2
+symbol_patterns = [
+  "\\bOQS_SIG_(?:alg_)?dilithium_2\\b",
+  "\\bdilithium_2\\b",
+]
+
+[[library.algorithms]]
+name = "Dilithium3"
+primitive = "signature"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bOQS_SIG_(?:alg_)?dilithium_3\\b",
+  "\\bdilithium_3\\b",
+]
+
+[[library.algorithms]]
+name = "Dilithium5"
+primitive = "signature"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bOQS_SIG_(?:alg_)?dilithium_5\\b",
+  "\\bdilithium_5\\b",
+]
+
+[[library.algorithms]]
+name = "Falcon-512"
+primitive = "signature"
+nistQuantumSecurityLevel = 1
+symbol_patterns = [
+  "\\bOQS_SIG_(?:alg_)?falcon_512\\b",
+  "\\bfalcon_512\\b",
+]
+
+[[library.algorithms]]
+name = "Falcon-1024"
+primitive = "signature"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bOQS_SIG_(?:alg_)?falcon_1024\\b",
+  "\\bfalcon_1024\\b",
+]
+
+[[library.algorithms]]
+name = "SPHINCS+-128"
+primitive = "signature"
+nistQuantumSecurityLevel = 1
+symbol_patterns = [
+  "\\bOQS_SIG_(?:alg_)?sphincs(?:_sha2|_shake)?_128\\w*\\b",
+  "\\bsphincs(?:_sha2|_shake)?_128\\w*\\b",
+]
+
+[[library.algorithms]]
+name = "SPHINCS+-192"
+primitive = "signature"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bOQS_SIG_(?:alg_)?sphincs(?:_sha2|_shake)?_192\\w*\\b",
+  "\\bsphincs(?:_sha2|_shake)?_192\\w*\\b",
+]
+
+[[library.algorithms]]
+name = "SPHINCS+-256"
+primitive = "signature"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bOQS_SIG_(?:alg_)?sphincs(?:_sha2|_shake)?_256\\w*\\b",
+  "\\bsphincs(?:_sha2|_shake)?_256\\w*\\b",
+]
+
+[[library]]
+name = "mlkem-native"
+languages = ["C", "C++"]
+[library.patterns]
+include = [
+  "^\\s*#\\s*include\\s*<mlkem/mlkem_native\\.h>",
+  "^\\s*#\\s*include\\s*<mlkem_native\\.h>",
+  "^\\s*#\\s*include\\s*\"mlkem_native\\.h\"",
+]
+apis = [
+  "\\bcrypto_kem_(?:keypair(?:_derand)?|enc(?:_derand)?|dec|check_pk|check_sk)\\b",
+  "\\bMLKEM(?:512|768|1024)_(?:SECRETKEYBYTES|PUBLICKEYBYTES|CIPHERTEXTBYTES|SYMBYTES|BYTES)\\b",
+]
+
+# Algorithm definitions for mlkem-native
+[[library.algorithms]]
+name = "ML-KEM-512"
+primitive = "keyexchange"
+nistQuantumSecurityLevel = 1
+symbol_patterns = [
+  "\\bMLKEM512_(?:SECRETKEYBYTES|PUBLICKEYBYTES|CIPHERTEXTBYTES|SYMBYTES|BYTES)\\b",
+  "\\bMLKEM_SECRETKEYBYTES\\(512\\)",
+  "\\bMLKEM_PUBLICKEYBYTES\\(512\\)",
+  "\\bMLKEM_CIPHERTEXTBYTES\\(512\\)",
+]
+
+[[library.algorithms]]
+name = "ML-KEM-768"
+primitive = "keyexchange"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bMLKEM768_(?:SECRETKEYBYTES|PUBLICKEYBYTES|CIPHERTEXTBYTES|SYMBYTES|BYTES)\\b",
+  "\\bMLKEM_SECRETKEYBYTES\\(768\\)",
+  "\\bMLKEM_PUBLICKEYBYTES\\(768\\)",
+  "\\bMLKEM_CIPHERTEXTBYTES\\(768\\)",
+]
+
+[[library.algorithms]]
+name = "ML-KEM-1024"
+primitive = "keyexchange"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bMLKEM1024_(?:SECRETKEYBYTES|PUBLICKEYBYTES|CIPHERTEXTBYTES|SYMBYTES|BYTES)\\b",
+  "\\bMLKEM_SECRETKEYBYTES\\(1024\\)",
+  "\\bMLKEM_PUBLICKEYBYTES\\(1024\\)",
+  "\\bMLKEM_CIPHERTEXTBYTES\\(1024\\)",
+]
+
+[[library]]
 name = "Libgcrypt"
 languages = ["C", "C++"]
 [library.patterns]
@@ -3256,6 +3420,105 @@ symbol_patterns = [
 ]
 
 [[library.algorithms]]
+name = "Kyber-512"
+primitive = "keyexchange"
+nistQuantumSecurityLevel = 1
+symbol_patterns = [
+  "\\bKeyPairGenerator\\.getInstance\\s*\\([^)]*(?:KYBER512|MLKEM512)[^)]*BCPQC",
+  "\\bKEMGenerator\\.getInstance\\s*\\([^)]*(?:KYBER512|MLKEM512)[^)]*BCPQC",
+]
+
+[[library.algorithms]]
+name = "Kyber-768"
+primitive = "keyexchange"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bKeyPairGenerator\\.getInstance\\s*\\([^)]*(?:KYBER768|MLKEM768)[^)]*BCPQC",
+  "\\bKEMGenerator\\.getInstance\\s*\\([^)]*(?:KYBER768|MLKEM768)[^)]*BCPQC",
+]
+
+[[library.algorithms]]
+name = "Kyber-1024"
+primitive = "keyexchange"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bKeyPairGenerator\\.getInstance\\s*\\([^)]*(?:KYBER1024|MLKEM1024)[^)]*BCPQC",
+  "\\bKEMGenerator\\.getInstance\\s*\\([^)]*(?:KYBER1024|MLKEM1024)[^)]*BCPQC",
+]
+
+[[library.algorithms]]
+name = "Dilithium2"
+primitive = "signature"
+nistQuantumSecurityLevel = 2
+symbol_patterns = [
+  "\\bKeyPairGenerator\\.getInstance\\s*\\([^)]*DILITHIUM2[^)]*BCPQC",
+  "\\bSignature\\.getInstance\\s*\\([^)]*DILITHIUM2[^)]*BCPQC",
+]
+
+[[library.algorithms]]
+name = "Dilithium3"
+primitive = "signature"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bKeyPairGenerator\\.getInstance\\s*\\([^)]*DILITHIUM3[^)]*BCPQC",
+  "\\bSignature\\.getInstance\\s*\\([^)]*DILITHIUM3[^)]*BCPQC",
+]
+
+[[library.algorithms]]
+name = "Dilithium5"
+primitive = "signature"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bKeyPairGenerator\\.getInstance\\s*\\([^)]*DILITHIUM5[^)]*BCPQC",
+  "\\bSignature\\.getInstance\\s*\\([^)]*DILITHIUM5[^)]*BCPQC",
+]
+
+[[library.algorithms]]
+name = "Falcon-512"
+primitive = "signature"
+nistQuantumSecurityLevel = 1
+symbol_patterns = [
+  "\\bKeyPairGenerator\\.getInstance\\s*\\([^)]*FALCON-?512[^)]*BCPQC",
+  "\\bSignature\\.getInstance\\s*\\([^)]*FALCON-?512[^)]*BCPQC",
+]
+
+[[library.algorithms]]
+name = "Falcon-1024"
+primitive = "signature"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bKeyPairGenerator\\.getInstance\\s*\\([^)]*FALCON-?1024[^)]*BCPQC",
+  "\\bSignature\\.getInstance\\s*\\([^)]*FALCON-?1024[^)]*BCPQC",
+]
+
+[[library.algorithms]]
+name = "SPHINCS+-128"
+primitive = "signature"
+nistQuantumSecurityLevel = 1
+symbol_patterns = [
+  "\\bKeyPairGenerator\\.getInstance\\s*\\([^)]*SPHINCS\\+?.*128[^)]*BCPQC",
+  "\\bSignature\\.getInstance\\s*\\([^)]*SPHINCS\\+?.*128[^)]*BCPQC",
+]
+
+[[library.algorithms]]
+name = "SPHINCS+-192"
+primitive = "signature"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bKeyPairGenerator\\.getInstance\\s*\\([^)]*SPHINCS\\+?.*192[^)]*BCPQC",
+  "\\bSignature\\.getInstance\\s*\\([^)]*SPHINCS\\+?.*192[^)]*BCPQC",
+]
+
+[[library.algorithms]]
+name = "SPHINCS+-256"
+primitive = "signature"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bKeyPairGenerator\\.getInstance\\s*\\([^)]*SPHINCS\\+?.*256[^)]*BCPQC",
+  "\\bSignature\\.getInstance\\s*\\([^)]*SPHINCS\\+?.*256[^)]*BCPQC",
+]
+
+[[library.algorithms]]
 name = "AES"
 primitive = "symmetric"
 nistQuantumSecurityLevel = 3
@@ -4198,6 +4461,120 @@ symbol_patterns = [
   "\\bsignature\\.NewSigner",
 ]
 
+[[library]]
+name = "CIRCL (Cloudflare)"
+languages = ["Go"]
+[library.patterns]
+include = [
+  "^\\s*import\\s*(?:\\(.*\\)|)\\s*[\\s\\S]*?\"github\\.com/cloudflare/circl/(?:kem/kyber|sign/dilithium|sign/falcon|sign/sphincsplus)",
+]
+apis = [
+  "\\bkyber(?:512|768|1024)?\\.",
+  "\\bdilithium\\.",
+  "\\bfalcon\\.",
+  "\\bsphincsplus\\.",
+]
+
+# Algorithm definitions for CIRCL
+[[library.algorithms]]
+name = "Kyber-512"
+primitive = "keyexchange"
+nistQuantumSecurityLevel = 1
+symbol_patterns = [
+  "\\bkyber512\\.",
+  "\\bKyber512\\b",
+]
+
+[[library.algorithms]]
+name = "Kyber-768"
+primitive = "keyexchange"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bkyber768\\.",
+  "\\bKyber768\\b",
+]
+
+[[library.algorithms]]
+name = "Kyber-1024"
+primitive = "keyexchange"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bkyber1024\\.",
+  "\\bKyber1024\\b",
+]
+
+[[library.algorithms]]
+name = "Dilithium2"
+primitive = "signature"
+nistQuantumSecurityLevel = 2
+symbol_patterns = [
+  "\\bdilithium\\.Mode2",
+  "\\bDilithium2\\b",
+]
+
+[[library.algorithms]]
+name = "Dilithium3"
+primitive = "signature"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bdilithium\\.Mode3",
+  "\\bDilithium3\\b",
+]
+
+[[library.algorithms]]
+name = "Dilithium5"
+primitive = "signature"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bdilithium\\.Mode5",
+  "\\bDilithium5\\b",
+]
+
+[[library.algorithms]]
+name = "Falcon-512"
+primitive = "signature"
+nistQuantumSecurityLevel = 1
+symbol_patterns = [
+  "\\bfalcon512\\.",
+  "\\bFalcon512\\b",
+]
+
+[[library.algorithms]]
+name = "Falcon-1024"
+primitive = "signature"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bfalcon1024\\.",
+  "\\bFalcon1024\\b",
+]
+
+[[library.algorithms]]
+name = "SPHINCS+-128"
+primitive = "signature"
+nistQuantumSecurityLevel = 1
+symbol_patterns = [
+  "\\bsphincsplus\\.(?:SHA2|SHAKE)_128",
+  "\\bSPHINCS\\+.*128\\b",
+]
+
+[[library.algorithms]]
+name = "SPHINCS+-192"
+primitive = "signature"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bsphincsplus\\.(?:SHA2|SHAKE)_192",
+  "\\bSPHINCS\\+.*192\\b",
+]
+
+[[library.algorithms]]
+name = "SPHINCS+-256"
+primitive = "signature"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bsphincsplus\\.(?:SHA2|SHAKE)_256",
+  "\\bSPHINCS\\+.*256\\b",
+]
+
 # =========================
 # Rust
 # =========================
@@ -4431,6 +4808,230 @@ symbol_patterns = [
 [[library.algorithms.parameter_patterns]]
 name = "curve"
 pattern = "p(\\d+)"
+
+[[library]]
+name = "pqcrypto (Rust)"
+languages = ["Rust"]
+[library.patterns]
+include = [
+  "\\bextern\\s+crate\\s+pqcrypto_",
+  "\\buse\\s+pqcrypto_",
+]
+apis = [
+  "\\bpqcrypto_[a-z0-9_]+::",
+]
+
+# Algorithm definitions for pqcrypto (Rust)
+[[library.algorithms]]
+name = "Kyber-512"
+primitive = "keyexchange"
+nistQuantumSecurityLevel = 1
+symbol_patterns = [
+  "\\bpqcrypto_kyber::kyber512",
+  "\\bkyber512::",
+]
+
+[[library.algorithms]]
+name = "Kyber-768"
+primitive = "keyexchange"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bpqcrypto_kyber::kyber768",
+  "\\bkyber768::",
+]
+
+[[library.algorithms]]
+name = "Kyber-1024"
+primitive = "keyexchange"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bpqcrypto_kyber::kyber1024",
+  "\\bkyber1024::",
+]
+
+[[library.algorithms]]
+name = "Dilithium2"
+primitive = "signature"
+nistQuantumSecurityLevel = 2
+symbol_patterns = [
+  "\\bpqcrypto_dilithium::dilithium2",
+  "\\bdilithium2::",
+]
+
+[[library.algorithms]]
+name = "Dilithium3"
+primitive = "signature"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bpqcrypto_dilithium::dilithium3",
+  "\\bdilithium3::",
+]
+
+[[library.algorithms]]
+name = "Dilithium5"
+primitive = "signature"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bpqcrypto_dilithium::dilithium5",
+  "\\bdilithium5::",
+]
+
+[[library.algorithms]]
+name = "Falcon-512"
+primitive = "signature"
+nistQuantumSecurityLevel = 1
+symbol_patterns = [
+  "\\bpqcrypto_falcon::falcon512",
+  "\\bfalcon512::",
+]
+
+[[library.algorithms]]
+name = "Falcon-1024"
+primitive = "signature"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bpqcrypto_falcon::falcon1024",
+  "\\bfalcon1024::",
+]
+
+[[library.algorithms]]
+name = "SPHINCS+-128"
+primitive = "signature"
+nistQuantumSecurityLevel = 1
+symbol_patterns = [
+  "\\bpqcrypto_sphincsplus::.*128",
+  "\\bsphincs.*128",
+]
+
+[[library.algorithms]]
+name = "SPHINCS+-192"
+primitive = "signature"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bpqcrypto_sphincsplus::.*192",
+  "\\bsphincs.*192",
+]
+
+[[library.algorithms]]
+name = "SPHINCS+-256"
+primitive = "signature"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bpqcrypto_sphincsplus::.*256",
+  "\\bsphincs.*256",
+]
+
+[[library]]
+name = "oqs (Rust)"
+languages = ["Rust"]
+[library.patterns]
+include = [
+  "\\bextern\\s+crate\\s+oqs\\b",
+  "\\buse\\s+oqs::",
+]
+apis = [
+  "\\boqs::(?:kem|sig)::",
+]
+
+# Algorithm definitions for oqs (Rust)
+[[library.algorithms]]
+name = "Kyber-512"
+primitive = "keyexchange"
+nistQuantumSecurityLevel = 1
+symbol_patterns = [
+  "\\boqs::kem::Algorithm::Kyber512",
+  "\\bKyber512\\b",
+]
+
+[[library.algorithms]]
+name = "Kyber-768"
+primitive = "keyexchange"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\boqs::kem::Algorithm::Kyber768",
+  "\\bKyber768\\b",
+]
+
+[[library.algorithms]]
+name = "Kyber-1024"
+primitive = "keyexchange"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\boqs::kem::Algorithm::Kyber1024",
+  "\\bKyber1024\\b",
+]
+
+[[library.algorithms]]
+name = "Dilithium2"
+primitive = "signature"
+nistQuantumSecurityLevel = 2
+symbol_patterns = [
+  "\\boqs::sig::Algorithm::Dilithium2",
+  "\\bDilithium2\\b",
+]
+
+[[library.algorithms]]
+name = "Dilithium3"
+primitive = "signature"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\boqs::sig::Algorithm::Dilithium3",
+  "\\bDilithium3\\b",
+]
+
+[[library.algorithms]]
+name = "Dilithium5"
+primitive = "signature"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\boqs::sig::Algorithm::Dilithium5",
+  "\\bDilithium5\\b",
+]
+
+[[library.algorithms]]
+name = "Falcon-512"
+primitive = "signature"
+nistQuantumSecurityLevel = 1
+symbol_patterns = [
+  "\\boqs::sig::Algorithm::Falcon512",
+  "\\bFalcon512\\b",
+]
+
+[[library.algorithms]]
+name = "Falcon-1024"
+primitive = "signature"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\boqs::sig::Algorithm::Falcon1024",
+  "\\bFalcon1024\\b",
+]
+
+[[library.algorithms]]
+name = "SPHINCS+-128"
+primitive = "signature"
+nistQuantumSecurityLevel = 1
+symbol_patterns = [
+  "\\boqs::sig::Algorithm::Sphincs\\w*128",
+  "\\bSphincs\\w*128",
+]
+
+[[library.algorithms]]
+name = "SPHINCS+-192"
+primitive = "signature"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\boqs::sig::Algorithm::Sphincs\\w*192",
+  "\\bSphincs\\w*192",
+]
+
+[[library.algorithms]]
+name = "SPHINCS+-256"
+primitive = "signature"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\boqs::sig::Algorithm::Sphincs\\w*256",
+  "\\bSphincs\\w*256",
+]
 
 # =========================
 # Swift
@@ -5306,6 +5907,119 @@ nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bConcatKDFHash\\(",
   "\\bConcatKDFHMAC\\(",
+]
+
+[[library]]
+name = "python-oqs"
+languages = ["Python"]
+[library.patterns]
+include = [
+  "^\\s*import\\s+oqs\\b",
+  "^\\s*from\\s+oqs\\b",
+]
+apis = [
+  "\\boqs\\.(?:KeyEncapsulation|Signature)\\b",
+  "\\boqs\\.(?:get_enabled_kems|get_enabled_sigs)\\b",
+]
+
+# Algorithm definitions for python-oqs
+[[library.algorithms]]
+name = "Kyber-512"
+primitive = "keyexchange"
+nistQuantumSecurityLevel = 1
+symbol_patterns = [
+  "\\bKyber512\\b",
+  "\\bkyber512\\b",
+]
+
+[[library.algorithms]]
+name = "Kyber-768"
+primitive = "keyexchange"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bKyber768\\b",
+  "\\bkyber768\\b",
+]
+
+[[library.algorithms]]
+name = "Kyber-1024"
+primitive = "keyexchange"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bKyber1024\\b",
+  "\\bkyber1024\\b",
+]
+
+[[library.algorithms]]
+name = "Dilithium2"
+primitive = "signature"
+nistQuantumSecurityLevel = 2
+symbol_patterns = [
+  "\\bDilithium2\\b",
+  "\\bdilithium2\\b",
+]
+
+[[library.algorithms]]
+name = "Dilithium3"
+primitive = "signature"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bDilithium3\\b",
+  "\\bdilithium3\\b",
+]
+
+[[library.algorithms]]
+name = "Dilithium5"
+primitive = "signature"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bDilithium5\\b",
+  "\\bdilithium5\\b",
+]
+
+[[library.algorithms]]
+name = "Falcon-512"
+primitive = "signature"
+nistQuantumSecurityLevel = 1
+symbol_patterns = [
+  "\\bFalcon-?512\\b",
+  "\\bfalcon-?512\\b",
+]
+
+[[library.algorithms]]
+name = "Falcon-1024"
+primitive = "signature"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bFalcon-?1024\\b",
+  "\\bfalcon-?1024\\b",
+]
+
+[[library.algorithms]]
+name = "SPHINCS+-128"
+primitive = "signature"
+nistQuantumSecurityLevel = 1
+symbol_patterns = [
+  "\\bSPHINCS\\+.*128\\b",
+  "\\bsphincs\\+.*128\\b",
+]
+
+[[library.algorithms]]
+name = "SPHINCS+-192"
+primitive = "signature"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bSPHINCS\\+.*192\\b",
+  "\\bsphincs\\+.*192\\b",
+]
+
+[[library.algorithms]]
+name = "SPHINCS+-256"
+primitive = "signature"
+nistQuantumSecurityLevel = 5
+symbol_patterns = [
+  "\\bSPHINCS\\+.*256\\b",
+  "\\bsphincs\\+.*256\\b",
 ]
 
 [[library]]

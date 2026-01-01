@@ -729,7 +729,10 @@ fn is_more_specific(specific: &str, generic: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::{AlgorithmHit, dedupe_more_specific_hits};
+    use super::{
+        AlgorithmHit, dedupe_more_specific_hits, find_library_anchors, has_anchor_hint, parse,
+    };
+    use crate::patterns::{Language, PatternSet};
     use ahash::AHashMap as HashMap;
     use serde_json::Value;
 
@@ -880,5 +883,78 @@ mod tests {
         let out = dedupe_more_specific_hits(hits);
         assert_eq!(out.len(), 1);
         assert_eq!(out[0].algorithm_name, "AES-GCM");
+    }
+
+    fn patterns_from_toml(text: &str) -> PatternSet {
+        PatternSet::from_toml(text).expect("valid patterns")
+    }
+
+    #[test]
+    fn has_anchor_hint_detects_include_and_api() {
+        let patterns = patterns_from_toml(
+            r#"
+[[library]]
+name = "TestLib"
+languages = ["Python"]
+[library.patterns]
+include = ["import\\s+testlib"]
+apis = ["testlib\\.crypto"]
+"#,
+        );
+        assert!(has_anchor_hint(
+            Language::Python,
+            "import testlib\nx = 1",
+            &patterns
+        ));
+        assert!(has_anchor_hint(
+            Language::Python,
+            "testlib.crypto()",
+            &patterns
+        ));
+        assert!(!has_anchor_hint(
+            Language::Python,
+            "print('nope')",
+            &patterns
+        ));
+    }
+
+    #[test]
+    fn find_library_anchors_uses_import_nodes() {
+        let patterns = patterns_from_toml(
+            r#"
+[[library]]
+name = "TestLib"
+languages = ["Python"]
+[library.patterns]
+include = ["testlib"]
+"#,
+        );
+        let content = "import testlib\nx = 1";
+        let tree = parse(Language::Python, content).expect("parse python");
+        let hits = find_library_anchors(Language::Python, content, &tree, &patterns);
+        assert_eq!(hits.len(), 1);
+        assert_eq!(hits[0].library_name, "TestLib");
+        assert_eq!(hits[0].line, 1);
+        assert_eq!(hits[0].column, 1);
+    }
+
+    #[test]
+    fn find_library_anchors_falls_back_to_api_regex() {
+        let patterns = patterns_from_toml(
+            r#"
+[[library]]
+name = "TestLib"
+languages = ["Python"]
+[library.patterns]
+apis = ["CryptoLib"]
+"#,
+        );
+        let content = "CryptoLib.new()\n";
+        let tree = parse(Language::Python, content).expect("parse python");
+        let hits = find_library_anchors(Language::Python, content, &tree, &patterns);
+        assert_eq!(hits.len(), 1);
+        assert_eq!(hits[0].library_name, "TestLib");
+        assert_eq!(hits[0].line, 1);
+        assert_eq!(hits[0].column, 1);
     }
 }
