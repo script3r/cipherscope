@@ -8,6 +8,7 @@ repository = "https://github.com/script3r/cipherscope"
 readme = "README.md"
 keywords = ["crypto", "static-analysis", "security", "inventory", "tree-sitter"]
 categories = ["development-tools", "command-line-utilities"]
+include = ["src/**", "patterns.toml", "Cargo.toml", "README.md", "LICENSE"]
 
 [dependencies]
 anyhow = "1.0"

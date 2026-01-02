@@ -19,6 +19,8 @@ use serde::Serialize;
 mod patterns;
 mod scan;
 
+const DEFAULT_PATTERNS: &str = include_str!("../patterns.toml");
+
 #[derive(Parser, Debug)]
 #[command(
     name = "cipherscope",
@@ -34,9 +36,9 @@ struct Cli {
     #[arg(short, long)]
     exclude: Vec<String>,
 
-    /// Path to patterns.toml
-    #[arg(short = 'p', long, default_value = "patterns.toml")]
-    patterns: PathBuf,
+    /// Path to patterns.toml (defaults to the embedded patterns)
+    #[arg(short = 'p', long)]
+    patterns: Option<PathBuf>,
 
     /// Output JSONL file path (defaults to stdout, use a filename to write to file)
     #[arg(short, long, default_value = "-")]
@@ -98,8 +100,12 @@ fn main() -> Result<()> {
         .build_global()
         .ok();
 
-    let patterns_text = std::fs::read_to_string(&cli.patterns)
-        .with_context(|| format!("reading patterns file: {}", cli.patterns.display()))?;
+    let patterns_text = if let Some(path) = cli.patterns.as_ref() {
+        std::fs::read_to_string(path)
+            .with_context(|| format!("reading patterns file: {}", path.display()))?
+    } else {
+        DEFAULT_PATTERNS.to_string()
+    };
     let patterns = Arc::new(patterns::PatternSet::from_toml(&patterns_text)?);
 
     // Setup progress reporting
