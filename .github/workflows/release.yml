@@ -23,7 +23,7 @@ jobs:
             target: x86_64-pc-windows-msvc
             ext: ".exe"
             archive: zip
-          - os: macos-13
+          - os: macos-14
             target: x86_64-apple-darwin
             ext: ""
             archive: tar.gz
