@@ -53,7 +53,6 @@
 {"assetType": "algorithm", "identifier": "HMAC", "path": "fixtures/cpp/mbedtls_comprehensive/src/comprehensive.cpp", "evidence": {"line": 491, "column": 5}, "metadata": {"primitive": "mac"}}
 {"assetType": "algorithm", "identifier": "HMAC", "path": "fixtures/cpp/mbedtls_comprehensive/src/comprehensive.cpp", "evidence": {"line": 492, "column": 5}, "metadata": {"primitive": "mac"}}
 {"assetType": "algorithm", "identifier": "HMAC", "path": "fixtures/cpp/mbedtls_comprehensive/src/comprehensive.cpp", "evidence": {"line": 493, "column": 5}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "RSA-OAEP", "path": "fixtures/cpp/mbedtls_comprehensive/src/comprehensive.cpp", "evidence": {"line": 190, "column": 39}, "metadata": {"primitive": "asymmetric"}}
 {"assetType": "algorithm", "identifier": "RSA-OAEP", "path": "fixtures/cpp/mbedtls_comprehensive/src/comprehensive.cpp", "evidence": {"line": 191, "column": 5}, "metadata": {"primitive": "asymmetric"}}
 {"assetType": "algorithm", "identifier": "ECDSA-P384", "path": "fixtures/cpp/mbedtls_comprehensive/src/comprehensive.cpp", "evidence": {"line": 241, "column": 38}, "metadata": {"primitive": "signature"}}
 {"assetType": "algorithm", "identifier": "AES", "path": "fixtures/cpp/mbedtls_comprehensive/src/comprehensive.cpp", "evidence": {"line": 46, "column": 5}, "metadata": {"primitive": "symmetric"}}
@@ -77,9 +76,6 @@
 {"assetType": "algorithm", "identifier": "3DES", "path": "fixtures/cpp/mbedtls_comprehensive/src/comprehensive.cpp", "evidence": {"line": 114, "column": 5}, "metadata": {"primitive": "symmetric"}}
 {"assetType": "algorithm", "identifier": "3DES", "path": "fixtures/cpp/mbedtls_comprehensive/src/comprehensive.cpp", "evidence": {"line": 115, "column": 5}, "metadata": {"primitive": "symmetric"}}
 {"assetType": "algorithm", "identifier": "3DES", "path": "fixtures/cpp/mbedtls_comprehensive/src/comprehensive.cpp", "evidence": {"line": 116, "column": 5}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "MD4", "path": "fixtures/cpp/mbedtls_comprehensive/src/comprehensive.cpp", "evidence": {"line": 330, "column": 5}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "MD4", "path": "fixtures/cpp/mbedtls_comprehensive/src/comprehensive.cpp", "evidence": {"line": 331, "column": 5}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "MD4", "path": "fixtures/cpp/mbedtls_comprehensive/src/comprehensive.cpp", "evidence": {"line": 337, "column": 5}, "metadata": {"primitive": "hash"}}
 {"assetType": "algorithm", "identifier": "secp256k1", "path": "fixtures/cpp/mbedtls_comprehensive/src/comprehensive.cpp", "evidence": {"line": 253, "column": 38}, "metadata": {"primitive": "signature"}}
 {"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/cpp/mbedtls_comprehensive/src/comprehensive.cpp", "evidence": {"line": 385, "column": 5}, "metadata": {"primitive": "hash"}}
 {"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/cpp/mbedtls_comprehensive/src/comprehensive.cpp", "evidence": {"line": 396, "column": 5}, "metadata": {"primitive": "hash"}}

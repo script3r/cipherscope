@@ -15,12 +15,8 @@
 {"assetType": "algorithm", "identifier": "Ed25519", "path": "fixtures/cpp/libsodium_comprehensive/src/comprehensive.cpp", "evidence": {"line": 188, "column": 5}, "metadata": {"primitive": "signature"}}
 {"assetType": "algorithm", "identifier": "Ed25519", "path": "fixtures/cpp/libsodium_comprehensive/src/comprehensive.cpp", "evidence": {"line": 189, "column": 5}, "metadata": {"primitive": "signature"}}
 {"assetType": "algorithm", "identifier": "Ed25519", "path": "fixtures/cpp/libsodium_comprehensive/src/comprehensive.cpp", "evidence": {"line": 190, "column": 5}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "X25519", "path": "fixtures/cpp/libsodium_comprehensive/src/comprehensive.cpp", "evidence": {"line": 114, "column": 5}, "metadata": {"primitive": "keyexchange"}}
-{"assetType": "algorithm", "identifier": "X25519", "path": "fixtures/cpp/libsodium_comprehensive/src/comprehensive.cpp", "evidence": {"line": 115, "column": 5}, "metadata": {"primitive": "keyexchange"}}
 {"assetType": "algorithm", "identifier": "X25519", "path": "fixtures/cpp/libsodium_comprehensive/src/comprehensive.cpp", "evidence": {"line": 119, "column": 5}, "metadata": {"primitive": "keyexchange"}}
 {"assetType": "algorithm", "identifier": "X25519", "path": "fixtures/cpp/libsodium_comprehensive/src/comprehensive.cpp", "evidence": {"line": 122, "column": 5}, "metadata": {"primitive": "keyexchange"}}
-{"assetType": "algorithm", "identifier": "X25519", "path": "fixtures/cpp/libsodium_comprehensive/src/comprehensive.cpp", "evidence": {"line": 130, "column": 5}, "metadata": {"primitive": "keyexchange"}}
-{"assetType": "algorithm", "identifier": "X25519", "path": "fixtures/cpp/libsodium_comprehensive/src/comprehensive.cpp", "evidence": {"line": 133, "column": 5}, "metadata": {"primitive": "keyexchange"}}
 {"assetType": "algorithm", "identifier": "X25519", "path": "fixtures/cpp/libsodium_comprehensive/src/comprehensive.cpp", "evidence": {"line": 141, "column": 5}, "metadata": {"primitive": "keyexchange"}}
 {"assetType": "algorithm", "identifier": "X25519", "path": "fixtures/cpp/libsodium_comprehensive/src/comprehensive.cpp", "evidence": {"line": 142, "column": 5}, "metadata": {"primitive": "keyexchange"}}
 {"assetType": "algorithm", "identifier": "X25519", "path": "fixtures/cpp/libsodium_comprehensive/src/comprehensive.cpp", "evidence": {"line": 146, "column": 5}, "metadata": {"primitive": "keyexchange"}}
@@ -78,3 +74,7 @@
 {"assetType": "algorithm", "identifier": "AES-256-GCM", "path": "fixtures/cpp/libsodium_comprehensive/src/comprehensive.cpp", "evidence": {"line": 63, "column": 9}, "metadata": {"primitive": "symmetric"}}
 {"assetType": "algorithm", "identifier": "AES-256-GCM", "path": "fixtures/cpp/libsodium_comprehensive/src/comprehensive.cpp", "evidence": {"line": 66, "column": 9}, "metadata": {"primitive": "symmetric"}}
 {"assetType": "algorithm", "identifier": "AES-256-GCM", "path": "fixtures/cpp/libsodium_comprehensive/src/comprehensive.cpp", "evidence": {"line": 73, "column": 9}, "metadata": {"primitive": "symmetric"}}
+{"assetType": "algorithm", "identifier": "X25519", "path": "fixtures/cpp/libsodium_comprehensive/src/comprehensive.cpp", "evidence": {"line": 114, "column": 5}, "metadata": {"primitive": "keyexchange"}}
+{"assetType": "algorithm", "identifier": "X25519", "path": "fixtures/cpp/libsodium_comprehensive/src/comprehensive.cpp", "evidence": {"line": 115, "column": 5}, "metadata": {"primitive": "keyexchange"}}
+{"assetType": "algorithm", "identifier": "X25519", "path": "fixtures/cpp/libsodium_comprehensive/src/comprehensive.cpp", "evidence": {"line": 130, "column": 5}, "metadata": {"primitive": "keyexchange"}}
+{"assetType": "algorithm", "identifier": "X25519", "path": "fixtures/cpp/libsodium_comprehensive/src/comprehensive.cpp", "evidence": {"line": 133, "column": 5}, "metadata": {"primitive": "keyexchange"}}
