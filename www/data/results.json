@@ -1,0 +1,334 @@
+{
+  "generatedAt": "2026-01-02T02:43:47.178374Z",
+  "repos": [
+    {
+      "slug": "django",
+      "name": "Django",
+      "url": "https://github.com/django/django",
+      "languageFocus": "Python",
+      "filesScanned": 2888,
+      "cryptoItems": 45,
+      "uniqueFiles": 10,
+      "byType": {
+        "library": 10,
+        "algorithm": 35
+      },
+      "topIdentifiers": [
+        {
+          "label": "PBKDF2",
+          "count": 24
+        },
+        {
+          "label": "Python stdlib crypto",
+          "count": 10
+        },
+        {
+          "label": "SHA-1",
+          "count": 6
+        },
+        {
+          "label": "HMAC",
+          "count": 1
+        },
+        {
+          "label": "scrypt",
+          "count": 1
+        },
+        {
+          "label": "MD5",
+          "count": 1
+        }
+      ],
+      "evidenceSamples": [
+        {
+          "identifier": "PBKDF2",
+          "assetType": "algorithm",
+          "path": "django/utils/crypto.py",
+          "line": 77,
+          "column": 12,
+          "context": [
+            {
+              "line": 76,
+              "text": "    salt = force_bytes(salt)",
+              "highlight": false
+            },
+            {
+              "line": 77,
+              "text": "    return hashlib.pbkdf2_hmac(digest().name, password, salt, iterations, dklen)",
+              "highlight": true
+            }
+          ]
+        },
+        {
+          "identifier": "Python stdlib crypto",
+          "assetType": "library",
+          "path": "django/utils/crypto.py",
+          "line": 6,
+          "column": 1,
+          "context": [
+            {
+              "line": 5,
+              "text": "import hashlib",
+              "highlight": false
+            },
+            {
+              "line": 6,
+              "text": "import hmac",
+              "highlight": true
+            },
+            {
+              "line": 7,
+              "text": "import secrets",
+              "highlight": false
+            }
+          ]
+        },
+        {
+          "identifier": "SHA-1",
+          "assetType": "algorithm",
+          "path": "tests/file_uploads/views.py",
+          "line": 50,
+          "column": 24,
+          "context": [
+            {
+              "line": 49,
+              "text": "        if isinstance(value, UploadedFile):",
+              "highlight": false
+            },
+            {
+              "line": 50,
+              "text": "            new_hash = hashlib.sha1(value.read()).hexdigest()",
+              "highlight": true
+            },
+            {
+              "line": 51,
+              "text": "        else:",
+              "highlight": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "go",
+      "name": "Go",
+      "url": "https://github.com/golang/go",
+      "languageFocus": "Go",
+      "filesScanned": 11180,
+      "cryptoItems": 983,
+      "uniqueFiles": 211,
+      "byType": {
+        "library": 230,
+        "algorithm": 753
+      },
+      "topIdentifiers": [
+        {
+          "label": "Go std crypto",
+          "count": 211
+        },
+        {
+          "label": "SHA-256",
+          "count": 170
+        },
+        {
+          "label": "AES",
+          "count": 95
+        },
+        {
+          "label": "ECDSA",
+          "count": 70
+        },
+        {
+          "label": "SHA-512",
+          "count": 69
+        },
+        {
+          "label": "AES-GCM",
+          "count": 31
+        }
+      ],
+      "evidenceSamples": [
+        {
+          "identifier": "Go std crypto",
+          "assetType": "library",
+          "path": "src/crypto/x509/sec1.go",
+          "line": 7,
+          "column": 1,
+          "context": [
+            {
+              "line": 6,
+              "text": "",
+              "highlight": false
+            },
+            {
+              "line": 7,
+              "text": "import (",
+              "highlight": true
+            },
+            {
+              "line": 8,
+              "text": "\t\"crypto/ecdh\"",
+              "highlight": false
+            }
+          ]
+        },
+        {
+          "identifier": "SHA-256",
+          "assetType": "algorithm",
+          "path": "src/crypto/rsa/pss_test.go",
+          "line": 204,
+          "column": 12,
+          "context": [
+            {
+              "line": 203,
+              "text": "\t}",
+              "highlight": false
+            },
+            {
+              "line": 204,
+              "text": "\tdigest := sha256.Sum256([]byte(\"message\"))",
+              "highlight": true
+            },
+            {
+              "line": 205,
+              "text": "\tsignature, err := key.Sign(rand.Reader, digest[:], &PSSOptions{",
+              "highlight": false
+            }
+          ]
+        },
+        {
+          "identifier": "AES",
+          "assetType": "algorithm",
+          "path": "src/crypto/issue21104_test.go",
+          "line": 24,
+          "column": 22,
+          "context": [
+            {
+              "line": 23,
+              "text": "func TestCTROutOfBoundsWrite(t *testing.T) {",
+              "highlight": false
+            },
+            {
+              "line": 24,
+              "text": "\ttestBlock(t, \"CTR\", cipher.NewCTR)",
+              "highlight": true
+            },
+            {
+              "line": 25,
+              "text": "}",
+              "highlight": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "node",
+      "name": "Node.js",
+      "url": "https://github.com/nodejs/node",
+      "languageFocus": "C/C++",
+      "filesScanned": 815,
+      "cryptoItems": 21,
+      "uniqueFiles": 13,
+      "byType": {
+        "library": 13,
+        "algorithm": 8
+      },
+      "topIdentifiers": [
+        {
+          "label": "OpenSSL",
+          "count": 8
+        },
+        {
+          "label": "Python stdlib crypto",
+          "count": 5
+        },
+        {
+          "label": "MD5",
+          "count": 4
+        },
+        {
+          "label": "SHA-1",
+          "count": 2
+        },
+        {
+          "label": "RSA",
+          "count": 1
+        },
+        {
+          "label": "DH",
+          "count": 1
+        }
+      ],
+      "evidenceSamples": [
+        {
+          "identifier": "OpenSSL",
+          "assetType": "library",
+          "path": "test/addons/openssl-test-engine/testsetengine.cc",
+          "line": 1,
+          "column": 1,
+          "context": [
+            {
+              "line": 1,
+              "text": "#include <openssl/engine.h>",
+              "highlight": true
+            },
+            {
+              "line": 2,
+              "text": "",
+              "highlight": false
+            }
+          ]
+        },
+        {
+          "identifier": "Python stdlib crypto",
+          "assetType": "library",
+          "path": "tools/configure.d/nodedownload.py",
+          "line": 5,
+          "column": 1,
+          "context": [
+            {
+              "line": 4,
+              "text": "from __future__ import print_function",
+              "highlight": false
+            },
+            {
+              "line": 5,
+              "text": "import hashlib",
+              "highlight": true
+            },
+            {
+              "line": 6,
+              "text": "import sys",
+              "highlight": false
+            }
+          ]
+        },
+        {
+          "identifier": "MD5",
+          "assetType": "algorithm",
+          "path": "tools/gyp/pylib/gyp/MSVSNew.py",
+          "line": 48,
+          "column": 9,
+          "context": [
+            {
+              "line": 47,
+              "text": "    # Calculate a MD5 signature for the seed and name.",
+              "highlight": false
+            },
+            {
+              "line": 48,
+              "text": "    d = hashlib.md5((str(seed) + str(name)).encode(\"utf-8\")).hexdigest().upper()",
+              "highlight": true
+            },
+            {
+              "line": 49,
+              "text": "    # Convert most of the signature to GUID form (discard the rest)",
+              "highlight": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

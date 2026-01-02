@@ -35,4 +35,4 @@
 {"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/cpp/openssl_comprehensive/src/comprehensive.cpp", "evidence": {"line": 227, "column": 30}, "metadata": {"primitive": "hash"}}
 {"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/cpp/openssl_comprehensive/src/comprehensive.cpp", "evidence": {"line": 240, "column": 36}, "metadata": {"primitive": "hash"}}
 {"assetType": "algorithm", "identifier": "SHA3-224", "path": "fixtures/cpp/openssl_comprehensive/src/comprehensive.cpp", "evidence": {"line": 183, "column": 30}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "DSA", "path": "fixtures/cpp/openssl_comprehensive/src/comprehensive.cpp", "evidence": {"line": 137, "column": 32}, "metadata": {"primitive": "signature"}}
+{"assetType": "algorithm", "identifier": "DSA", "path": "fixtures/cpp/openssl_comprehensive/src/comprehensive.cpp", "evidence": {"line": 137, "column": 12}, "metadata": {"primitive": "signature"}}
