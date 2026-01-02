@@ -67,7 +67,7 @@ jobs:
       - name: cargo test
         run: cargo test
       - name: cargo publish
-        run: cargo publish
+        run: cargo publish --allow-dirty
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
       - name: GitHub Release
