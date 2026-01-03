@@ -1,6 +1,6 @@
 [package]
 name = "cipherscope"
-version = "0.2.2"
+version = "0.2.3"
 edition = "2024"
 description = "A high-performance, language-aware tool for scanning source code to detect cryptographic libraries and algorithms usage."
 license = "MIT"
