@@ -1,8 +1,14 @@
 {
   "cleanUrls": true,
-  "public": "www",
-  "builds": [{ "src": "api/*.rs", "use": "@vercel/rust" }],
-  "rewrites": [
-    { "source": "/api/:path*", "destination": "/api/:path*.rs" }
+  "public": true,
+  "builds": [
+    { "src": "api/*.rs", "use": "@vercel/rust" },
+    { "src": "www/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1.rs" },
+    { "handle": "filesystem" },
+    { "src": "/", "dest": "/www/index.html" },
+    { "src": "/(.*)", "dest": "/www/$1" }
   ]
 }
