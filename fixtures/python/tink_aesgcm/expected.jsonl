@@ -1,4 +1,4 @@
 {"assetType": "library", "identifier": "Google Tink (Python)", "path": "fixtures/python/tink_aesgcm/src/tink_example.py", "evidence": {"line": 3, "column": 1}}
 {"assetType": "algorithm", "identifier": "AES-CTR-HMAC", "path": "fixtures/python/tink_aesgcm/src/tink_example.py", "evidence": {"line": 26, "column": 20}, "metadata": {"primitive": "symmetric"}}
 {"assetType": "algorithm", "identifier": "AES-GCM", "path": "fixtures/python/tink_aesgcm/src/tink_example.py", "evidence": {"line": 10, "column": 20}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "ChaCha20-Poly1305", "path": "fixtures/python/tink_aesgcm/src/tink_example.py", "evidence": {"line": 31, "column": 23}, "metadata": {"primitive": "symmetric"}}
+{"assetType": "algorithm", "identifier": "XChaCha20-Poly1305", "path": "fixtures/python/tink_aesgcm/src/tink_example.py", "evidence": {"line": 31, "column": 23}, "metadata": {"primitive": "symmetric"}}

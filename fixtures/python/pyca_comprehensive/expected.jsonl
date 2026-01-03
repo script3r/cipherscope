@@ -1,121 +1,110 @@
-{"assetType": "library", "identifier": "PyCA cryptography", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 21, "column": 1}}
-{"assetType": "algorithm", "identifier": "Ed448", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 206, "column": 25}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "Ed448", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 334, "column": 25}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "RSA", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 157, "column": 23}, "metadata": {"primitive": "signature", "keySize": 2048}}
-{"assetType": "algorithm", "identifier": "RSA", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 237, "column": 23}, "metadata": {"primitive": "signature", "keySize": 2048}}
-{"assetType": "algorithm", "identifier": "RSA", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 596, "column": 5}, "metadata": {"primitive": "signature", "keySize": 3072}}
-{"assetType": "algorithm", "identifier": "SM4", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 148, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "SEED", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 139, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "Scrypt", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 506, "column": 18}, "metadata": {"primitive": "kdf"}}
-{"assetType": "algorithm", "identifier": "ECDSA", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 296, "column": 9}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "ECDSA", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 302, "column": 9}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "ECDSA", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 308, "column": 9}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "ECDSA", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 317, "column": 9}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "ECDSA", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 326, "column": 9}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "AES-GCM", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 57, "column": 14}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "X963KDF", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 556, "column": 16}, "metadata": {"primitive": "kdf"}}
-{"assetType": "algorithm", "identifier": "HMAC", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 436, "column": 14}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HMAC", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 441, "column": 16}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HMAC", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 446, "column": 16}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HMAC", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 451, "column": 16}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HMAC", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 456, "column": 16}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HMAC", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 461, "column": 18}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HMAC", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 466, "column": 18}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HMAC", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 471, "column": 18}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HMAC", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 476, "column": 18}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HMAC", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 481, "column": 17}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HMAC", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 486, "column": 17}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "SHA3-256", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 396, "column": 35}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA3-256", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 466, "column": 33}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "ChaCha20-Poly1305", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 97, "column": 19}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "DSA", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 218, "column": 23}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "DSA", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 338, "column": 23}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 275, "column": 9}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 326, "column": 18}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 386, "column": 33}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 456, "column": 31}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 34, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 35, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 42, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 43, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 50, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 51, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 66, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 67, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 74, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 75, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 105, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 113, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 122, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 131, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 140, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 149, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "X25519", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 210, "column": 26}, "metadata": {"primitive": "keyexchange"}}
-{"assetType": "algorithm", "identifier": "3DES", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 104, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "ConcatKDF", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 565, "column": 23}, "metadata": {"primitive": "kdf"}}
-{"assetType": "algorithm", "identifier": "ConcatKDF", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 574, "column": 23}, "metadata": {"primitive": "kdf"}}
-{"assetType": "algorithm", "identifier": "KBKDF", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 541, "column": 17}, "metadata": {"primitive": "kdf"}}
-{"assetType": "algorithm", "identifier": "MD5", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 421, "column": 30}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "BLAKE2b", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 411, "column": 34}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "BLAKE2b", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 481, "column": 32}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "AES-CCM", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 81, "column": 14}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "ChaCha20", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 90, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "X448", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 214, "column": 24}, "metadata": {"primitive": "keyexchange"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 174, "column": 40}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 175, "column": 23}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 261, "column": 9}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 282, "column": 30}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 285, "column": 9}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 308, "column": 18}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 358, "column": 9}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 376, "column": 33}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 446, "column": 31}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 497, "column": 19}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 518, "column": 19}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 528, "column": 19}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 542, "column": 19}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 557, "column": 19}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 566, "column": 19}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 575, "column": 19}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA3-512", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 406, "column": 35}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA3-512", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 476, "column": 33}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-1", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 247, "column": 9}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-1", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 296, "column": 18}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-1", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 346, "column": 9}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-1", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 366, "column": 31}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-1", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 436, "column": 29}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "AES-OCB3", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 61, "column": 15}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "SHA-224", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 254, "column": 9}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-224", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 302, "column": 18}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-224", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 352, "column": 9}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-224", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 371, "column": 33}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-224", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 441, "column": 31}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-384", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 268, "column": 9}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-384", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 317, "column": 18}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-384", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 381, "column": 33}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-384", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 451, "column": 31}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "RSA-PSS", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 281, "column": 9}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "PBKDF2", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 496, "column": 18}, "metadata": {"primitive": "kdf"}}
-{"assetType": "algorithm", "identifier": "RSA-PKCS1", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 167, "column": 9}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "RSA-PKCS1", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 246, "column": 9}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "RSA-PKCS1", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 253, "column": 9}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "RSA-PKCS1", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 260, "column": 9}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "RSA-PKCS1", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 267, "column": 9}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "RSA-PKCS1", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 274, "column": 9}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "RSA-OAEP", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 173, "column": 9}, "metadata": {"primitive": "pke"}}
-{"assetType": "algorithm", "identifier": "IDEA", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 130, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "SHA3-224", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 391, "column": 35}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA3-224", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 461, "column": 33}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA3-384", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 401, "column": 35}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA3-384", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 471, "column": 33}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "Camellia", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 112, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES-GCM-SIV", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 85, "column": 17}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "BLAKE2s", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 416, "column": 34}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "BLAKE2s", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 486, "column": 37}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SM3", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 426, "column": 30}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "DH", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 224, "column": 21}, "metadata": {"primitive": "keyexchange"}}
-{"assetType": "algorithm", "identifier": "CAST5", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 121, "column": 9}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "Ed25519", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 202, "column": 27}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "Ed25519", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 330, "column": 27}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "HKDF", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 517, "column": 16}, "metadata": {"primitive": "kdf"}}
-{"assetType": "algorithm", "identifier": "HKDF", "path": "fixtures/python/pyca_comprehensive/src/comprehensive_test.py", "evidence": {"line": 527, "column": 23}, "metadata": {"primitive": "kdf"}}
+{"assetType":"library","identifier":"PyCA cryptography","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":21,"column":1}}
+{"assetType":"algorithm","identifier":"CAST5","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":121,"column":9},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"BLAKE2b","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":411,"column":34},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"BLAKE2b","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":481,"column":32},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":174,"column":40},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":175,"column":23},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":261,"column":9},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":282,"column":30},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":285,"column":9},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":308,"column":18},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":358,"column":9},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":376,"column":33},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":446,"column":31},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":497,"column":19},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":518,"column":19},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":528,"column":19},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":542,"column":19},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":557,"column":19},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":566,"column":19},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":575,"column":19},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA3-384","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":401,"column":35},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA3-384","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":471,"column":33},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-1","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":247,"column":9},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-1","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":296,"column":18},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-1","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":346,"column":9},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-1","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":366,"column":31},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-1","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":436,"column":29},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"Ed448","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":206,"column":25},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"Ed448","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":334,"column":25},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"X448","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":214,"column":24},"metadata":{"primitive":"keyexchange"}}
+{"assetType":"algorithm","identifier":"AES-OCB3","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":61,"column":15},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":296,"column":9},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":302,"column":9},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":308,"column":9},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":317,"column":9},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":326,"column":9},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"MD5","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":421,"column":30},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"3DES","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":104,"column":9},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"ChaCha20","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":90,"column":9},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"SHA3-256","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":396,"column":35},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA3-256","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":466,"column":33},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SM4","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":148,"column":9},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"IDEA","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":130,"column":9},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"ChaCha20-Poly1305","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":97,"column":19},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"AES-GCM","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":57,"column":14},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"RSA","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":157,"column":23},"metadata":{"keySize":2048,"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"RSA","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":237,"column":23},"metadata":{"keySize":2048,"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"RSA","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":596,"column":5},"metadata":{"keySize":3072,"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"RSA-PKCS1","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":167,"column":9},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"RSA-PKCS1","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":246,"column":9},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"RSA-PKCS1","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":253,"column":9},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"RSA-PKCS1","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":260,"column":9},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"RSA-PKCS1","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":267,"column":9},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"RSA-PKCS1","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":274,"column":9},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"SHA-512","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":275,"column":9},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-512","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":326,"column":18},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-512","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":386,"column":33},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-512","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":456,"column":31},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"DSA","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":218,"column":23},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"DSA","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":338,"column":23},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"BLAKE2s","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":416,"column":34},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"BLAKE2s","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":486,"column":37},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA3-224","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":391,"column":35},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA3-224","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":461,"column":33},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"AES-GCM-SIV","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":85,"column":17},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"AES","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":34,"column":9},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"AES","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":42,"column":9},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"AES","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":50,"column":9},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"AES","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":66,"column":9},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"AES","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":74,"column":9},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"X963KDF","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":556,"column":16},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"HKDF","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":517,"column":16},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"HKDF","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":527,"column":23},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"RSA-OAEP","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":173,"column":9},"metadata":{"primitive":"pke"}}
+{"assetType":"algorithm","identifier":"Camellia","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":112,"column":9},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"Ed25519","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":202,"column":27},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"Ed25519","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":330,"column":27},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"AES-CCM","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":81,"column":14},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"KBKDF","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":541,"column":17},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"SHA-384","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":268,"column":9},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-384","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":317,"column":18},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-384","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":381,"column":33},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-384","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":451,"column":31},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"ConcatKDF","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":565,"column":23},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"ConcatKDF","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":574,"column":23},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"RSA-PSS","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":281,"column":9},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"PBKDF2","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":496,"column":18},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"DH","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":224,"column":21},"metadata":{"primitive":"keyexchange"}}
+{"assetType":"algorithm","identifier":"HMAC","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":436,"column":14},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"HMAC","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":441,"column":16},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"HMAC","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":446,"column":16},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"HMAC","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":451,"column":16},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"HMAC","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":456,"column":16},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"HMAC","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":461,"column":18},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"HMAC","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":466,"column":18},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"HMAC","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":471,"column":18},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"HMAC","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":476,"column":18},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"HMAC","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":481,"column":17},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"HMAC","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":486,"column":17},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"SHA-224","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":254,"column":9},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-224","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":302,"column":18},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-224","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":352,"column":9},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-224","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":371,"column":33},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-224","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":441,"column":31},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SM3","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":426,"column":30},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SEED","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":139,"column":9},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"SHA3-512","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":406,"column":35},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA3-512","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":476,"column":33},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"X25519","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":210,"column":26},"metadata":{"primitive":"keyexchange"}}
+{"assetType":"algorithm","identifier":"Scrypt","path":"fixtures/python/pyca_comprehensive/src/comprehensive_test.py","evidence":{"line":506,"column":18},"metadata":{"primitive":"kdf"}}

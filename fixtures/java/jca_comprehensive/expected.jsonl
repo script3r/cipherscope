@@ -1,93 +1,87 @@
-{"assetType": "library", "identifier": "Java JCA/JCE", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 5, "column": 1}}
-{"assetType": "algorithm", "identifier": "SHA1withRSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 143, "column": 29}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "HmacSHA3-256", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 332, "column": 43}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HmacSHA3-256", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 334, "column": 28}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HMAC-SHA256", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 306, "column": 26}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "RSA-Cipher", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 80, "column": 27}, "metadata": {"primitive": "pke"}}
-{"assetType": "algorithm", "identifier": "RSA-Cipher", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 84, "column": 26}, "metadata": {"primitive": "pke"}}
-{"assetType": "algorithm", "identifier": "RSA-Cipher", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 88, "column": 32}, "metadata": {"primitive": "pke"}}
-{"assetType": "algorithm", "identifier": "SHA-224", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 239, "column": 32}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA384withECDSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 185, "column": 33}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "ChaCha20", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 63, "column": 27}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "MD5", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 229, "column": 29}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA3-512", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 274, "column": 34}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "3DES", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 39, "column": 25}, "metadata": {"mode": "CBC", "primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "HmacSHA3-224", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 325, "column": 43}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HmacSHA3-224", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 327, "column": 28}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "ECDSA-P521", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 192, "column": 33}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "SHA256withRSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 149, "column": 31}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "AES-ECB", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 27, "column": 25}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES-CBC", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 17, "column": 25}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "HmacSHA1", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 290, "column": 39}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HmacSHA1", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 292, "column": 24}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "SHA512withRSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 155, "column": 31}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "HmacSHA224", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 297, "column": 41}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HmacSHA224", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 299, "column": 26}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "Ed448", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 216, "column": 37}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "Ed448", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 219, "column": 30}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "SHA-1", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 143, "column": 52}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-1", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 162, "column": 52}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-1", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 234, "column": 30}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "HmacSHA3-512", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 346, "column": 43}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HmacSHA3-512", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 348, "column": 28}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "SHA1withDSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 162, "column": 29}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "DES", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 33, "column": 22}, "metadata": {"mode": "CBC", "primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "RSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 75, "column": 35}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "RSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 80, "column": 47}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "RSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 84, "column": 46}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "RSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 88, "column": 52}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "RSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 127, "column": 35}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "RSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 201, "column": 51}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 254, "column": 32}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "ChaCha20-Poly1305", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 68, "column": 35}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "RC2", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 55, "column": 34}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "RC2", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 57, "column": 22}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "RC4", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 51, "column": 22}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "HmacSHA384", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 311, "column": 41}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HmacSHA384", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 313, "column": 26}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "SHA256withECDSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 175, "column": 33}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "Blowfish", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 45, "column": 27}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "HmacMD5", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 283, "column": 38}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HmacMD5", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 285, "column": 23}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "SHA-384", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 249, "column": 32}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "ECDSA-P384", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 182, "column": 33}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "AES-GCM", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 22, "column": 25}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "SHA3-224", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 259, "column": 34}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "ECDSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 93, "column": 37}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "ECDSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 99, "column": 37}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "ECDSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 105, "column": 37}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "ECDSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 135, "column": 34}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "ECDSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 175, "column": 33}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "ECDSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 181, "column": 37}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "ECDSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 185, "column": 33}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "ECDSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 191, "column": 37}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "ECDSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 195, "column": 33}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "RSASSA-PSS", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 201, "column": 28}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "DSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 120, "column": 35}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "DSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 131, "column": 35}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "DSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 162, "column": 29}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "DSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 168, "column": 31}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "DSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 175, "column": 33}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "DSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 185, "column": 33}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "DSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 195, "column": 33}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "HmacSHA3-384", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 339, "column": 43}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HmacSHA3-384", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 341, "column": 28}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "SHA3-384", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 269, "column": 34}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "HmacSHA512", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 318, "column": 41}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HmacSHA512", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 320, "column": 26}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "SHA3-256", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 264, "column": 34}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "PBKDF2", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 359, "column": 39}, "metadata": {"primitive": "kdf"}}
-{"assetType": "algorithm", "identifier": "PBKDF2", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 364, "column": 41}, "metadata": {"primitive": "kdf"}}
-{"assetType": "algorithm", "identifier": "PBKDF2", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 369, "column": 41}, "metadata": {"primitive": "kdf"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 377, "column": 9}, "metadata": {"keySize": 192, "primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 149, "column": 54}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 168, "column": 54}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 175, "column": 56}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 244, "column": 32}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "Ed25519", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 207, "column": 39}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "Ed25519", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 210, "column": 32}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "SHA256withDSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 168, "column": 31}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "DH", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 111, "column": 34}, "metadata": {"primitive": "keyexchange"}}
-{"assetType": "algorithm", "identifier": "DH", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 116, "column": 35}, "metadata": {"primitive": "keyexchange"}}
-{"assetType": "algorithm", "identifier": "SHA512withECDSA", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 195, "column": 33}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "ECDSA-P256", "path": "fixtures/java/jca_comprehensive/src/ComprehensiveTest.java", "evidence": {"line": 136, "column": 30}, "metadata": {"primitive": "signature"}}
+{"assetType":"library","identifier":"Java JCA/JCE","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":5,"column":1}}
+{"assetType":"algorithm","identifier":"AES-CBC","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":17,"column":25},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"DES","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":33,"column":22},"metadata":{"primitive":"symmetric","mode":"CBC"}}
+{"assetType":"algorithm","identifier":"SHA3-224","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":259,"column":34},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"HmacSHA3-224","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":325,"column":43},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"HmacSHA3-224","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":327,"column":28},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"HMAC-SHA256","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":306,"column":26},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"PBKDF2","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":359,"column":39},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"PBKDF2","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":364,"column":41},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"PBKDF2","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":369,"column":41},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":93,"column":37},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":99,"column":37},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":105,"column":37},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":135,"column":34},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":175,"column":33},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":181,"column":37},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":185,"column":33},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":191,"column":37},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":195,"column":33},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA-P384","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":182,"column":33},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"SHA512withECDSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":195,"column":33},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"HmacSHA3-512","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":346,"column":43},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"HmacSHA3-512","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":348,"column":28},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"SHA384withECDSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":185,"column":33},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"SHA256withECDSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":175,"column":33},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA-P521","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":192,"column":33},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"SHA256withRSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":149,"column":31},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"SHA1withRSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":143,"column":29},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"RSA-Cipher","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":80,"column":27},"metadata":{"primitive":"pke"}}
+{"assetType":"algorithm","identifier":"RSA-Cipher","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":84,"column":26},"metadata":{"primitive":"pke"}}
+{"assetType":"algorithm","identifier":"RSA-Cipher","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":88,"column":32},"metadata":{"primitive":"pke"}}
+{"assetType":"algorithm","identifier":"SHA-512","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":254,"column":32},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"HmacSHA3-256","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":332,"column":43},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"HmacSHA3-256","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":334,"column":28},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"SHA3-512","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":274,"column":34},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA1withDSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":162,"column":29},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"SHA3-256","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":264,"column":34},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"Ed25519","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":207,"column":39},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"Ed25519","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":210,"column":32},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"RSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":75,"column":35},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"RSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":127,"column":35},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ChaCha20-Poly1305","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":68,"column":35},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"RC2","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":55,"column":34},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"RC2","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":57,"column":22},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"HmacSHA3-384","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":339,"column":43},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"HmacSHA3-384","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":341,"column":28},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"HmacSHA512","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":318,"column":41},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"HmacSHA512","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":320,"column":26},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"MD5","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":229,"column":29},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"RSASSA-PSS","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":201,"column":28},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"DSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":120,"column":35},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"DSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":131,"column":35},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"DSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":162,"column":29},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"DSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":168,"column":31},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"DSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":175,"column":33},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"DSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":185,"column":33},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"DSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":195,"column":33},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"RC4","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":51,"column":22},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"ChaCha20","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":63,"column":27},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":149,"column":54},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":168,"column":54},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":175,"column":56},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":244,"column":32},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"HmacSHA224","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":297,"column":41},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"HmacSHA224","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":299,"column":26},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"SHA256withDSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":168,"column":31},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"SHA-1","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":143,"column":52},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-1","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":162,"column":52},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-1","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":234,"column":30},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"HmacSHA384","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":311,"column":41},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"HmacSHA384","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":313,"column":26},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"SHA-384","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":249,"column":32},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-224","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":239,"column":32},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"Ed448","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":216,"column":37},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"Ed448","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":219,"column":30},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"Blowfish","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":45,"column":27},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"3DES","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":39,"column":25},"metadata":{"primitive":"symmetric","mode":"CBC"}}
+{"assetType":"algorithm","identifier":"SHA3-384","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":269,"column":34},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"AES","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":377,"column":9},"metadata":{"keySize":192,"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"AES-ECB","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":27,"column":25},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"SHA512withRSA","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":155,"column":31},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"HmacSHA1","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":290,"column":39},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"HmacSHA1","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":292,"column":24},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"HmacMD5","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":283,"column":38},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"HmacMD5","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":285,"column":23},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"ECDSA-P256","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":136,"column":30},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"AES-GCM","path":"fixtures/java/jca_comprehensive/src/ComprehensiveTest.java","evidence":{"line":22,"column":25},"metadata":{"primitive":"symmetric"}}

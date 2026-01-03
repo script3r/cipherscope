@@ -1,2 +1,2 @@
-{"assetType": "library", "identifier": "Google Tink (C++)", "path": "fixtures/cpp/tink_aesgcm/src/tink_example.cpp", "evidence": {"line": 5, "column": 1}}
-{"assetType": "algorithm", "identifier": "AES-GCM", "path": "fixtures/cpp/tink_aesgcm/src/tink_example.cpp", "evidence": {"line": 26, "column": 9}, "metadata": {"primitive": "symmetric"}}
+{"assetType":"library","identifier":"Google Tink (C++)","path":"fixtures/cpp/tink_aesgcm/src/tink_example.cpp","evidence":{"line":5,"column":1}}
+{"assetType":"algorithm","identifier":"AES-GCM","path":"fixtures/cpp/tink_aesgcm/src/tink_example.cpp","evidence":{"line":26,"column":9},"metadata":{"primitive":"symmetric"}}

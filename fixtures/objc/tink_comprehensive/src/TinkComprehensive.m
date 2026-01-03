@@ -33,23 +33,15 @@ int main() {
         TINKAeadKeyTemplate *aesCtrHmacTemplate = [[TINKAeadKeyTemplate alloc]
             initWithKeyTemplate:TINKAes256CtrHmacSha256 error:&error];
             
-        // ChaCha20-Poly1305
-        TINKAeadKeyTemplate *chachaTemplate = [[TINKAeadKeyTemplate alloc]
-            initWithKeyTemplate:TINKChaCha20Poly1305 error:&error];
-            
         // XChaCha20-Poly1305
         TINKAeadKeyTemplate *xchachaTemplate = [[TINKAeadKeyTemplate alloc]
             initWithKeyTemplate:TINKXChaCha20Poly1305 error:&error];
-            
-        // AES-GCM-SIV
-        TINKAeadKeyTemplate *aesGcmSivTemplate = [[TINKAeadKeyTemplate alloc]
-            initWithKeyTemplate:TINKAes256GcmSiv error:&error];
         
         // MAC algorithms
         
         // HMAC-SHA256
         TINKMacKeyTemplate *hmacTemplate = [[TINKMacKeyTemplate alloc]
-            initWithKeyTemplate:TINKHmacSha256Tag256 error:&error];
+            initWithKeyTemplate:TINKHmacSha256 error:&error];
             
         // AES-CMAC
         TINKMacKeyTemplate *cmacTemplate = [[TINKMacKeyTemplate alloc]
@@ -57,7 +49,7 @@ int main() {
             
         // HMAC-SHA512
         TINKMacKeyTemplate *hmac512Template = [[TINKMacKeyTemplate alloc]
-            initWithKeyTemplate:TINKHmacSha512Tag512 error:&error];
+            initWithKeyTemplate:TINKHmacSha512 error:&error];
         
         // Signature algorithms
         
@@ -75,7 +67,7 @@ int main() {
             
         // RSA-SSA-PSS
         TINKSignatureKeyTemplate *rsaPssTemplate = [[TINKSignatureKeyTemplate alloc]
-            initWithKeyTemplate:TINKRsaSsaPss3072Sha256F4 error:&error];
+            initWithKeyTemplate:TINKRsaSsaPss3072Sha256Sha256F4 error:&error];
             
         // RSA-SSA-PKCS1
         TINKSignatureKeyTemplate *rsaPkcs1Template = [[TINKSignatureKeyTemplate alloc]

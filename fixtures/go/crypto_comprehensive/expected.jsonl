@@ -1,129 +1,103 @@
-{"assetType": "library", "identifier": "Go std crypto", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 3, "column": 1}}
-{"assetType": "library", "identifier": "golang.org/x/crypto", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 3, "column": 1}}
-{"assetType": "algorithm", "identifier": "MD5", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 199, "column": 13}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "MD5", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 204, "column": 6}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "MD5", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 383, "column": 22}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-1", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 207, "column": 14}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-1", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 212, "column": 6}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-1", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 334, "column": 47}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-1", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 388, "column": 23}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "ECDSA", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 143, "column": 13}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "ECDSA", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 148, "column": 17}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "ECDSA", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 153, "column": 12}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "ECDSA", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 158, "column": 17}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "RC4", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 96, "column": 18}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "SHA-224", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 215, "column": 16}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-224", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 220, "column": 6}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 44, "column": 14}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 51, "column": 13}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 56, "column": 13}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 62, "column": 16}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 66, "column": 16}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 71, "column": 13}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 76, "column": 13}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES-GCM", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 57, "column": 12}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES-GCM", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 63, "column": 14}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES-GCM", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 67, "column": 14}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 128, "column": 34}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 129, "column": 33}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 132, "column": 12}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 215, "column": 16}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 223, "column": 16}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 228, "column": 6}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 337, "column": 46}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 357, "column": 22}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 367, "column": 21}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 368, "column": 28}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 373, "column": 31}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 393, "column": 25}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 444, "column": 6}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "RSA", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 120, "column": 19}, "metadata": {"keySize": 2048, "primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "RSA", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 121, "column": 19}, "metadata": {"keySize": 4096, "primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "RSA", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 414, "column": 13}, "metadata": {"keySize": 2048, "primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "RSA", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 462, "column": 2}, "metadata": {"primitive": "signature", "keySize": 3072}}
-{"assetType": "algorithm", "identifier": "DES", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 82, "column": 17}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "DES", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 90, "column": 18}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "SHA-384", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 231, "column": 16}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-384", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 236, "column": 6}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "3DES", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 90, "column": 18}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "HMAC-SHA256", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 393, "column": 16}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 231, "column": 16}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 239, "column": 16}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 244, "column": 6}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 247, "column": 20}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 252, "column": 6}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 255, "column": 20}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 260, "column": 6}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 340, "column": 46}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 362, "column": 22}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 398, "column": 25}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "HMAC-SHA512", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 398, "column": 16}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "PBKDF2", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 334, "column": 9}, "metadata": {"primitive": "kdf"}}
-{"assetType": "algorithm", "identifier": "PBKDF2", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 337, "column": 8}, "metadata": {"primitive": "kdf"}}
-{"assetType": "algorithm", "identifier": "PBKDF2", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 340, "column": 8}, "metadata": {"primitive": "kdf"}}
-{"assetType": "algorithm", "identifier": "SHA-512/256", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 255, "column": 20}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-512/256", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 260, "column": 6}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "XChaCha20-Poly1305", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 111, "column": 14}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "X25519", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 187, "column": 19}, "metadata": {"primitive": "keyexchange"}}
-{"assetType": "algorithm", "identifier": "X25519", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 188, "column": 23}, "metadata": {"primitive": "keyexchange"}}
-{"assetType": "algorithm", "identifier": "Argon2", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 344, "column": 8}, "metadata": {"primitive": "kdf"}}
-{"assetType": "algorithm", "identifier": "Argon2", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 347, "column": 8}, "metadata": {"primitive": "kdf"}}
-{"assetType": "algorithm", "identifier": "RSA-PSS", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 133, "column": 18}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "RSA-PSS", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 134, "column": 6}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "ECDH-P256", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 172, "column": 17}, "metadata": {"primitive": "keyexchange"}}
-{"assetType": "algorithm", "identifier": "ECDH-P256", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 173, "column": 21}, "metadata": {"primitive": "keyexchange"}}
-{"assetType": "algorithm", "identifier": "ECDSA-P384", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 152, "column": 39}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "RSA-OAEP", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 128, "column": 18}, "metadata": {"primitive": "asymmetric"}}
-{"assetType": "algorithm", "identifier": "RSA-OAEP", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 129, "column": 17}, "metadata": {"primitive": "asymmetric"}}
-{"assetType": "algorithm", "identifier": "SHA3-384", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 279, "column": 18}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA3-384", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 284, "column": 6}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "AES-OFB", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 72, "column": 11}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "Ed25519", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 162, "column": 44}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "Ed25519", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 163, "column": 22}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "Ed25519", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 164, "column": 6}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "Ed25519", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 168, "column": 6}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "RSA-PKCS1", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 124, "column": 19}, "metadata": {"primitive": "asymmetric"}}
-{"assetType": "algorithm", "identifier": "RSA-PKCS1", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 125, "column": 18}, "metadata": {"primitive": "asymmetric"}}
-{"assetType": "algorithm", "identifier": "RSA-PKCS1", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 137, "column": 17}, "metadata": {"primitive": "asymmetric"}}
-{"assetType": "algorithm", "identifier": "RSA-PKCS1", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 138, "column": 6}, "metadata": {"primitive": "asymmetric"}}
-{"assetType": "algorithm", "identifier": "ECDH-P384", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 177, "column": 17}, "metadata": {"primitive": "keyexchange"}}
-{"assetType": "algorithm", "identifier": "ECDH-P384", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 178, "column": 21}, "metadata": {"primitive": "keyexchange"}}
-{"assetType": "algorithm", "identifier": "ChaCha20-Poly1305", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 106, "column": 13}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES-CTR", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 52, "column": 12}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "ECDSA-P224", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 142, "column": 39}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "HMAC-SHA1", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 388, "column": 14}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "AES-CFB", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 77, "column": 11}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "SHA-512/224", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 247, "column": 20}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-512/224", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 252, "column": 6}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "BLAKE2s", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 315, "column": 20}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "BLAKE2s", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 320, "column": 19}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "BLAKE2s", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 325, "column": 6}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "ECDH-P521", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 182, "column": 17}, "metadata": {"primitive": "keyexchange"}}
-{"assetType": "algorithm", "identifier": "ECDH-P521", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 183, "column": 21}, "metadata": {"primitive": "keyexchange"}}
-{"assetType": "algorithm", "identifier": "AES-CBC", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 46, "column": 10}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES-CBC", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 84, "column": 13}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES-CBC", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 91, "column": 14}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "HMAC-MD5", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 383, "column": 13}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "ECDSA-P521", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 157, "column": 39}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "BLAKE2b", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 295, "column": 20}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "BLAKE2b", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 301, "column": 19}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "BLAKE2b", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 306, "column": 23}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "BLAKE2b", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 311, "column": 6}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "BLAKE2b", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 312, "column": 6}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA3-512", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 287, "column": 18}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA3-512", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 292, "column": 6}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "ECDSA-P256", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 147, "column": 39}, "metadata": {"primitive": "signature"}}
-{"assetType": "algorithm", "identifier": "SHA3-256", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 271, "column": 18}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA3-256", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 276, "column": 6}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA3-256", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 403, "column": 27}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "HKDF", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 357, "column": 13}, "metadata": {"primitive": "kdf"}}
-{"assetType": "algorithm", "identifier": "HKDF", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 362, "column": 13}, "metadata": {"primitive": "kdf"}}
-{"assetType": "algorithm", "identifier": "HKDF", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 368, "column": 16}, "metadata": {"primitive": "kdf"}}
-{"assetType": "algorithm", "identifier": "HKDF", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 373, "column": 18}, "metadata": {"primitive": "kdf"}}
-{"assetType": "algorithm", "identifier": "SHA3-224", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 263, "column": 18}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA3-224", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 268, "column": 6}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "scrypt", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 350, "column": 11}, "metadata": {"primitive": "kdf"}}
-{"assetType": "algorithm", "identifier": "scrypt", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 353, "column": 11}, "metadata": {"primitive": "kdf"}}
-{"assetType": "algorithm", "identifier": "ChaCha20", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 102, "column": 23}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "ChaCha20Poly1305", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 106, "column": 13}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "ChaCha20Poly1305", "path": "fixtures/go/crypto_comprehensive/src/main.go", "evidence": {"line": 111, "column": 14}, "metadata": {"primitive": "symmetric"}}
+{"assetType":"library","identifier":"Go std crypto","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":3,"column":1}}
+{"assetType":"library","identifier":"golang.org/x/crypto","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":3,"column":1}}
+{"assetType":"algorithm","identifier":"AES-GCM","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":57,"column":12},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"AES-GCM","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":63,"column":14},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"AES-GCM","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":67,"column":14},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"AES","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":44,"column":14},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"AES","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":51,"column":13},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"AES","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":56,"column":13},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"AES","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":62,"column":16},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"AES","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":66,"column":16},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"AES","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":71,"column":13},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"AES","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":76,"column":13},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"ECDH-P521","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":182,"column":17},"metadata":{"primitive":"keyexchange"}}
+{"assetType":"algorithm","identifier":"ECDH-P521","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":183,"column":21},"metadata":{"primitive":"keyexchange"}}
+{"assetType":"algorithm","identifier":"SHA-384","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":231,"column":16},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-384","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":236,"column":6},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"MD5","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":199,"column":13},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"MD5","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":204,"column":6},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"MD5","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":383,"column":22},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-1","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":207,"column":14},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-1","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":212,"column":6},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-1","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":334,"column":47},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-1","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":388,"column":23},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"RC4","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":96,"column":18},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"HMAC-SHA256","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":393,"column":16},"metadata":{"primitive":"mac"}}
+{"assetType":"algorithm","identifier":"ECDH-P384","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":177,"column":17},"metadata":{"primitive":"keyexchange"}}
+{"assetType":"algorithm","identifier":"ECDH-P384","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":178,"column":21},"metadata":{"primitive":"keyexchange"}}
+{"assetType":"algorithm","identifier":"SHA-224","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":215,"column":16},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-224","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":220,"column":6},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"RSA","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":120,"column":19},"metadata":{"primitive":"signature","keySize":2048}}
+{"assetType":"algorithm","identifier":"RSA","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":121,"column":19},"metadata":{"primitive":"signature","keySize":4096}}
+{"assetType":"algorithm","identifier":"RSA","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":414,"column":13},"metadata":{"keySize":2048,"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"RSA","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":462,"column":2},"metadata":{"keySize":3072,"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDH-P256","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":172,"column":17},"metadata":{"primitive":"keyexchange"}}
+{"assetType":"algorithm","identifier":"ECDH-P256","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":173,"column":21},"metadata":{"primitive":"keyexchange"}}
+{"assetType":"algorithm","identifier":"DES","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":82,"column":17},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"SHA-512","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":231,"column":16},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-512","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":239,"column":16},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-512","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":244,"column":6},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-512","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":247,"column":20},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-512","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":252,"column":6},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-512","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":255,"column":20},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-512","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":260,"column":6},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-512","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":340,"column":46},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-512","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":362,"column":22},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-512","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":398,"column":25},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"X25519","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":187,"column":19},"metadata":{"primitive":"keyexchange"}}
+{"assetType":"algorithm","identifier":"X25519","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":188,"column":23},"metadata":{"primitive":"keyexchange"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":142,"column":21},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":143,"column":13},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":147,"column":21},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":148,"column":17},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":152,"column":21},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":153,"column":12},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":157,"column":21},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":158,"column":17},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"3DES","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":90,"column":18},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":128,"column":34},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":129,"column":33},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":132,"column":12},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":215,"column":16},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":223,"column":16},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":228,"column":6},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":337,"column":46},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":357,"column":22},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":367,"column":21},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":368,"column":28},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":373,"column":31},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":393,"column":25},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":444,"column":6},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"XChaCha20-Poly1305","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":111,"column":14},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"scrypt","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":350,"column":11},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"scrypt","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":353,"column":11},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"ChaCha20","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":102,"column":23},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"SHA3-512","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":287,"column":18},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA3-512","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":292,"column":6},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"Argon2","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":344,"column":8},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"Argon2","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":347,"column":8},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"ChaCha20-Poly1305","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":106,"column":13},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"PBKDF2","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":334,"column":9},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"PBKDF2","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":337,"column":8},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"PBKDF2","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":340,"column":8},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"HKDF","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":357,"column":13},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"HKDF","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":362,"column":13},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"HKDF","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":368,"column":16},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"HKDF","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":373,"column":18},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"SHA3-384","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":279,"column":18},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA3-384","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":284,"column":6},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA3-256","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":271,"column":18},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA3-256","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":276,"column":6},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA3-224","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":263,"column":18},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA3-224","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":268,"column":6},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"BLAKE2b","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":295,"column":20},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"BLAKE2b","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":301,"column":19},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"BLAKE2b","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":306,"column":23},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"BLAKE2b","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":311,"column":6},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"BLAKE2b","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":312,"column":6},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"Ed25519","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":162,"column":44},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"Ed25519","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":163,"column":22},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"Ed25519","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":164,"column":6},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"BLAKE2s","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":315,"column":20},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"BLAKE2s","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":320,"column":19},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"BLAKE2s","path":"fixtures/go/crypto_comprehensive/src/main.go","evidence":{"line":325,"column":6},"metadata":{"primitive":"hash"}}

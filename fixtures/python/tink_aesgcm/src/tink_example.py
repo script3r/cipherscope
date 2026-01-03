@@ -27,8 +27,8 @@ def main():
     ctr_handle = tink.new_keyset_handle(ctr_template)
     ctr_aead = ctr_handle.primitive(aead.Aead)
     
-    # And ChaCha20-Poly1305
-    chacha_template = aead.aead_key_templates.CHACHA20_POLY1305
+    # And XChaCha20-Poly1305
+    chacha_template = aead.aead_key_templates.XCHACHA20_POLY1305
     chacha_handle = tink.new_keyset_handle(chacha_template)
     chacha_aead = chacha_handle.primitive(aead.Aead)
 

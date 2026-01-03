@@ -1,6 +1,5 @@
-{"assetType": "library", "identifier": "Google Tink (Go)", "path": "fixtures/go/tink_aesgcm/src/main.go", "evidence": {"line": 3, "column": 1}}
-{"assetType": "algorithm", "identifier": "HMAC-SHA256", "path": "fixtures/go/tink_aesgcm/src/main.go", "evidence": {"line": 72, "column": 38}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "HMAC-SHA256", "path": "fixtures/go/tink_aesgcm/src/main.go", "evidence": {"line": 76, "column": 12}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "ChaCha20-Poly1305", "path": "fixtures/go/tink_aesgcm/src/main.go", "evidence": {"line": 58, "column": 40}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES-CTR-HMAC", "path": "fixtures/go/tink_aesgcm/src/main.go", "evidence": {"line": 48, "column": 37}, "metadata": {"primitive": "symmetric"}}
-{"assetType": "algorithm", "identifier": "AES-GCM", "path": "fixtures/go/tink_aesgcm/src/main.go", "evidence": {"line": 21, "column": 30}, "metadata": {"primitive": "symmetric"}}
+{"assetType":"library","identifier":"Google Tink (Go)","path":"fixtures/go/tink_aesgcm/src/main.go","evidence":{"line":3,"column":1}}
+{"assetType":"algorithm","identifier":"ChaCha20-Poly1305","path":"fixtures/go/tink_aesgcm/src/main.go","evidence":{"line":58,"column":40},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"AES-CTR-HMAC","path":"fixtures/go/tink_aesgcm/src/main.go","evidence":{"line":48,"column":37},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"AES-GCM","path":"fixtures/go/tink_aesgcm/src/main.go","evidence":{"line":21,"column":30},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"HMAC-SHA256","path":"fixtures/go/tink_aesgcm/src/main.go","evidence":{"line":72,"column":38},"metadata":{"primitive":"mac"}}
