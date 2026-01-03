@@ -52,10 +52,12 @@ jobs:
           else
             tar -czf "${dist}/cipherscope-${{ github.ref_name }}-${{ matrix.target }}.tar.gz" -C "target/${{ matrix.target }}/release" "${bin}"
           fi
-      - name: upload release assets
-        uses: softprops/action-gh-release@v2
+      - name: upload artifacts
+        uses: actions/upload-artifact@v4
         with:
-          files: dist/*
+          name: cipherscope-${{ matrix.target }}
+          path: dist/*
+          if-no-files-found: error
 
   publish:
     needs: build-binaries
@@ -70,5 +72,13 @@ jobs:
         run: cargo publish --allow-dirty
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+      - name: download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
       - name: GitHub Release
         uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/**/*.tar.gz
+            dist/**/*.zip
