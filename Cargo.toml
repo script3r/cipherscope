@@ -1,6 +1,6 @@
 [package]
 name = "cipherscope"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2024"
 description = "A high-performance, language-aware tool for scanning source code to detect cryptographic libraries and algorithms usage."
 license = "MIT"
@@ -26,7 +26,6 @@ tree-sitter = "0.25"
 num_cpus = "1.17"
 crossbeam-channel = "0.5"
 tokio = { version = "1.41", features = ["macros", "rt-multi-thread"] }
-vercel_runtime = "1.1"
 http = "1.1"
 tree-sitter-c = { version = "0.24", optional = true }
 tree-sitter-cpp = { version = "0.23", optional = true }
@@ -62,7 +61,3 @@ harness = false
 [[bench]]
 name = "scan_large_bench"
 harness = false
-
-[[bin]]
-name = "scan"
-path = "api/scan.rs"
