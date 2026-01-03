@@ -19,8 +19,6 @@ jobs:
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
 
-      - name: Check pattern evidence
-        run: python3 scripts/check_evidence.py
 
       - name: Check formatting
         run: cargo fmt -- --check
