@@ -29,8 +29,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;600;700&display=swap"
       rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.css"
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
@@ -42,6 +46,7 @@
         <span>Cipherscope</span>
       </a>
       <nav>
+        <a href="#try">Try it live</a>
         <a href="#results">Results</a>
         <a href="#workflow">Workflow</a>
         <a href="#cta">Get Started</a>
@@ -220,6 +225,53 @@
         </div>
       </section>
 
+      <section class="live" id="try">
+        <div class="live-inner">
+          <div class="live-copy">
+            <p class="eyebrow">Try it live</p>
+            <h2>Paste a single file and see the crypto footprint.</h2>
+            <p>
+              This is a lightweight live scan powered by the same AST engine.
+              Drop in a source snippet, pick the language, and get the exact
+              line-level evidence in seconds.
+            </p>
+            <div class="live-note">
+              <strong>Limits:</strong> One snippet, up to 64 KB.
+            </div>
+          </div>
+          <form class="live-form" id="live-form">
+            <label class="live-label" for="live-language">Language</label>
+            <select id="live-language" name="language" required>
+              <option value="c">C</option>
+              <option value="cpp">C++</option>
+              <option value="java">Java</option>
+              <option value="python">Python</option>
+              <option value="go">Go</option>
+              <option value="swift">Swift</option>
+              <option value="php">PHP</option>
+              <option value="objc">Objective-C</option>
+              <option value="rust">Rust</option>
+            </select>
+            <label class="live-label" for="live-code">Source snippet</label>
+            <textarea
+              id="live-code"
+              name="code"
+              rows="10"
+              placeholder="Paste a single source file here."
+            ></textarea>
+            <div class="live-counter" id="live-counter">0 / 64 KB</div>
+            <div class="live-actions">
+              <button class="cta" type="submit">Scan snippet</button>
+              <button class="cta ghost" type="button" id="live-sample">Use sample</button>
+              <span class="live-hint">Uses default patterns.</span>
+            </div>
+          </form>
+          <div class="live-results" id="live-results" aria-live="polite">
+            <div class="live-placeholder">Run a scan to see findings.</div>
+          </div>
+        </div>
+      </section>
+
       <section class="results" id="results">
         <div class="results-head">
           <div>
@@ -323,6 +375,14 @@
       <span>cipherscope.com</span>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/mode/simple.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/clike/clike.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/python/python.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/go/go.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/swift/swift.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/php/php.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/rust/rust.js" defer></script>
     <script src="app.js" defer></script>
   </body>
 </html>

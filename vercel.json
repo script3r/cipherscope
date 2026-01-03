@@ -1,5 +1,12 @@
 {
-  "rootDirectory": "www",
   "cleanUrls": true,
-  "public": true
+  "public": true,
+  "builds": [
+    { "src": "api/*.rs", "use": "@vercel/rust" },
+    { "src": "www/**", "use": "@vercel/static" }
+  ],
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/:path*.rs" },
+    { "source": "/:path*", "destination": "/www/:path*" }
+  ]
 }

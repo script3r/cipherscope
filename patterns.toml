@@ -6874,6 +6874,48 @@ symbol_patterns = [
 # =========================
 
 [[library]]
+name = "PHP Std"
+languages = ["PHP"]
+[library.patterns]
+include = []
+apis = [
+  "\\bhash\\s*\\(",
+]
+
+# Algorithm definitions for Hash (PHP)
+[[library.algorithms]]
+name = "SHA-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bhash\\s*\\(\\s*['\"]sha256['\"]",
+]
+
+[[library.algorithms]]
+name = "SHA-1"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bhash\\s*\\(\\s*['\"]sha1['\"]",
+]
+
+[[library.algorithms]]
+name = "SHA-512"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bhash\\s*\\(\\s*['\"]sha512['\"]",
+]
+
+[[library.algorithms]]
+name = "MD5"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bhash\\s*\\(\\s*['\"]md5['\"]",
+]
+
+[[library]]
 name = "OpenSSL (PHP)"
 languages = ["PHP"]
 [library.patterns]
@@ -7665,7 +7707,7 @@ name = "SHA-256"
 primitive = "hash"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
-  "\\bCC_SHA256",
+  "\\bCC_SHA256\\s*\\(",
 ]
 
 [[library.algorithms]]
@@ -7673,7 +7715,7 @@ name = "SHA-512"
 primitive = "hash"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
-  "\\bCC_SHA512",
+  "\\bCC_SHA512\\s*\\(",
 ]
 
 [[library.algorithms]]
@@ -7681,7 +7723,7 @@ name = "MD5"
 primitive = "hash"
 nistQuantumSecurityLevel = 0
 symbol_patterns = [
-  "\\bCC_MD5",
+  "\\bCC_MD5\\s*\\(",
 ]
 
 [[library.algorithms]]

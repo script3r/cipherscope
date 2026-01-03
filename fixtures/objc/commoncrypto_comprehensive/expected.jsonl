@@ -3,9 +3,6 @@
 {"assetType": "algorithm", "identifier": "AES-GCM", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 164, "column": 41}, "metadata": {"primitive": "symmetric", "keySize": 128}}
 {"assetType": "algorithm", "identifier": "AES-OFB", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 136, "column": 41}, "metadata": {"primitive": "symmetric", "keySize": 128}}
 {"assetType": "algorithm", "identifier": "MD5", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 198, "column": 5}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "MD5", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 202, "column": 5}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "MD5", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 203, "column": 5}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "MD5", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 204, "column": 5}, "metadata": {"primitive": "hash"}}
 {"assetType": "algorithm", "identifier": "PBKDF2", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 321, "column": 5}, "metadata": {"primitive": "kdf"}}
 {"assetType": "algorithm", "identifier": "PBKDF2", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 327, "column": 5}, "metadata": {"primitive": "kdf"}}
 {"assetType": "algorithm", "identifier": "PBKDF2", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 333, "column": 5}, "metadata": {"primitive": "kdf"}}
@@ -65,9 +62,6 @@
 {"assetType": "algorithm", "identifier": "HMAC-SHA512", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 305, "column": 5}, "metadata": {"primitive": "mac"}}
 {"assetType": "algorithm", "identifier": "HMAC-SHA512", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 309, "column": 5}, "metadata": {"primitive": "mac"}}
 {"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 225, "column": 5}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 229, "column": 5}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 230, "column": 5}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-256", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 231, "column": 5}, "metadata": {"primitive": "hash"}}
 {"assetType": "algorithm", "identifier": "RC2", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 74, "column": 25}, "metadata": {"primitive": "symmetric"}}
 {"assetType": "algorithm", "identifier": "SHA-384", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 234, "column": 5}, "metadata": {"primitive": "hash"}}
 {"assetType": "algorithm", "identifier": "SHA-384", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 238, "column": 5}, "metadata": {"primitive": "hash"}}
@@ -78,12 +72,7 @@
 {"assetType": "algorithm", "identifier": "AES-ECB", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 105, "column": 45}, "metadata": {"primitive": "symmetric", "keySize": 128}}
 {"assetType": "algorithm", "identifier": "HMAC-MD5", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 260, "column": 5}, "metadata": {"primitive": "mac"}}
 {"assetType": "algorithm", "identifier": "HMAC-MD5", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 264, "column": 5}, "metadata": {"primitive": "mac"}}
-{"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 177, "column": 18}, "metadata": {"primitive": "hash"}}
 {"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 243, "column": 5}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 247, "column": 5}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 248, "column": 5}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 249, "column": 5}, "metadata": {"primitive": "hash"}}
-{"assetType": "algorithm", "identifier": "SHA-512", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 257, "column": 17}, "metadata": {"primitive": "hash"}}
 {"assetType": "algorithm", "identifier": "AES-CTR", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 128, "column": 41}, "metadata": {"keySize": 128, "primitive": "symmetric"}}
 {"assetType": "algorithm", "identifier": "DES", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 53, "column": 5}, "metadata": {"primitive": "symmetric"}}
 {"assetType": "algorithm", "identifier": "HMAC-SHA224", "path": "fixtures/objc/commoncrypto_comprehensive/src/comprehensive.m", "evidence": {"line": 278, "column": 5}, "metadata": {"primitive": "mac"}}
