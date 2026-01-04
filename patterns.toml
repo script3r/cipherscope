@@ -4498,6 +4498,24 @@ symbol_patterns = [
 ]
 
 [[library.algorithms]]
+name = "HMAC-SHA384"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bhmac::HMAC_SHA384",
+  "\\bhmac::Key::new\\s*\\(\\s*hmac::HMAC_SHA384",
+]
+
+[[library.algorithms]]
+name = "HMAC-SHA512"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bhmac::HMAC_SHA512",
+  "\\bhmac::Key::new\\s*\\(\\s*hmac::HMAC_SHA512",
+]
+
+[[library.algorithms]]
 name = "ChaCha20Poly1305"
 primitive = "symmetric"
 nistQuantumSecurityLevel = 3
