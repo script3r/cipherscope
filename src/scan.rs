@@ -303,45 +303,19 @@ pub fn find_algorithms<'a>(
         }
     }
 
-    // Java fallback: regex scan
-    if result.is_empty()
-        && matches!(lang, Language::Java)
-        && let Some(lib) = patterns.libraries.iter().find(|l| l.name == library_name)
-    {
-        let mut seen_on_line: HashSet<(&str, usize)> = HashSet::new();
-        for alg in &lib.algorithms {
-            for re in &alg.symbol_regexes {
-                for m in re.find_iter(content) {
-                    let (line, column) = line_col_from_offset(content, m.start());
-                    if seen_on_line.insert((&alg.name, line)) {
-                        let mut metadata = HashMap::new();
-                        // Add primitive if present
-                        if let Some(primitive) = &alg.primitive {
-                            metadata
-                                .insert("primitive", serde_json::Value::String(primitive.clone()));
-                        }
-                        result.push(AlgorithmHit {
-                            algorithm_name: &alg.name,
-                            line,
-                            column,
-                            metadata,
-                        });
-                    }
-                }
-            }
-        }
-    }
-
-    // Swift fallback: regex scan for missing algorithms.
-    if matches!(lang, Language::Swift)
-        && let Some(lib) = patterns.libraries.iter().find(|l| l.name == library_name)
-    {
+    // Unified regex fallback for missing algorithms.
+    // This catches patterns that the AST-based detection might miss due to
+    // language-specific syntax quirks or tree-sitter grammar limitations.
+    // We only add algorithms not already found, avoiding duplicates while
+    // ensuring comprehensive coverage.
+    if let Some(lib) = patterns.libraries.iter().find(|l| l.name == library_name) {
         let mut seen_on_line: HashSet<(&str, usize)> = result
             .iter()
             .map(|hit| (hit.algorithm_name, hit.line))
             .collect();
         let present_algs: HashSet<&str> = result.iter().map(|hit| hit.algorithm_name).collect();
         for alg in &lib.algorithms {
+            // Skip if we already found this algorithm via AST
             if present_algs.contains(alg.name.as_str()) {
                 continue;
             }
@@ -612,20 +586,57 @@ fn import_like_nodes<'a>(lang: Language, root: Node<'a>) -> Vec<Node<'a>> {
 }
 
 fn code_symbol_nodes<'a>(lang: Language, root: Node<'a>) -> Vec<Node<'a>> {
-    // Heuristic: collect identifiers, call expressions, etc.
+    // Collect AST nodes that can reasonably contain cryptographic identifiers/patterns.
+    // Each language needs to capture:
+    // 1. Function/method calls (primary detection)
+    // 2. Identifiers and type references (for algorithm constants like AES_256_GCM)
+    // 3. String literals (for algorithm strings like "AES/GCM/NoPadding")
+    // 4. Member/field access (for qualified names like hashes.SHA256)
+    //
+    // Strategy: We use a two-pass approach to avoid duplicate detections:
+    // - First, collect "container" nodes (calls, field access) that encompass child nodes
+    // - Second, collect "leaf" nodes (identifiers, strings) only if they're not already
+    //   contained within a collected container node.
+    // However, this is complex and changes behavior. Instead, we rely on the existing
+    // deduplication logic (dedupe by line/column) to handle redundant matches.
+    // We keep collecting all interesting nodes but ensure the pattern matching
+    // and deduplication filters out duplicate hits.
     let mut nodes = Vec::new();
     let mut stack = vec![root];
     while let Some(node) = stack.pop() {
         let kind = node.kind();
         let interesting = match lang {
-            Language::C | Language::Cpp => matches!(kind, "call_expression"),
-            Language::Java => matches!(kind, "method_invocation"),
+            // C/C++: function calls capture all info; no need for identifiers as children
+            // String literals may contain algorithm names passed to functions
+            Language::C | Language::Cpp => matches!(kind, "call_expression" | "string_literal"),
+            // Java: method calls are primary; string literals contain algorithm names
+            Language::Java => matches!(kind, "method_invocation" | "string_literal"),
+            // Python: calls and attribute access are primary patterns
             Language::Python => matches!(kind, "call" | "attribute"),
-            Language::Go => matches!(kind, "call_expression"),
+            // Go: comprehensive coverage - calls, selectors, identifiers for package-qualified refs
+            Language::Go => matches!(
+                kind,
+                "call_expression" | "selector_expression" | "identifier"
+            ),
+            // Swift: calls, member access for method chains
             Language::Swift => matches!(kind, "call_expression" | "member_access_expression"),
-            Language::Php => matches!(kind, "function_call_expression"),
-            Language::Objc => matches!(kind, "call_expression" | "selector" | "identifier"),
-            Language::Rust => matches!(kind, "call_expression" | "macro_invocation"),
+            // PHP: function calls are primary; string literals contain cipher method names
+            Language::Php => matches!(kind, "function_call_expression" | "string"),
+            // Objective-C: function calls, message expressions (Obj-C method calls), selectors
+            Language::Objc => matches!(
+                kind,
+                "call_expression" | "message_expression" | "selector" | "identifier"
+            ),
+            // Rust: calls, macros, paths are all important for detection
+            Language::Rust => matches!(
+                kind,
+                "call_expression"
+                    | "macro_invocation"
+                    | "path"
+                    | "path_expression"
+                    | "scoped_identifier"
+                    | "identifier"
+            ),
         };
         if interesting {
             nodes.push(node);

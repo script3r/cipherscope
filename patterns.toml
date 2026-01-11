@@ -3749,7 +3749,7 @@ name = "Go std crypto"
 languages = ["Go"]
 [library.patterns]
 include = [
-  "^\\s*import\\s*(?:\\(.*\\)|)\\s*[\\s\\S]*?\"crypto/(?:aes|des|rc4|sha\\d*|md5|rsa|ecdsa|ecdh|ed25519|x509|rand|tls|cipher|hmac)\"",
+  "^\\s*import\\s*(?:\\(.*\\)|)\\s*[\\s\\S]*?\"crypto/(?:aes|des|rc4|sha\\d*|md5|rsa|ecdsa|ecdh|ed25519|x509|rand|tls|cipher|hmac|hkdf)\"",
   "^\\s*import\\s*(?:\\(.*\\)|)\\s*[\\s\\S]*?\"golang\\.org/x/crypto/",
 ]
 apis = [
@@ -3757,6 +3757,7 @@ apis = [
   "\\bcipher\\.New(?:GCM|CTR|CFB|OFB)\\b",
   "\\bsha256\\.(?:Sum256|New)\\b",
   "\\bhmac\\.(?:New|Equal)\\b",
+  "\\bhkdf\\.New\\b",
   "\\brsa\\.(?:GenerateKey|SignPKCS1v15|VerifyPKCS1v15|EncryptOAEP)\\b",
   "\\becdsa\\.(?:GenerateKey|Sign|Verify)\\b",
   "\\bed25519\\.(?:GenerateKey|Sign|Verify)\\b",
@@ -3787,6 +3788,14 @@ primitive = "mac"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bhmac\\.New.*sha256",
+]
+
+[[library.algorithms]]
+name = "HKDF-SHA256"
+primitive = "kdf"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bhkdf\\.New\\s*\\(\\s*sha256\\.New",
 ]
 
 [[library.algorithms]]
@@ -5276,6 +5285,7 @@ primitive = "mac"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bCCHmac.*kCCHmacAlgSHA256",
+  "\\bkCCHmacAlgSHA256",
 ]
 
 [[library.algorithms]]
@@ -5308,6 +5318,7 @@ primitive = "mac"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bCCHmac.*kCCHmacAlgSHA512",
+  "\\bkCCHmacAlgSHA512",
 ]
 
 [[library.algorithms]]
@@ -7827,6 +7838,7 @@ primitive = "mac"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bCCHmac.*kCCHmacAlgSHA256",
+  "\\bkCCHmacAlgSHA256",
 ]
 
 [[library.algorithms]]
@@ -7843,6 +7855,7 @@ primitive = "mac"
 nistQuantumSecurityLevel = 3
 symbol_patterns = [
   "\\bCCHmac.*kCCHmacAlgSHA512",
+  "\\bkCCHmacAlgSHA512",
 ]
 
 [[library.algorithms]]
