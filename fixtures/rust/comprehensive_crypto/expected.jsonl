@@ -1,0 +1,21 @@
+{"assetType":"library","identifier":"RustCrypto (common crates)","path":"fixtures/rust/comprehensive_crypto/src/main.rs","evidence":{"line":198,"column":5}}
+{"assetType":"library","identifier":"ring","path":"fixtures/rust/comprehensive_crypto/src/main.rs","evidence":{"line":10,"column":1}}
+{"assetType":"algorithm","identifier":"Ed25519","path":"fixtures/rust/comprehensive_crypto/src/main.rs","evidence":{"line":183,"column":19},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ChaCha20Poly1305","path":"fixtures/rust/comprehensive_crypto/src/main.rs","evidence":{"line":16,"column":5},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"ChaCha20Poly1305","path":"fixtures/rust/comprehensive_crypto/src/main.rs","evidence":{"line":141,"column":18},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"AES-GCM","path":"fixtures/rust/comprehensive_crypto/src/main.rs","evidence":{"line":15,"column":15},"metadata":{"primitive":"symmetric","keySize":256}}
+{"assetType":"algorithm","identifier":"AES-GCM","path":"fixtures/rust/comprehensive_crypto/src/main.rs","evidence":{"line":133,"column":21},"metadata":{"keySize":256,"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"AES-GCM","path":"fixtures/rust/comprehensive_crypto/src/main.rs","evidence":{"line":134,"column":18},"metadata":{"primitive":"symmetric","keySize":256}}
+{"assetType":"algorithm","identifier":"SHA-512","path":"fixtures/rust/comprehensive_crypto/src/main.rs","evidence":{"line":17,"column":20},"metadata":{"outputSize":512,"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-512","path":"fixtures/rust/comprehensive_crypto/src/main.rs","evidence":{"line":153,"column":22},"metadata":{"outputSize":512,"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/rust/comprehensive_crypto/src/main.rs","evidence":{"line":17,"column":12},"metadata":{"outputSize":256,"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/rust/comprehensive_crypto/src/main.rs","evidence":{"line":148,"column":22},"metadata":{"primitive":"hash","outputSize":256}}
+{"assetType":"algorithm","identifier":"ChaCha20Poly1305","path":"fixtures/rust/comprehensive_crypto/src/main.rs","evidence":{"line":4,"column":87},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"ChaCha20Poly1305","path":"fixtures/rust/comprehensive_crypto/src/main.rs","evidence":{"line":38,"column":26},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"Ed25519","path":"fixtures/rust/comprehensive_crypto/src/main.rs","evidence":{"line":11,"column":23},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"Ed25519","path":"fixtures/rust/comprehensive_crypto/src/main.rs","evidence":{"line":98,"column":25},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"Ed25519","path":"fixtures/rust/comprehensive_crypto/src/main.rs","evidence":{"line":99,"column":23},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"RSA","path":"fixtures/rust/comprehensive_crypto/src/main.rs","evidence":{"line":114,"column":30},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/rust/comprehensive_crypto/src/main.rs","evidence":{"line":102,"column":33},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/rust/comprehensive_crypto/src/main.rs","evidence":{"line":108,"column":33},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/rust/comprehensive_crypto/src/main.rs","evidence":{"line":50,"column":25},"metadata":{"primitive":"hash"}}

@@ -1,0 +1,5 @@
+{"assetType":"library","identifier":"ring","path":"fixtures/rust/ring_test/src/test.rs","evidence":{"line":5,"column":1}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/rust/ring_test/src/test.rs","evidence":{"line":45,"column":32},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"Ed25519","path":"fixtures/rust/ring_test/src/test.rs","evidence":{"line":41,"column":34},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"Ed25519","path":"fixtures/rust/ring_test/src/test.rs","evidence":{"line":42,"column":31},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/rust/ring_test/src/test.rs","evidence":{"line":19,"column":18},"metadata":{"primitive":"hash"}}
