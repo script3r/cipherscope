@@ -169,8 +169,9 @@ fn main() -> Result<()> {
         Ok(())
     });
 
-    // First pass: collect files to scan
-    let files_to_scan = Arc::new(std::sync::Mutex::new(Vec::new()));
+    // Streaming architecture: WalkBuilder sends files to channel, rayon workers process immediately
+    // This eliminates the mutex contention and synchronous barrier of collect-then-process
+    let (file_tx, file_rx) = channel::unbounded::<PathBuf>();
     let patterns_for_discovery = patterns.clone();
     let file_count_discovery = file_count.clone();
     let skipped_oversize_discovery = skipped_oversize_count.clone();
@@ -222,6 +223,28 @@ fn main() -> Result<()> {
 
     let max_bytes = cli.max_file_mb.map(|mb| mb.saturating_mul(1024 * 1024));
 
+    // Spawn scanner workers that process files as they're discovered
+    let scan_bar_for_workers = scan_bar.clone();
+    let scanned_count_for_workers = scanned_count.clone();
+    let patterns_for_workers = patterns.clone();
+    let tx_for_workers = tx.clone();
+
+    // Use a thread to run the parallel scanner on the receiving end
+    let scanner_handle = std::thread::spawn(move || {
+        // Process files as they arrive from the channel
+        file_rx.into_iter().par_bridge().for_each(|path| {
+            if let Err(err) = process_file(&path, &patterns_for_workers, &tx_for_workers) {
+                eprintln!("Error processing {}: {err:#}", path.display());
+            }
+
+            scanned_count_for_workers.fetch_add(1, Ordering::Relaxed);
+            if let Some(pb) = &scan_bar_for_workers {
+                pb.inc(1);
+            }
+        });
+    });
+
+    // Walk and send files to channel (no mutex contention!)
     walk_builder
         .hidden(false)
         .ignore(cli.gitignore)
@@ -233,7 +256,7 @@ fn main() -> Result<()> {
         .build_parallel()
         .run(|| {
             let patterns = patterns_for_discovery.clone();
-            let files = files_to_scan.clone();
+            let file_tx = file_tx.clone();
             let file_count = file_count_discovery.clone();
             let discovery_bar = discovery_bar.clone();
             let skipped_oversize = skipped_oversize_discovery.clone();
@@ -245,14 +268,6 @@ fn main() -> Result<()> {
                             && meta.len() > limit
                         {
                             skipped_oversize.fetch_add(1, Ordering::Relaxed);
-                            if let Some(pb) = &discovery_bar {
-                                let found = file_count.load(Ordering::Relaxed);
-                                let skipped = skipped_oversize.load(Ordering::Relaxed);
-                                pb.set_message(format!(
-                                    "Found {} files to scan (skipped {} oversized)",
-                                    found, skipped
-                                ));
-                            }
                             return ignore::WalkState::Continue;
                         }
 
@@ -260,9 +275,13 @@ fn main() -> Result<()> {
                         if let Some(lang) = scan::language_from_path(&path)
                             && patterns.supports_language(lang)
                         {
-                            files.lock().unwrap().push(path);
+                            // Send to channel instead of pushing to mutex-protected Vec
+                            let _ = file_tx.send(path);
                             let count = file_count.fetch_add(1, Ordering::Relaxed) + 1;
-                            if let Some(pb) = &discovery_bar {
+                            // Batch progress updates: only update every 100 files
+                            if let Some(pb) = &discovery_bar
+                                && (count.is_multiple_of(100) || count == 1)
+                            {
                                 let skipped = skipped_oversize.load(Ordering::Relaxed);
                                 pb.set_message(format!(
                                     "Found {} files to scan (skipped {} oversized)",
@@ -278,38 +297,25 @@ fn main() -> Result<()> {
             })
         });
 
+    // Discovery complete - close the channel so scanners know to finish
+    drop(file_tx);
+
+    let total_files = file_count.load(Ordering::Relaxed);
     if let Some(pb) = &discovery_bar {
         pb.finish_with_message(format!(
             "Found {} files to scan (skipped {} oversized)",
-            file_count.load(Ordering::Relaxed),
+            total_files,
             skipped_oversize_count.load(Ordering::Relaxed)
         ));
     }
-
-    // Second pass: scan files in parallel
-    let files_to_scan = Arc::try_unwrap(files_to_scan)
-        .unwrap()
-        .into_inner()
-        .unwrap();
-    let total_files = files_to_scan.len();
 
     if let Some(pb) = &scan_bar {
         pb.set_length(total_files as u64);
         pb.set_message("Scanning files...");
     }
 
-    // Process files in parallel with rayon
-    files_to_scan.into_par_iter().for_each(|path| {
-        // Process the file
-        if let Err(err) = process_file(&path, &patterns, &tx) {
-            eprintln!("Error processing {}: {err:#}", path.display());
-        }
-
-        scanned_count.fetch_add(1, Ordering::Relaxed);
-        if let Some(pb) = &scan_bar {
-            pb.inc(1);
-        }
-    });
+    // Wait for all scanning to complete
+    scanner_handle.join().expect("scanner thread panicked");
 
     // All files have been processed
     drop(tx);
