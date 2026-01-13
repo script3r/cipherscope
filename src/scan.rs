@@ -1,6 +1,6 @@
 use ahash::{AHashMap as HashMap, AHashSet as HashSet};
 use anyhow::{Context, Result};
-use regex::{Regex, RegexSet};
+use regex::Regex;
 use tree_sitter::{Language as TsLanguage, Node, Parser, Point, Tree};
 
 use crate::patterns::{Language, ParameterPattern, PatternSet};
@@ -105,9 +105,8 @@ pub fn find_library_anchors<'a>(
     patterns: &'a PatternSet,
 ) -> Vec<LibraryHit<'a>> {
     let mut hits = Vec::new();
-    let mut include_patterns = Vec::new();
-    let mut include_owners = Vec::new();
 
+    // Handle libraries without include patterns (fallback to api_regexes)
     for lib in &patterns.libraries {
         if !lib.languages.contains(&lang) {
             continue;
@@ -121,27 +120,23 @@ pub fn find_library_anchors<'a>(
                     column: 1,
                 });
             }
-            continue;
-        }
-        for re in &lib.include_regexes {
-            include_patterns.push(re.as_str().to_string());
-            include_owners.push(&lib.name);
         }
     }
 
-    if include_patterns.is_empty() {
+    // Use pre-compiled include set with ownership tracking
+    let Some(include_set_with_owners) = patterns.include_sets_with_owners.get(&lang) else {
         return hits;
-    }
+    };
 
-    let include_set = RegexSet::new(&include_patterns).expect("valid include regexes");
     for node in import_like_nodes(lang, tree.root_node()) {
         let text = node.utf8_text(content.as_bytes()).unwrap_or("");
-        let matches = include_set.matches(text);
+        let matches = include_set_with_owners.regex_set.matches(text);
         if matches.matched_any() {
             let Point { row, column } = node.start_position();
             for idx in matches.iter() {
+                let lib_idx = include_set_with_owners.library_indices[idx];
                 hits.push(LibraryHit {
-                    library_name: include_owners[idx],
+                    library_name: &patterns.libraries[lib_idx].name,
                     line: row + 1,
                     column: column + 1,
                 });

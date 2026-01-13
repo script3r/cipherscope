@@ -73,11 +73,21 @@ struct RawParameterPattern {
     default_value: Option<toml::Value>,
 }
 
+/// Pre-compiled include patterns with ownership tracking for find_library_anchors
+#[derive(Debug, Clone)]
+pub struct IncludeSetWithOwners {
+    pub regex_set: RegexSet,
+    /// Maps each regex index to its library index in PatternSet::libraries
+    pub library_indices: Vec<usize>,
+}
+
 #[derive(Debug, Clone)]
 pub struct PatternSet {
     pub libraries: Vec<Library>,
     pub include_sets: HashMap<Language, RegexSet>,
     pub api_sets: HashMap<Language, RegexSet>,
+    /// Pre-compiled include patterns per language with library ownership for find_library_anchors
+    pub include_sets_with_owners: HashMap<Language, IncludeSetWithOwners>,
 }
 
 #[derive(Debug, Clone)]
@@ -173,11 +183,16 @@ impl PatternSet {
         }
         let mut include_patterns: HashMap<Language, Vec<String>> = HashMap::new();
         let mut api_patterns: HashMap<Language, Vec<String>> = HashMap::new();
-        for lib in &libraries {
+        // Track which library owns each include pattern (for find_library_anchors)
+        let mut include_owners: HashMap<Language, Vec<usize>> = HashMap::new();
+
+        for (lib_idx, lib) in libraries.iter().enumerate() {
             for lang in &lib.languages {
                 let include_entry = include_patterns.entry(*lang).or_default();
+                let owners_entry = include_owners.entry(*lang).or_default();
                 for re in &lib.include_regexes {
                     include_entry.push(re.as_str().to_string());
+                    owners_entry.push(lib_idx);
                 }
                 let api_entry = api_patterns.entry(*lang).or_default();
                 for re in &lib.api_regexes {
@@ -188,9 +203,19 @@ impl PatternSet {
 
         let mut include_sets = HashMap::new();
         let mut api_sets = HashMap::new();
+        let mut include_sets_with_owners = HashMap::new();
+
         for (lang, patterns) in include_patterns {
             if !patterns.is_empty() {
-                include_sets.insert(lang, RegexSet::new(patterns)?);
+                let regex_set = RegexSet::new(&patterns)?;
+                include_sets.insert(lang, regex_set.clone());
+                include_sets_with_owners.insert(
+                    lang,
+                    IncludeSetWithOwners {
+                        regex_set,
+                        library_indices: include_owners.remove(&lang).unwrap_or_default(),
+                    },
+                );
             }
         }
         for (lang, patterns) in api_patterns {
@@ -203,6 +228,7 @@ impl PatternSet {
             libraries,
             include_sets,
             api_sets,
+            include_sets_with_owners,
         })
     }
 
