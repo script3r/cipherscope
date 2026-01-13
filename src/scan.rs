@@ -1,6 +1,5 @@
 use ahash::{AHashMap as HashMap, AHashSet as HashSet};
 use anyhow::{Context, Result};
-use regex::Regex;
 use tree_sitter::{Language as TsLanguage, Node, Parser, Point, Tree};
 
 use crate::patterns::{Language, ParameterPattern, PatternSet};
@@ -190,7 +189,9 @@ pub fn find_algorithms<'a>(
             primitive_by_alg.insert(alg.name.clone(), primitive.clone());
         }
     }
-    let constants = collect_constants(lang, content);
+    let constants = collect_constants(lang, content, patterns);
+    // Build line cache for fast line/column lookups (O(n) once, O(log n) per lookup)
+    let line_cache = LineCache::new(content);
     // Collect raw hits
     let mut hits_by_alg: HashMap<&str, Vec<(AlgorithmHit<'a>, bool)>> = HashMap::new();
     for node in code_symbol_nodes(lang, tree.root_node()) {
@@ -260,7 +261,7 @@ pub fn find_algorithms<'a>(
                 }
                 let Point { row, column } = node.start_position();
                 let (line, column) = match_offset
-                    .map(|offset| line_col_from_offset(content, node.start_byte() + offset))
+                    .map(|offset| line_cache.line_col(node.start_byte() + offset))
                     .unwrap_or((row + 1, column + 1));
                 let hit = AlgorithmHit {
                     algorithm_name: &alg.name,
@@ -316,7 +317,7 @@ pub fn find_algorithms<'a>(
             }
             for re in &alg.symbol_regexes {
                 for m in re.find_iter(content) {
-                    let (line, column) = line_col_from_offset(content, m.start());
+                    let (line, column) = line_cache.line_col(m.start());
                     if seen_on_line.insert((&alg.name, line)) {
                         let mut metadata = HashMap::new();
                         if let Some(primitive) = &alg.primitive {
@@ -373,22 +374,38 @@ pub fn dedupe_more_specific_hits<'a>(hits: Vec<AlgorithmHit<'a>>) -> Vec<Algorit
         .collect()
 }
 
-fn line_col_from_offset(content: &str, byte_idx: usize) -> (usize, usize) {
-    // 1-based line, column
-    let bytes = content.as_bytes();
-    let mut line = 1usize;
-    let mut col = 1usize;
-    let mut i = 0usize;
-    while i < byte_idx && i < bytes.len() {
-        if bytes[i] == b'\n' {
-            line += 1;
-            col = 1;
-        } else {
-            col += 1;
+/// Cache of line start byte offsets for fast line/column lookup.
+/// Building the cache is O(n), but subsequent lookups are O(log n).
+struct LineCache {
+    /// Byte offset of the start of each line (0-indexed internally)
+    /// line_starts[0] = 0 (line 1 starts at byte 0)
+    /// line_starts[1] = offset after first newline (line 2 start)
+    line_starts: Vec<usize>,
+}
+
+impl LineCache {
+    fn new(content: &str) -> Self {
+        let bytes = content.as_bytes();
+        let mut line_starts = vec![0usize];
+        for (i, &b) in bytes.iter().enumerate() {
+            if b == b'\n' {
+                line_starts.push(i + 1);
+            }
         }
-        i += 1;
+        Self { line_starts }
     }
-    (line, col)
+
+    /// Convert byte offset to 1-based (line, column)
+    fn line_col(&self, byte_idx: usize) -> (usize, usize) {
+        // Binary search to find which line contains this offset
+        let line_idx = match self.line_starts.binary_search(&byte_idx) {
+            Ok(exact) => exact,        // byte_idx is exactly at a line start
+            Err(insert) => insert - 1, // byte_idx is within line (insert-1)
+        };
+        let line = line_idx + 1; // 1-based
+        let col = byte_idx - self.line_starts[line_idx] + 1; // 1-based
+        (line, col)
+    }
 }
 
 fn extract_parameter(pp: &ParameterPattern, text: &str) -> Option<serde_json::Value> {
@@ -403,28 +420,18 @@ fn extract_parameter(pp: &ParameterPattern, text: &str) -> Option<serde_json::Va
     None
 }
 
-fn collect_constants(lang: Language, content: &str) -> HashMap<String, String> {
+fn collect_constants(
+    lang: Language,
+    content: &str,
+    patterns: &PatternSet,
+) -> HashMap<String, String> {
     let mut constants = HashMap::new();
-    let patterns: &[&str] = match lang {
-        Language::C | Language::Cpp | Language::Objc => &[
-            r"(?m)^\s*#\s*define\s+([A-Za-z_][A-Za-z0-9_]*)\s+([^\n]+)$",
-            r"(?m)^\s*(?:static\s+)?const\s+[^=;]+?\b([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^;]+);",
-        ],
-        Language::Java => &[
-            r"(?m)^\s*(?:public|private|protected)?\s*(?:static\s+)?final\s+(?:int|long|String)\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^;]+);",
-        ],
-        Language::Go => &[r"(?m)^\s*const\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^\n]+)$"],
-        Language::Python => &[r"(?m)^\s*([A-Z_][A-Z0-9_]*)\s*=\s*([^#\n]+)"],
-        Language::Php => &[
-            r"(?m)^\s*const\s+([A-Z_][A-Z0-9_]*)\s*=\s*([^;]+);",
-            r#"define\(\s*['"]([A-Z_][A-Z0-9_]*)['"]\s*,\s*([^)]+)\)"#,
-        ],
-        Language::Rust => &[r"(?m)^\s*const\s+([A-Za-z_][A-Za-z0-9_]*)\s*:[^=]+=\s*([^;]+);"],
-        _ => &[],
+
+    let Some(const_patterns) = patterns.constant_patterns.get(&lang) else {
+        return constants;
     };
 
-    for pattern in patterns {
-        let re = Regex::new(pattern).expect("valid regex");
+    for re in &const_patterns.regexes {
         for caps in re.captures_iter(content) {
             let Some(name) = caps.get(1).map(|m| m.as_str()) else {
                 continue;

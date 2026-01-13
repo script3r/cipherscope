@@ -81,6 +81,12 @@ pub struct IncludeSetWithOwners {
     pub library_indices: Vec<usize>,
 }
 
+/// Pre-compiled constant detection patterns per language
+#[derive(Debug, Clone)]
+pub struct ConstantPatterns {
+    pub regexes: Vec<Regex>,
+}
+
 #[derive(Debug, Clone)]
 pub struct PatternSet {
     pub libraries: Vec<Library>,
@@ -88,6 +94,8 @@ pub struct PatternSet {
     pub api_sets: HashMap<Language, RegexSet>,
     /// Pre-compiled include patterns per language with library ownership for find_library_anchors
     pub include_sets_with_owners: HashMap<Language, IncludeSetWithOwners>,
+    /// Pre-compiled constant detection patterns per language
+    pub constant_patterns: HashMap<Language, ConstantPatterns>,
 }
 
 #[derive(Debug, Clone)]
@@ -224,12 +232,79 @@ impl PatternSet {
             }
         }
 
+        // Pre-compile constant detection patterns per language
+        let constant_patterns = Self::build_constant_patterns()?;
+
         Ok(Self {
             libraries,
             include_sets,
             api_sets,
             include_sets_with_owners,
+            constant_patterns,
         })
+    }
+
+    /// Build pre-compiled constant detection patterns for each language
+    fn build_constant_patterns() -> Result<HashMap<Language, ConstantPatterns>> {
+        let patterns_by_lang: &[(Language, &[&str])] = &[
+            (
+                Language::C,
+                &[
+                    r"(?m)^\s*#\s*define\s+([A-Za-z_][A-Za-z0-9_]*)\s+([^\n]+)$",
+                    r"(?m)^\s*(?:static\s+)?const\s+[^=;]+?\b([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^;]+);",
+                ],
+            ),
+            (
+                Language::Cpp,
+                &[
+                    r"(?m)^\s*#\s*define\s+([A-Za-z_][A-Za-z0-9_]*)\s+([^\n]+)$",
+                    r"(?m)^\s*(?:static\s+)?const\s+[^=;]+?\b([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^;]+);",
+                ],
+            ),
+            (
+                Language::Objc,
+                &[
+                    r"(?m)^\s*#\s*define\s+([A-Za-z_][A-Za-z0-9_]*)\s+([^\n]+)$",
+                    r"(?m)^\s*(?:static\s+)?const\s+[^=;]+?\b([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^;]+);",
+                ],
+            ),
+            (
+                Language::Java,
+                &[
+                    r"(?m)^\s*(?:public|private|protected)?\s*(?:static\s+)?final\s+(?:int|long|String)\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^;]+);",
+                ],
+            ),
+            (
+                Language::Go,
+                &[r"(?m)^\s*const\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^\n]+)$"],
+            ),
+            (
+                Language::Python,
+                &[r"(?m)^\s*([A-Z_][A-Z0-9_]*)\s*=\s*([^#\n]+)"],
+            ),
+            (
+                Language::Php,
+                &[
+                    r"(?m)^\s*const\s+([A-Z_][A-Z0-9_]*)\s*=\s*([^;]+);",
+                    r#"define\(\s*['"]([A-Z_][A-Z0-9_]*)['"]\s*,\s*([^)]+)\)"#,
+                ],
+            ),
+            (
+                Language::Rust,
+                &[r"(?m)^\s*const\s+([A-Za-z_][A-Za-z0-9_]*)\s*:[^=]+=\s*([^;]+);"],
+            ),
+        ];
+
+        let mut result = HashMap::new();
+        for (lang, patterns) in patterns_by_lang {
+            let regexes = patterns
+                .iter()
+                .map(|p| Regex::new(p))
+                .collect::<std::result::Result<Vec<_>, _>>()
+                .context("compile constant patterns")?;
+            result.insert(*lang, ConstantPatterns { regexes });
+        }
+        Ok(result)
     }
 
     pub fn supports_language(&self, lang: Language) -> bool {
