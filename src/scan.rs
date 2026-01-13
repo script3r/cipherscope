@@ -340,30 +340,44 @@ pub fn find_algorithms<'a>(
 }
 
 pub fn dedupe_more_specific_hits<'a>(hits: Vec<AlgorithmHit<'a>>) -> Vec<AlgorithmHit<'a>> {
+    if hits.len() <= 1 {
+        return hits;
+    }
+
+    // Group hits by line for O(n) instead of O(n²)
+    let mut by_line: HashMap<usize, Vec<usize>> = HashMap::new();
+    for (idx, hit) in hits.iter().enumerate() {
+        by_line.entry(hit.line).or_default().push(idx);
+    }
+
     let mut drop = vec![false; hits.len()];
-    for i in 0..hits.len() {
-        if drop[i] {
+
+    // Only compare hits on the same line
+    for indices in by_line.values() {
+        if indices.len() <= 1 {
             continue;
         }
-        for j in 0..hits.len() {
-            if i == j || drop[j] {
-                continue;
-            }
-            if hits[i].line != hits[j].line {
+        for &i in indices {
+            if drop[i] {
                 continue;
             }
             let Some(p_i) = primitive_of_metadata(&hits[i]) else {
                 continue;
             };
-            let Some(p_j) = primitive_of_metadata(&hits[j]) else {
-                continue;
-            };
-            if p_i != p_j {
-                continue;
-            }
-            if is_more_specific(hits[j].algorithm_name, hits[i].algorithm_name) {
-                drop[i] = true;
-                break;
+            for &j in indices {
+                if i == j || drop[j] {
+                    continue;
+                }
+                let Some(p_j) = primitive_of_metadata(&hits[j]) else {
+                    continue;
+                };
+                if p_i != p_j {
+                    continue;
+                }
+                if is_more_specific(hits[j].algorithm_name, hits[i].algorithm_name) {
+                    drop[i] = true;
+                    break;
+                }
             }
         }
     }
@@ -656,24 +670,38 @@ fn dedupe_more_specific<'a>(
     hits: Vec<AlgorithmHit<'a>>,
     primitive_by_alg: &HashMap<String, String>,
 ) -> Vec<AlgorithmHit<'a>> {
+    if hits.len() <= 1 {
+        return hits;
+    }
+
+    // Group hits by line for O(n) instead of O(n²)
+    let mut by_line: HashMap<usize, Vec<usize>> = HashMap::new();
+    for (idx, hit) in hits.iter().enumerate() {
+        by_line.entry(hit.line).or_default().push(idx);
+    }
+
     let mut drop = vec![false; hits.len()];
-    for i in 0..hits.len() {
-        if drop[i] {
+
+    // Only compare hits on the same line
+    for indices in by_line.values() {
+        if indices.len() <= 1 {
             continue;
         }
-        for j in 0..hits.len() {
-            if i == j || drop[j] {
+        for &i in indices {
+            if drop[i] {
                 continue;
             }
-            if hits[i].line != hits[j].line {
-                continue;
-            }
-            if !primitives_compatible(&hits[i], &hits[j], primitive_by_alg) {
-                continue;
-            }
-            if is_more_specific(hits[j].algorithm_name, hits[i].algorithm_name) {
-                drop[i] = true;
-                break;
+            for &j in indices {
+                if i == j || drop[j] {
+                    continue;
+                }
+                if !primitives_compatible(&hits[i], &hits[j], primitive_by_alg) {
+                    continue;
+                }
+                if is_more_specific(hits[j].algorithm_name, hits[i].algorithm_name) {
+                    drop[i] = true;
+                    break;
+                }
             }
         }
     }
