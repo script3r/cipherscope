@@ -61,3 +61,27 @@ harness = false
 [[bench]]
 name = "scan_large_bench"
 harness = false
+
+[[bench]]
+name = "file_size_bench"
+harness = false
+
+[[bench]]
+name = "scale_bench"
+harness = false
+
+[[bench]]
+name = "thread_scaling_bench"
+harness = false
+
+[[bench]]
+name = "component_bench"
+harness = false
+
+[[bench]]
+name = "memory_bench"
+harness = false
+
+[[bench]]
+name = "large_fixture_bench"
+harness = false
