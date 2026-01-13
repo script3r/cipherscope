@@ -14,6 +14,8 @@ pub enum Language {
     Php,
     Objc,
     Rust,
+    JavaScript,
+    TypeScript,
 }
 
 #[derive(Debug, Deserialize)]
@@ -143,6 +145,8 @@ impl PatternSet {
                     "PHP" => Some(Language::Php),
                     "ObjC" => Some(Language::Objc),
                     "Rust" => Some(Language::Rust),
+                    "JavaScript" => Some(Language::JavaScript),
+                    "TypeScript" => Some(Language::TypeScript),
                     _ => None,
                 })
                 .collect::<Vec<_>>();
@@ -292,6 +296,24 @@ impl PatternSet {
             (
                 Language::Rust,
                 &[r"(?m)^\s*const\s+([A-Za-z_][A-Za-z0-9_]*)\s*:[^=]+=\s*([^;]+);"],
+            ),
+            (
+                Language::JavaScript,
+                &[
+                    // const ALGO = "value"
+                    r"(?m)^\s*const\s+([A-Z_][A-Z0-9_]*)\s*=\s*([^;\n]+)",
+                    // let ALGO = "value" (for module-level constants)
+                    r"(?m)^\s*let\s+([A-Z_][A-Z0-9_]*)\s*=\s*([^;\n]+)",
+                ],
+            ),
+            (
+                Language::TypeScript,
+                &[
+                    // const ALGO = "value" or const ALGO: string = "value"
+                    r"(?m)^\s*const\s+([A-Z_][A-Z0-9_]*)\s*(?::\s*[^=]+)?\s*=\s*([^;\n]+)",
+                    // let ALGO = "value" (for module-level constants)
+                    r"(?m)^\s*let\s+([A-Z_][A-Z0-9_]*)\s*(?::\s*[^=]+)?\s*=\s*([^;\n]+)",
+                ],
             ),
         ];
 

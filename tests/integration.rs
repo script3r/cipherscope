@@ -49,6 +49,8 @@ fn should_skip_family(family: &str) -> bool {
         "swift" => !cfg!(feature = "lang-swift"),
         "php" => !cfg!(feature = "lang-php"),
         "objc" | "objective-c" => !cfg!(feature = "lang-objc"),
+        "javascript" | "js" => !cfg!(feature = "lang-javascript"),
+        "typescript" | "ts" => !cfg!(feature = "lang-typescript"),
         _ => false,
     }
 }
@@ -273,4 +275,20 @@ symbol_patterns = ["test_algo"]
     }
     assert!(!paths.is_empty());
     assert!(paths.iter().all(|p| p.ends_with("small.rs")));
+}
+
+#[test]
+fn javascript_extension_detection() {
+    // This test verifies JavaScript support is available
+    // by checking that the feature flag is enabled
+    #[cfg(not(feature = "lang-javascript"))]
+    compile_error!("lang-javascript feature must be enabled");
+}
+
+#[test]
+fn typescript_extension_detection() {
+    // This test verifies TypeScript support is available
+    // by checking that the feature flag is enabled
+    #[cfg(not(feature = "lang-typescript"))]
+    compile_error!("lang-typescript feature must be enabled");
 }

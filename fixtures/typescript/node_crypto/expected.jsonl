@@ -1,0 +1,14 @@
+{"assetType":"library","identifier":"Node.js crypto","path":"fixtures/typescript/node_crypto/src/test.ts","evidence":{"line":2,"column":1}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/typescript/node_crypto/src/test.ts","evidence":{"line":17,"column":25},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/typescript/node_crypto/src/test.ts","evidence":{"line":31,"column":25},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"scrypt","path":"fixtures/typescript/node_crypto/src/test.ts","evidence":{"line":108,"column":19},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"SHA-512","path":"fixtures/typescript/node_crypto/src/test.ts","evidence":{"line":24,"column":25},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"AES-GCM","path":"fixtures/typescript/node_crypto/src/test.ts","evidence":{"line":39,"column":27},"metadata":{"primitive":"symmetric","keySize":256}}
+{"assetType":"algorithm","identifier":"AES-GCM","path":"fixtures/typescript/node_crypto/src/test.ts","evidence":{"line":53,"column":29},"metadata":{"primitive":"symmetric","keySize":256}}
+{"assetType":"algorithm","identifier":"ChaCha20-Poly1305","path":"fixtures/typescript/node_crypto/src/test.ts","evidence":{"line":122,"column":27},"metadata":{"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/typescript/node_crypto/src/test.ts","evidence":{"line":93,"column":46},"metadata":{"curve":"P-384","primitive":"signature"}}
+{"assetType":"algorithm","identifier":"RSA","path":"fixtures/typescript/node_crypto/src/test.ts","evidence":{"line":80,"column":16},"metadata":{"primitive":"asymmetric","keySize":4096}}
+{"assetType":"algorithm","identifier":"HKDF","path":"fixtures/typescript/node_crypto/src/test.ts","evidence":{"line":117,"column":19},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"Ed25519","path":"fixtures/typescript/node_crypto/src/test.ts","evidence":{"line":70,"column":46},"metadata":{"primitive":"signature"}}
+{"assetType":"algorithm","identifier":"PBKDF2","path":"fixtures/typescript/node_crypto/src/test.ts","evidence":{"line":103,"column":19},"metadata":{"primitive":"kdf","iterations":100000}}
+{"assetType":"algorithm","identifier":"AES-CBC","path":"fixtures/typescript/node_crypto/src/test.ts","evidence":{"line":62,"column":27},"metadata":{"primitive":"symmetric","keySize":256}}

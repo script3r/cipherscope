@@ -36,9 +36,11 @@ tree-sitter-swift = { version = "0.7", optional = true }
 tree-sitter-php = { version = "0.24", optional = true }
 tree-sitter-objc = { version = "3.0", optional = true }
 tree-sitter-rust = { version = "0.23", optional = true }
+tree-sitter-javascript = { version = "0.25", optional = true }
+tree-sitter-typescript = { version = "0.23", optional = true }
 
 [features]
-default = ["lang-c", "lang-cpp", "lang-java", "lang-python", "lang-go", "lang-swift", "lang-php", "lang-objc", "lang-rust"]
+default = ["lang-c", "lang-cpp", "lang-java", "lang-python", "lang-go", "lang-swift", "lang-php", "lang-objc", "lang-rust", "lang-javascript", "lang-typescript"]
 lang-c = ["tree-sitter-c"]
 lang-cpp = ["tree-sitter-cpp"]
 lang-java = ["tree-sitter-java"]
@@ -48,6 +50,8 @@ lang-swift = ["tree-sitter-swift"]
 lang-php = ["tree-sitter-php"]
 lang-objc = ["tree-sitter-objc"]
 lang-rust = ["tree-sitter-rust"]
+lang-javascript = ["tree-sitter-javascript"]
+lang-typescript = ["tree-sitter-typescript"]
 
 [dev-dependencies]
 assert_cmd = "2.0"

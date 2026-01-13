@@ -26,6 +26,19 @@ define_ts_lang!(ts_lang_swift, "lang-swift", tree_sitter_swift::LANGUAGE);
 define_ts_lang!(ts_lang_php, "lang-php", tree_sitter_php::LANGUAGE_PHP);
 define_ts_lang!(ts_lang_objc, "lang-objc", tree_sitter_objc::LANGUAGE);
 define_ts_lang!(ts_lang_rust, "lang-rust", tree_sitter_rust::LANGUAGE);
+define_ts_lang!(
+    ts_lang_javascript,
+    "lang-javascript",
+    tree_sitter_javascript::LANGUAGE
+);
+define_ts_lang!(
+    ts_lang_typescript,
+    "lang-typescript",
+    tree_sitter_typescript::LANGUAGE_TYPESCRIPT
+);
+// Note: For TSX files, we use the TypeScript grammar which handles most crypto detection needs.
+// The TSX grammar (tree_sitter_typescript::LANGUAGE_TSX) could be used for JSX-specific parsing
+// if needed in the future.
 
 #[derive(Clone, Copy, Debug)]
 pub struct LibraryHit<'a> {
@@ -55,6 +68,8 @@ pub fn language_from_path(path: &std::path::Path) -> Option<Language> {
         "php" | "hack" => Some(Language::Php),
         "m" | "mm" => Some(Language::Objc),
         "rs" => Some(Language::Rust),
+        "js" | "mjs" | "cjs" | "jsx" => Some(Language::JavaScript),
+        "ts" | "mts" | "cts" | "tsx" => Some(Language::TypeScript),
         _ => None,
     }
 }
@@ -76,6 +91,8 @@ pub fn parse(lang: Language, content: &str) -> Result<Tree> {
         Language::Php => ts_lang_php(),
         Language::Objc => ts_lang_objc(),
         Language::Rust => ts_lang_rust(),
+        Language::JavaScript => ts_lang_javascript(),
+        Language::TypeScript => ts_lang_typescript(),
     };
     parser.set_language(&ts_lang).context("set language")?;
 
@@ -127,7 +144,7 @@ pub fn find_library_anchors<'a>(
         return hits;
     };
 
-    for node in import_like_nodes(lang, tree.root_node()) {
+    for node in import_like_nodes(lang, tree.root_node(), content.as_bytes()) {
         let text = node.utf8_text(content.as_bytes()).unwrap_or("");
         let matches = include_set_with_owners.regex_set.matches(text);
         if matches.matched_any() {
@@ -574,7 +591,7 @@ fn replace_constants_with_map(
     (resolved, map)
 }
 
-fn import_like_nodes<'a>(lang: Language, root: Node<'a>) -> Vec<Node<'a>> {
+fn import_like_nodes<'a>(lang: Language, root: Node<'a>, content: &[u8]) -> Vec<Node<'a>> {
     let mut nodes = Vec::new();
     let mut stack = vec![root];
     while let Some(node) = stack.pop() {
@@ -588,6 +605,25 @@ fn import_like_nodes<'a>(lang: Language, root: Node<'a>) -> Vec<Node<'a>> {
             Language::Php => kind == "namespace_use_declaration" || kind == "qualified_name",
             Language::Objc => kind == "preproc_import" || kind == "preproc_include",
             Language::Rust => kind == "use_declaration",
+            // JavaScript: import declarations, require() calls
+            Language::JavaScript => {
+                kind == "import_statement"
+                    || kind == "call_expression" && {
+                        // Check if it's a require() call
+                        node.child(0)
+                            .map(|c| c.utf8_text(content).unwrap_or("") == "require")
+                            .unwrap_or(false)
+                    }
+            }
+            // TypeScript: same as JavaScript (import statements, require calls)
+            Language::TypeScript => {
+                kind == "import_statement"
+                    || kind == "call_expression" && {
+                        node.child(0)
+                            .map(|c| c.utf8_text(content).unwrap_or("") == "require")
+                            .unwrap_or(false)
+                    }
+            }
         };
         if is_import {
             nodes.push(node);
@@ -652,6 +688,16 @@ fn code_symbol_nodes<'a>(lang: Language, root: Node<'a>) -> Vec<Node<'a>> {
                     | "path_expression"
                     | "scoped_identifier"
                     | "identifier"
+            ),
+            // JavaScript: calls, member expressions, string literals for algorithm names
+            Language::JavaScript => matches!(
+                kind,
+                "call_expression" | "member_expression" | "string" | "template_string"
+            ),
+            // TypeScript: same as JavaScript
+            Language::TypeScript => matches!(
+                kind,
+                "call_expression" | "member_expression" | "string" | "template_string"
             ),
         };
         if interesting {

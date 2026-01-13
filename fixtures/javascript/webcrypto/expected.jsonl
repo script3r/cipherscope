@@ -1,0 +1,11 @@
+{"assetType":"library","identifier":"Web Crypto API","path":"fixtures/javascript/webcrypto/src/test.js","evidence":{"line":1,"column":1}}
+{"assetType":"algorithm","identifier":"PBKDF2","path":"fixtures/javascript/webcrypto/src/test.js","evidence":{"line":86,"column":13},"metadata":{"iterations":100000,"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"AES-GCM","path":"fixtures/javascript/webcrypto/src/test.js","evidence":{"line":4,"column":11},"metadata":{"keySize":256,"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"AES-GCM","path":"fixtures/javascript/webcrypto/src/test.js","evidence":{"line":92,"column":11},"metadata":{"keySize":256,"primitive":"symmetric"}}
+{"assetType":"algorithm","identifier":"ECDSA","path":"fixtures/javascript/webcrypto/src/test.js","evidence":{"line":45,"column":11},"metadata":{"primitive":"signature","curve":"P-384"}}
+{"assetType":"algorithm","identifier":"SHA-384","path":"fixtures/javascript/webcrypto/src/test.js","evidence":{"line":54,"column":26},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-384","path":"fixtures/javascript/webcrypto/src/test.js","evidence":{"line":63,"column":26},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"RSA-OAEP","path":"fixtures/javascript/webcrypto/src/test.js","evidence":{"line":33,"column":13},"metadata":{"keySize":4096,"primitive":"asymmetric"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/javascript/webcrypto/src/test.js","evidence":{"line":36,"column":13},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/javascript/webcrypto/src/test.js","evidence":{"line":72,"column":32},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/javascript/webcrypto/src/test.js","evidence":{"line":89,"column":13},"metadata":{"primitive":"hash"}}

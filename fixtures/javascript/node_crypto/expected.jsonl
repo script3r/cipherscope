@@ -1,0 +1,8 @@
+{"assetType":"library","identifier":"Node.js crypto","path":"fixtures/javascript/node_crypto/src/test.js","evidence":{"line":2,"column":16}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/javascript/node_crypto/src/test.js","evidence":{"line":6,"column":25},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"SHA-256","path":"fixtures/javascript/node_crypto/src/test.js","evidence":{"line":13,"column":25},"metadata":{"primitive":"hash"}}
+{"assetType":"algorithm","identifier":"scrypt","path":"fixtures/javascript/node_crypto/src/test.js","evidence":{"line":64,"column":19},"metadata":{"primitive":"kdf"}}
+{"assetType":"algorithm","identifier":"AES-GCM","path":"fixtures/javascript/node_crypto/src/test.js","evidence":{"line":21,"column":27},"metadata":{"primitive":"symmetric","keySize":256}}
+{"assetType":"algorithm","identifier":"AES-GCM","path":"fixtures/javascript/node_crypto/src/test.js","evidence":{"line":30,"column":29},"metadata":{"primitive":"symmetric","keySize":256}}
+{"assetType":"algorithm","identifier":"RSA","path":"fixtures/javascript/node_crypto/src/test.js","evidence":{"line":40,"column":16},"metadata":{"keySize":4096,"primitive":"asymmetric"}}
+{"assetType":"algorithm","identifier":"PBKDF2","path":"fixtures/javascript/node_crypto/src/test.js","evidence":{"line":59,"column":19},"metadata":{"iterations":100000,"primitive":"kdf"}}

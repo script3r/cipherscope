@@ -8686,3 +8686,605 @@ symbol_patterns = [
   "\\bbcrypt:gen_salt\\s*\\(",
   "\\bbcrypt:hashpw\\s*\\(",
 ]
+
+# =========================
+# JavaScript / TypeScript
+# =========================
+
+[[library]]
+name = "Node.js crypto"
+languages = ["JavaScript", "TypeScript"]
+[library.patterns]
+include = [
+  # CommonJS require patterns
+  "\\brequire\\s*\\(\\s*['\"]crypto['\"]\\s*\\)",
+  "\\brequire\\s*\\(\\s*['\"]node:crypto['\"]\\s*\\)",
+  # ES module import patterns
+  "^\\s*import\\s+.*\\bfrom\\s+['\"]crypto['\"]",
+  "^\\s*import\\s+.*\\bfrom\\s+['\"]node:crypto['\"]",
+]
+apis = [
+  # Hash creation
+  "\\bcrypto\\.createHash\\s*\\(",
+  "\\bcreateHash\\s*\\(",
+  # HMAC creation
+  "\\bcrypto\\.createHmac\\s*\\(",
+  "\\bcreateHmac\\s*\\(",
+  # Cipher/decipher
+  "\\bcrypto\\.createCipheriv\\s*\\(",
+  "\\bcreateDecipheriv\\s*\\(",
+  "\\bcrypto\\.createDecipheriv\\s*\\(",
+  "\\bcreateCipheriv\\s*\\(",
+  # Sign/verify
+  "\\bcrypto\\.createSign\\s*\\(",
+  "\\bcreateSign\\s*\\(",
+  "\\bcrypto\\.createVerify\\s*\\(",
+  "\\bcreateVerify\\s*\\(",
+  # Key generation
+  "\\bcrypto\\.generateKeyPair\\s*\\(",
+  "\\bgenerateKeyPair\\s*\\(",
+  "\\bcrypto\\.generateKeyPairSync\\s*\\(",
+  "\\bgenerateKeyPairSync\\s*\\(",
+  "\\bcrypto\\.generateKey\\s*\\(",
+  "\\bgenerateKey\\s*\\(",
+  # Key derivation
+  "\\bcrypto\\.pbkdf2\\s*\\(",
+  "\\bpbkdf2\\s*\\(",
+  "\\bcrypto\\.pbkdf2Sync\\s*\\(",
+  "\\bpbkdf2Sync\\s*\\(",
+  "\\bcrypto\\.scrypt\\s*\\(",
+  "\\bscrypt\\s*\\(",
+  "\\bcrypto\\.scryptSync\\s*\\(",
+  "\\bscryptSync\\s*\\(",
+  "\\bcrypto\\.hkdf\\s*\\(",
+  "\\bhkdf\\s*\\(",
+  "\\bcrypto\\.hkdfSync\\s*\\(",
+  "\\bhkdfSync\\s*\\(",
+  # Diffie-Hellman
+  "\\bcrypto\\.createDiffieHellman\\s*\\(",
+  "\\bcreateDiffieHellman\\s*\\(",
+  "\\bcrypto\\.createECDH\\s*\\(",
+  "\\bcreateECDH\\s*\\(",
+  # Random bytes
+  "\\bcrypto\\.randomBytes\\s*\\(",
+  "\\brandomBytes\\s*\\(",
+  # Public/private key operations
+  "\\bcrypto\\.publicEncrypt\\s*\\(",
+  "\\bpublicEncrypt\\s*\\(",
+  "\\bcrypto\\.privateDecrypt\\s*\\(",
+  "\\bprivateDecrypt\\s*\\(",
+]
+
+# Algorithm definitions for Node.js crypto
+[[library.algorithms]]
+name = "SHA-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcreateHash\\s*\\(\\s*['\"]sha256['\"]",
+  "\\bcreateHmac\\s*\\(\\s*['\"]sha256['\"]",
+  "\\bhash\\s*\\(\\s*['\"]sha256['\"]",
+]
+
+[[library.algorithms]]
+name = "SHA-512"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcreateHash\\s*\\(\\s*['\"]sha512['\"]",
+  "\\bcreateHmac\\s*\\(\\s*['\"]sha512['\"]",
+  "\\bhash\\s*\\(\\s*['\"]sha512['\"]",
+]
+
+[[library.algorithms]]
+name = "SHA-384"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcreateHash\\s*\\(\\s*['\"]sha384['\"]",
+  "\\bcreateHmac\\s*\\(\\s*['\"]sha384['\"]",
+  "\\bhash\\s*\\(\\s*['\"]sha384['\"]",
+]
+
+[[library.algorithms]]
+name = "SHA-1"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bcreateHash\\s*\\(\\s*['\"]sha1['\"]",
+  "\\bcreateHmac\\s*\\(\\s*['\"]sha1['\"]",
+  "\\bhash\\s*\\(\\s*['\"]sha1['\"]",
+]
+
+[[library.algorithms]]
+name = "MD5"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bcreateHash\\s*\\(\\s*['\"]md5['\"]",
+  "\\bcreateHmac\\s*\\(\\s*['\"]md5['\"]",
+  "\\bhash\\s*\\(\\s*['\"]md5['\"]",
+]
+
+[[library.algorithms]]
+name = "AES-GCM"
+primitive = "symmetric"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcreateCipheriv\\s*\\(\\s*['\"]aes-\\d+-gcm['\"]",
+  "\\bcreateDecipheriv\\s*\\(\\s*['\"]aes-\\d+-gcm['\"]",
+]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "create(?:Cipher|Decipher)iv\\s*\\(\\s*['\"]aes-(\\d+)-gcm['\"]"
+
+[[library.algorithms]]
+name = "AES-CBC"
+primitive = "symmetric"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcreateCipheriv\\s*\\(\\s*['\"]aes-\\d+-cbc['\"]",
+  "\\bcreateDecipheriv\\s*\\(\\s*['\"]aes-\\d+-cbc['\"]",
+]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "create(?:Cipher|Decipher)iv\\s*\\(\\s*['\"]aes-(\\d+)-cbc['\"]"
+
+[[library.algorithms]]
+name = "AES-CTR"
+primitive = "symmetric"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcreateCipheriv\\s*\\(\\s*['\"]aes-\\d+-ctr['\"]",
+  "\\bcreateDecipheriv\\s*\\(\\s*['\"]aes-\\d+-ctr['\"]",
+]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "create(?:Cipher|Decipher)iv\\s*\\(\\s*['\"]aes-(\\d+)-ctr['\"]"
+
+[[library.algorithms]]
+name = "ChaCha20-Poly1305"
+primitive = "symmetric"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bcreateCipheriv\\s*\\(\\s*['\"]chacha20-poly1305['\"]",
+  "\\bcreateDecipheriv\\s*\\(\\s*['\"]chacha20-poly1305['\"]",
+]
+
+[[library.algorithms]]
+name = "RSA"
+primitive = "asymmetric"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bgenerateKeyPair(?:Sync)?\\s*\\(\\s*['\"]rsa['\"]",
+  "\\bpublicEncrypt\\s*\\(",
+  "\\bprivateDecrypt\\s*\\(",
+  "\\bcreateSign\\s*\\(\\s*['\"]RSA-",
+  "\\bcreateVerify\\s*\\(\\s*['\"]RSA-",
+]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "modulusLength\\s*:\\s*(\\d{4})"
+
+[[library.algorithms]]
+name = "ECDSA"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bgenerateKeyPair(?:Sync)?\\s*\\(\\s*['\"]ec['\"]",
+  "\\bcreateECDH\\s*\\(",
+]
+[[library.algorithms.parameter_patterns]]
+name = "curve"
+pattern = "namedCurve\\s*:\\s*['\"]([^'\"]+)['\"]"
+
+[[library.algorithms]]
+name = "Ed25519"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bgenerateKeyPair(?:Sync)?\\s*\\(\\s*['\"]ed25519['\"]",
+]
+
+[[library.algorithms]]
+name = "X25519"
+primitive = "asymmetric"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bgenerateKeyPair(?:Sync)?\\s*\\(\\s*['\"]x25519['\"]",
+]
+
+[[library.algorithms]]
+name = "PBKDF2"
+primitive = "kdf"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bpbkdf2(?:Sync)?\\s*\\(",
+]
+[[library.algorithms.parameter_patterns]]
+name = "iterations"
+pattern = "pbkdf2(?:Sync)?\\s*\\([^,]+,\\s*[^,]+,\\s*(\\d+)"
+
+[[library.algorithms]]
+name = "scrypt"
+primitive = "kdf"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bscrypt(?:Sync)?\\s*\\(",
+]
+
+[[library.algorithms]]
+name = "HKDF"
+primitive = "kdf"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bhkdf(?:Sync)?\\s*\\(",
+]
+
+[[library]]
+name = "Web Crypto API"
+languages = ["JavaScript", "TypeScript"]
+[library.patterns]
+include = []
+apis = [
+  # SubtleCrypto methods via crypto.subtle
+  "\\bcrypto\\.subtle\\.encrypt\\s*\\(",
+  "\\bcrypto\\.subtle\\.decrypt\\s*\\(",
+  "\\bcrypto\\.subtle\\.sign\\s*\\(",
+  "\\bcrypto\\.subtle\\.verify\\s*\\(",
+  "\\bcrypto\\.subtle\\.digest\\s*\\(",
+  "\\bcrypto\\.subtle\\.generateKey\\s*\\(",
+  "\\bcrypto\\.subtle\\.deriveKey\\s*\\(",
+  "\\bcrypto\\.subtle\\.deriveBits\\s*\\(",
+  "\\bcrypto\\.subtle\\.importKey\\s*\\(",
+  "\\bcrypto\\.subtle\\.exportKey\\s*\\(",
+  "\\bcrypto\\.subtle\\.wrapKey\\s*\\(",
+  "\\bcrypto\\.subtle\\.unwrapKey\\s*\\(",
+  # Via window.crypto.subtle
+  "\\bwindow\\.crypto\\.subtle\\.",
+  # Via navigator if accessed
+  "\\bnavigator\\.crypto\\.subtle\\.",
+  # SubtleCrypto reference
+  "\\bSubtleCrypto\\b",
+  # getRandomValues
+  "\\bcrypto\\.getRandomValues\\s*\\(",
+  "\\bwindow\\.crypto\\.getRandomValues\\s*\\(",
+]
+
+# Algorithm definitions for Web Crypto API
+[[library.algorithms]]
+name = "AES-GCM"
+primitive = "symmetric"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bname\\s*:\\s*['\"]AES-GCM['\"]",
+  "\\{\\s*name\\s*:\\s*['\"]AES-GCM['\"]",
+]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "length\\s*:\\s*(128|192|256)"
+
+[[library.algorithms]]
+name = "AES-CBC"
+primitive = "symmetric"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bname\\s*:\\s*['\"]AES-CBC['\"]",
+  "\\{\\s*name\\s*:\\s*['\"]AES-CBC['\"]",
+]
+
+[[library.algorithms]]
+name = "AES-CTR"
+primitive = "symmetric"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bname\\s*:\\s*['\"]AES-CTR['\"]",
+  "\\{\\s*name\\s*:\\s*['\"]AES-CTR['\"]",
+]
+
+[[library.algorithms]]
+name = "AES-KW"
+primitive = "symmetric"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bname\\s*:\\s*['\"]AES-KW['\"]",
+  "\\{\\s*name\\s*:\\s*['\"]AES-KW['\"]",
+]
+
+[[library.algorithms]]
+name = "RSA-OAEP"
+primitive = "asymmetric"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bname\\s*:\\s*['\"]RSA-OAEP['\"]",
+  "\\{\\s*name\\s*:\\s*['\"]RSA-OAEP['\"]",
+]
+[[library.algorithms.parameter_patterns]]
+name = "keySize"
+pattern = "modulusLength\\s*:\\s*(\\d{4})"
+
+[[library.algorithms]]
+name = "RSASSA-PKCS1-v1_5"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bname\\s*:\\s*['\"]RSASSA-PKCS1-v1_5['\"]",
+  "\\{\\s*name\\s*:\\s*['\"]RSASSA-PKCS1-v1_5['\"]",
+]
+
+[[library.algorithms]]
+name = "RSA-PSS"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bname\\s*:\\s*['\"]RSA-PSS['\"]",
+  "\\{\\s*name\\s*:\\s*['\"]RSA-PSS['\"]",
+]
+
+[[library.algorithms]]
+name = "ECDSA"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bname\\s*:\\s*['\"]ECDSA['\"]",
+  "\\{\\s*name\\s*:\\s*['\"]ECDSA['\"]",
+]
+[[library.algorithms.parameter_patterns]]
+name = "curve"
+pattern = "namedCurve\\s*:\\s*['\"]([^'\"]+)['\"]"
+
+[[library.algorithms]]
+name = "ECDH"
+primitive = "asymmetric"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bname\\s*:\\s*['\"]ECDH['\"]",
+  "\\{\\s*name\\s*:\\s*['\"]ECDH['\"]",
+]
+
+[[library.algorithms]]
+name = "Ed25519"
+primitive = "signature"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bname\\s*:\\s*['\"]Ed25519['\"]",
+  "\\{\\s*name\\s*:\\s*['\"]Ed25519['\"]",
+]
+
+[[library.algorithms]]
+name = "X25519"
+primitive = "asymmetric"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bname\\s*:\\s*['\"]X25519['\"]",
+  "\\{\\s*name\\s*:\\s*['\"]X25519['\"]",
+]
+
+[[library.algorithms]]
+name = "HMAC"
+primitive = "mac"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bname\\s*:\\s*['\"]HMAC['\"]",
+  "\\{\\s*name\\s*:\\s*['\"]HMAC['\"]",
+]
+
+[[library.algorithms]]
+name = "SHA-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bhash\\s*:\\s*['\"]SHA-256['\"]",
+  "\\bdigest\\s*\\(\\s*['\"]SHA-256['\"]",
+  "\\{\\s*hash\\s*:\\s*['\"]SHA-256['\"]",
+]
+
+[[library.algorithms]]
+name = "SHA-384"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bhash\\s*:\\s*['\"]SHA-384['\"]",
+  "\\bdigest\\s*\\(\\s*['\"]SHA-384['\"]",
+  "\\{\\s*hash\\s*:\\s*['\"]SHA-384['\"]",
+]
+
+[[library.algorithms]]
+name = "SHA-512"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bhash\\s*:\\s*['\"]SHA-512['\"]",
+  "\\bdigest\\s*\\(\\s*['\"]SHA-512['\"]",
+  "\\{\\s*hash\\s*:\\s*['\"]SHA-512['\"]",
+]
+
+[[library.algorithms]]
+name = "SHA-1"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bhash\\s*:\\s*['\"]SHA-1['\"]",
+  "\\bdigest\\s*\\(\\s*['\"]SHA-1['\"]",
+  "\\{\\s*hash\\s*:\\s*['\"]SHA-1['\"]",
+]
+
+[[library.algorithms]]
+name = "PBKDF2"
+primitive = "kdf"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bname\\s*:\\s*['\"]PBKDF2['\"]",
+  "\\{\\s*name\\s*:\\s*['\"]PBKDF2['\"]",
+]
+[[library.algorithms.parameter_patterns]]
+name = "iterations"
+pattern = "iterations\\s*:\\s*(\\d+)"
+
+[[library.algorithms]]
+name = "HKDF"
+primitive = "kdf"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bname\\s*:\\s*['\"]HKDF['\"]",
+  "\\{\\s*name\\s*:\\s*['\"]HKDF['\"]",
+]
+
+[[library]]
+name = "crypto-js"
+languages = ["JavaScript", "TypeScript"]
+[library.patterns]
+include = [
+  # CommonJS require patterns
+  "\\brequire\\s*\\(\\s*['\"]crypto-js['\"]\\s*\\)",
+  "\\brequire\\s*\\(\\s*['\"]crypto-js/[^'\"]+['\"]\\s*\\)",
+  # ES module import patterns
+  "^\\s*import\\s+.*\\bfrom\\s+['\"]crypto-js['\"]",
+  "^\\s*import\\s+.*\\bfrom\\s+['\"]crypto-js/[^'\"]+['\"]",
+]
+apis = [
+  # CryptoJS global object methods
+  "\\bCryptoJS\\.AES\\.(?:encrypt|decrypt)\\s*\\(",
+  "\\bCryptoJS\\.DES\\.(?:encrypt|decrypt)\\s*\\(",
+  "\\bCryptoJS\\.TripleDES\\.(?:encrypt|decrypt)\\s*\\(",
+  "\\bCryptoJS\\.Rabbit\\.(?:encrypt|decrypt)\\s*\\(",
+  "\\bCryptoJS\\.RC4\\.(?:encrypt|decrypt)\\s*\\(",
+  "\\bCryptoJS\\.MD5\\s*\\(",
+  "\\bCryptoJS\\.SHA1\\s*\\(",
+  "\\bCryptoJS\\.SHA256\\s*\\(",
+  "\\bCryptoJS\\.SHA224\\s*\\(",
+  "\\bCryptoJS\\.SHA384\\s*\\(",
+  "\\bCryptoJS\\.SHA512\\s*\\(",
+  "\\bCryptoJS\\.SHA3\\s*\\(",
+  "\\bCryptoJS\\.RIPEMD160\\s*\\(",
+  "\\bCryptoJS\\.HmacMD5\\s*\\(",
+  "\\bCryptoJS\\.HmacSHA1\\s*\\(",
+  "\\bCryptoJS\\.HmacSHA256\\s*\\(",
+  "\\bCryptoJS\\.HmacSHA224\\s*\\(",
+  "\\bCryptoJS\\.HmacSHA384\\s*\\(",
+  "\\bCryptoJS\\.HmacSHA512\\s*\\(",
+  "\\bCryptoJS\\.PBKDF2\\s*\\(",
+  "\\bCryptoJS\\.lib\\.WordArray\\.random\\s*\\(",
+]
+
+# Algorithm definitions for crypto-js
+[[library.algorithms]]
+name = "AES"
+primitive = "symmetric"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCryptoJS\\.AES\\.(?:encrypt|decrypt)\\s*\\(",
+]
+
+[[library.algorithms]]
+name = "DES"
+primitive = "symmetric"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCryptoJS\\.DES\\.(?:encrypt|decrypt)\\s*\\(",
+]
+
+[[library.algorithms]]
+name = "3DES"
+primitive = "symmetric"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCryptoJS\\.TripleDES\\.(?:encrypt|decrypt)\\s*\\(",
+]
+
+[[library.algorithms]]
+name = "Rabbit"
+primitive = "symmetric"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCryptoJS\\.Rabbit\\.(?:encrypt|decrypt)\\s*\\(",
+]
+
+[[library.algorithms]]
+name = "RC4"
+primitive = "symmetric"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCryptoJS\\.RC4\\.(?:encrypt|decrypt)\\s*\\(",
+]
+
+[[library.algorithms]]
+name = "MD5"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCryptoJS\\.MD5\\s*\\(",
+  "\\bCryptoJS\\.HmacMD5\\s*\\(",
+]
+
+[[library.algorithms]]
+name = "SHA-1"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCryptoJS\\.SHA1\\s*\\(",
+  "\\bCryptoJS\\.HmacSHA1\\s*\\(",
+]
+
+[[library.algorithms]]
+name = "SHA-256"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCryptoJS\\.SHA256\\s*\\(",
+  "\\bCryptoJS\\.HmacSHA256\\s*\\(",
+]
+
+[[library.algorithms]]
+name = "SHA-224"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCryptoJS\\.SHA224\\s*\\(",
+  "\\bCryptoJS\\.HmacSHA224\\s*\\(",
+]
+
+[[library.algorithms]]
+name = "SHA-384"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCryptoJS\\.SHA384\\s*\\(",
+  "\\bCryptoJS\\.HmacSHA384\\s*\\(",
+]
+
+[[library.algorithms]]
+name = "SHA-512"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCryptoJS\\.SHA512\\s*\\(",
+  "\\bCryptoJS\\.HmacSHA512\\s*\\(",
+]
+
+[[library.algorithms]]
+name = "SHA-3"
+primitive = "hash"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCryptoJS\\.SHA3\\s*\\(",
+]
+
+[[library.algorithms]]
+name = "RIPEMD-160"
+primitive = "hash"
+nistQuantumSecurityLevel = 0
+symbol_patterns = [
+  "\\bCryptoJS\\.RIPEMD160\\s*\\(",
+]
+
+[[library.algorithms]]
+name = "PBKDF2"
+primitive = "kdf"
+nistQuantumSecurityLevel = 3
+symbol_patterns = [
+  "\\bCryptoJS\\.PBKDF2\\s*\\(",
+]
+[[library.algorithms.parameter_patterns]]
+name = "iterations"
+pattern = "iterations\\s*:\\s*(\\d+)"

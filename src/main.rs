@@ -201,6 +201,14 @@ fn main() -> Result<()> {
     types_builder.add("objc", "*.m").unwrap();
     types_builder.add("objc", "*.mm").unwrap();
     types_builder.add("rust", "*.rs").unwrap();
+    types_builder.add("javascript", "*.js").unwrap();
+    types_builder.add("javascript", "*.mjs").unwrap();
+    types_builder.add("javascript", "*.cjs").unwrap();
+    types_builder.add("javascript", "*.jsx").unwrap();
+    types_builder.add("typescript", "*.ts").unwrap();
+    types_builder.add("typescript", "*.mts").unwrap();
+    types_builder.add("typescript", "*.cts").unwrap();
+    types_builder.add("typescript", "*.tsx").unwrap();
     types_builder.select("c");
     types_builder.select("cpp");
     types_builder.select("java");
@@ -210,6 +218,8 @@ fn main() -> Result<()> {
     types_builder.select("php");
     types_builder.select("objc");
     types_builder.select("rust");
+    types_builder.select("javascript");
+    types_builder.select("typescript");
     walk_builder.types(types_builder.build()?);
 
     if !cli.exclude.is_empty() {
