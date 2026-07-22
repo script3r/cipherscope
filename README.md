@@ -1,7 +1,7 @@
 # cipherscope
 
 <div align="center">
-  <img src="cipherscope.png" alt="CipherScope Logo" width="350" height="350">
+  <img src="https://raw.githubusercontent.com/script3r/cipherscope/main/cipherscope.png" alt="CipherScope Logo" width="350" height="350">
 </div>
 
 [![CI](https://github.com/script3r/cipherscope/actions/workflows/ci.yml/badge.svg)](https://github.com/script3r/cipherscope/actions/workflows/ci.yml)
@@ -14,7 +14,7 @@
 - **Language-Aware**: Uses Tree-sitter parsers to reduce false positives by understanding code structure.
 - **Inventory-First**: Focused on assembling a reliable crypto usage inventory across large repos.
 - **Extensible Patterns**: Easily add new libraries and algorithms via a simple TOML configuration.
-- **Broad Language Support**: Currently supports C, C++, Java, Python, Go, Swift, PHP, Objective-C, and Rust.
+- **Broad Language Support**: Currently supports C, C++, Java, Python, Go, Swift, PHP, Objective-C, Rust, JavaScript, and TypeScript.
 - **Developer Friendly**: JSONL output for easy integration with CI/CD pipelines and security tools.
 - **Cross-Platform**: Native binaries for macOS, Linux, and Windows.
 
@@ -52,11 +52,11 @@ cipherscope [OPTIONS]
 
 - `-r, --roots <PATHS>`: One or more root directories to scan (default: `.`).
 - `-e, --exclude <GLOBS>`: Glob patterns to exclude from the scan (e.g., `vendor/**`).
-- `-p, --patterns <PATH>`: Path to the `patterns.toml` file (default: `patterns.toml`).
+- `-p, --patterns <PATH>`: Path to a custom `patterns.toml` file (default: patterns embedded in the binary).
 - `-o, --output <PATH>`: Output file path for JSONL results (default: stdout).
 - `--threads <NUM>`: Maximum number of parallel threads to use.
 - `-v, --progress`: Enable progress bars for discovery and scanning.
-- `--gitignore`: Respect `.gitignore` files (default: true).
+- `--gitignore[=<BOOL>]`: Respect `.gitignore` files (default: true; use `--gitignore=false` to disable).
 - `--max-file-mb <MB>`: Skip files larger than this size in megabytes (default: 1).
 
 ### Examples

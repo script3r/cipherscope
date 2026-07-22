@@ -1,7 +1,7 @@
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, bail};
 use regex::{Regex, RegexSet};
 use serde::Deserialize;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Language {
@@ -16,6 +16,41 @@ pub enum Language {
     Rust,
     JavaScript,
     TypeScript,
+}
+
+impl Language {
+    pub const fn is_enabled(self) -> bool {
+        match self {
+            Self::C => cfg!(feature = "lang-c"),
+            Self::Cpp => cfg!(feature = "lang-cpp"),
+            Self::Java => cfg!(feature = "lang-java"),
+            Self::Python => cfg!(feature = "lang-python"),
+            Self::Go => cfg!(feature = "lang-go"),
+            Self::Swift => cfg!(feature = "lang-swift"),
+            Self::Php => cfg!(feature = "lang-php"),
+            Self::Objc => cfg!(feature = "lang-objc"),
+            Self::Rust => cfg!(feature = "lang-rust"),
+            Self::JavaScript => cfg!(feature = "lang-javascript"),
+            Self::TypeScript => cfg!(feature = "lang-typescript"),
+        }
+    }
+
+    fn from_pattern_name(name: &str) -> Option<Self> {
+        match name {
+            "C" => Some(Self::C),
+            "C++" => Some(Self::Cpp),
+            "Java" => Some(Self::Java),
+            "Python" => Some(Self::Python),
+            "Go" => Some(Self::Go),
+            "Swift" => Some(Self::Swift),
+            "PHP" => Some(Self::Php),
+            "ObjC" => Some(Self::Objc),
+            "Rust" => Some(Self::Rust),
+            "JavaScript" => Some(Self::JavaScript),
+            "TypeScript" => Some(Self::TypeScript),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -131,27 +166,18 @@ impl PatternSet {
     pub fn from_toml(text: &str) -> Result<Self> {
         let raw: RawPatternSet = toml::from_str(text).context("parse patterns.toml")?;
         let mut libraries = Vec::new();
+        let mut library_names = HashSet::new();
         for lib in raw.library {
             let languages = lib
                 .languages
                 .into_iter()
-                .filter_map(|s| match s.as_str() {
-                    "C" => Some(Language::C),
-                    "C++" => Some(Language::Cpp),
-                    "Java" => Some(Language::Java),
-                    "Python" => Some(Language::Python),
-                    "Go" => Some(Language::Go),
-                    "Swift" => Some(Language::Swift),
-                    "PHP" => Some(Language::Php),
-                    "ObjC" => Some(Language::Objc),
-                    "Rust" => Some(Language::Rust),
-                    "JavaScript" => Some(Language::JavaScript),
-                    "TypeScript" => Some(Language::TypeScript),
-                    _ => None,
-                })
+                .filter_map(|name| Language::from_pattern_name(&name))
                 .collect::<Vec<_>>();
             if languages.is_empty() {
                 continue;
+            }
+            if !library_names.insert(lib.name.clone()) {
+                bail!("duplicate library name {:?}", lib.name);
             }
             let mut include_regexes = Vec::new();
             let mut api_regexes = Vec::new();
@@ -330,7 +356,7 @@ impl PatternSet {
     }
 
     pub fn supports_language(&self, lang: Language) -> bool {
-        self.libraries.iter().any(|l| l.languages.contains(&lang))
+        lang.is_enabled() && self.libraries.iter().any(|l| l.languages.contains(&lang))
     }
 }
 
@@ -349,5 +375,32 @@ fn toml_value_to_json(v: toml::Value) -> serde_json::Value {
                 .collect(),
         ),
         toml::Value::Datetime(dt) => serde_json::Value::String(dt.to_string()),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::PatternSet;
+
+    #[test]
+    fn rejects_duplicate_library_names() {
+        let error = PatternSet::from_toml(
+            r#"
+[[library]]
+name = "Example"
+languages = ["Rust"]
+
+[[library]]
+name = "Example"
+languages = ["Go"]
+"#,
+        )
+        .unwrap_err();
+
+        assert!(
+            error
+                .to_string()
+                .contains("duplicate library name \"Example\"")
+        );
     }
 }

@@ -21,10 +21,13 @@ jobs:
 
 
       - name: Check formatting
-        run: cargo fmt -- --check
+        run: cargo fmt --all -- --check
 
       - name: Lint code
-        run: cargo clippy -- -D warnings
+        run: cargo clippy --all-targets --all-features -- -D warnings
 
-      - name: Run tests
-        run: cargo test --verbose
+      - name: Run all-feature tests
+        run: cargo test --all-features --verbose
+
+      - name: Run minimal-feature tests
+        run: cargo test --no-default-features --verbose

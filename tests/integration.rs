@@ -3,7 +3,9 @@ use std::{
     path::{Path, PathBuf},
     process::Command,
 };
-use tempfile::{NamedTempFile, TempDir};
+use tempfile::NamedTempFile;
+#[cfg(feature = "lang-rust")]
+use tempfile::TempDir;
 
 fn normalize_path_in_value(mut v: serde_json::Value) -> serde_json::Value {
     if let Some(obj) = v.as_object_mut()
@@ -49,6 +51,9 @@ fn should_skip_family(family: &str) -> bool {
         "swift" => !cfg!(feature = "lang-swift"),
         "php" => !cfg!(feature = "lang-php"),
         "objc" | "objective-c" => !cfg!(feature = "lang-objc"),
+        "openssl_c" => !cfg!(feature = "lang-c") || !cfg!(feature = "lang-cpp"),
+        "cpp" => !cfg!(feature = "lang-cpp"),
+        "rust" => !cfg!(feature = "lang-rust"),
         "javascript" | "js" => !cfg!(feature = "lang-javascript"),
         "typescript" | "ts" => !cfg!(feature = "lang-typescript"),
         _ => false,
@@ -131,6 +136,7 @@ fn fixtures_match_ground_truth() {
     }
 }
 
+#[cfg(feature = "lang-go")]
 #[test]
 fn exclude_works() {
     let repo_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
@@ -170,6 +176,7 @@ fn exclude_works() {
     assert_eq!(actual, expected);
 }
 
+#[cfg(feature = "lang-go")]
 #[test]
 fn multiple_roots_work() {
     let repo_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
@@ -208,6 +215,7 @@ fn multiple_roots_work() {
     assert_eq!(actual, expected1);
 }
 
+#[cfg(feature = "lang-rust")]
 #[test]
 fn max_file_mb_skips_large_files() {
     let repo_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
@@ -279,16 +287,142 @@ symbol_patterns = ["test_algo"]
 
 #[test]
 fn javascript_extension_detection() {
-    // This test verifies JavaScript support is available
-    // by checking that the feature flag is enabled
-    #[cfg(not(feature = "lang-javascript"))]
-    compile_error!("lang-javascript feature must be enabled");
+    let detected = cipherscope::scan::language_from_path(Path::new("example.js"));
+    if cfg!(feature = "lang-javascript") {
+        assert_eq!(detected, Some(cipherscope::patterns::Language::JavaScript));
+    } else {
+        assert_eq!(detected, None);
+    }
 }
 
 #[test]
 fn typescript_extension_detection() {
-    // This test verifies TypeScript support is available
-    // by checking that the feature flag is enabled
-    #[cfg(not(feature = "lang-typescript"))]
-    compile_error!("lang-typescript feature must be enabled");
+    let detected = cipherscope::scan::language_from_path(Path::new("example.ts"));
+    if cfg!(feature = "lang-typescript") {
+        assert_eq!(detected, Some(cipherscope::patterns::Language::TypeScript));
+    } else {
+        assert_eq!(detected, None);
+    }
+}
+
+#[test]
+fn zero_threads_is_rejected() {
+    let output = Command::new(env!("CARGO_BIN_EXE_cipherscope"))
+        .args(["--threads", "0"])
+        .output()
+        .unwrap();
+
+    assert!(!output.status.success());
+    assert!(String::from_utf8_lossy(&output.stderr).contains("at least 1"));
+}
+
+#[cfg(feature = "lang-rust")]
+#[test]
+fn source_shaped_output_is_not_scanned() {
+    let tmp_dir = TempDir::new().unwrap();
+    let root = tmp_dir.path();
+    let patterns_path = root.join("patterns.toml");
+    fs::write(
+        &patterns_path,
+        r#"
+[[library]]
+name = "TestLib"
+languages = ["Rust"]
+[library.patterns]
+include = ["TestLib"]
+
+[[library.algorithms]]
+name = "TEST-ALG"
+primitive = "test"
+symbol_patterns = ["test_algo"]
+"#,
+    )
+    .unwrap();
+    fs::write(
+        root.join("input.rs"),
+        "use TestLib;\nfn main() { test_algo(); }\n",
+    )
+    .unwrap();
+    let output_path = root.join("findings.rs");
+
+    let output = Command::new(env!("CARGO_BIN_EXE_cipherscope"))
+        .args([
+            "--roots",
+            root.to_str().unwrap(),
+            "--patterns",
+            patterns_path.to_str().unwrap(),
+            "--output",
+            output_path.to_str().unwrap(),
+        ])
+        .output()
+        .unwrap();
+
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert_eq!(read_jsonl(&output_path).len(), 2);
+}
+
+#[cfg(feature = "lang-rust")]
+#[test]
+fn gitignore_can_be_disabled() {
+    let tmp_dir = TempDir::new().unwrap();
+    let root = tmp_dir.path();
+    fs::create_dir(root.join(".git")).unwrap();
+    fs::write(root.join(".gitignore"), "ignored.rs\n").unwrap();
+    fs::write(
+        root.join("ignored.rs"),
+        "use TestLib;\nfn main() { test_algo(); }\n",
+    )
+    .unwrap();
+    let patterns_path = root.join("patterns.toml");
+    fs::write(
+        &patterns_path,
+        r#"
+[[library]]
+name = "TestLib"
+languages = ["Rust"]
+[library.patterns]
+include = ["TestLib"]
+
+[[library.algorithms]]
+name = "TEST-ALG"
+primitive = "test"
+symbol_patterns = ["test_algo"]
+"#,
+    )
+    .unwrap();
+
+    let default_output = NamedTempFile::new().unwrap();
+    let status = Command::new(env!("CARGO_BIN_EXE_cipherscope"))
+        .args([
+            "--roots",
+            root.to_str().unwrap(),
+            "--patterns",
+            patterns_path.to_str().unwrap(),
+            "--output",
+            default_output.path().to_str().unwrap(),
+        ])
+        .status()
+        .unwrap();
+    assert!(status.success());
+    assert!(read_jsonl(default_output.path()).is_empty());
+
+    let unignored_output = NamedTempFile::new().unwrap();
+    let status = Command::new(env!("CARGO_BIN_EXE_cipherscope"))
+        .args([
+            "--roots",
+            root.to_str().unwrap(),
+            "--patterns",
+            patterns_path.to_str().unwrap(),
+            "--output",
+            unignored_output.path().to_str().unwrap(),
+            "--gitignore=false",
+        ])
+        .status()
+        .unwrap();
+    assert!(status.success());
+    assert_eq!(read_jsonl(unignored_output.path()).len(), 2);
 }

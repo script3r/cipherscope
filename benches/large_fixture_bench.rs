@@ -76,7 +76,9 @@ fn bench_large_fixture(c: &mut Criterion) {
     group.measurement_time(Duration::from_secs(10));
     group.throughput(Throughput::Bytes(total_bytes));
 
-    let max_cpus = num_cpus::get();
+    let max_cpus = std::thread::available_parallelism()
+        .map(usize::from)
+        .unwrap_or(1);
     let thread_counts: Vec<usize> = vec![1, max_cpus]
         .into_iter()
         .filter(|&t| t > 0 && t <= max_cpus)
@@ -151,7 +153,9 @@ fn bench_nested_directories(c: &mut Criterion) {
     group.measurement_time(Duration::from_secs(10));
     group.throughput(Throughput::Elements(total_files as u64));
 
-    let threads = num_cpus::get();
+    let threads = std::thread::available_parallelism()
+        .map(usize::from)
+        .unwrap_or(1);
     group.bench_function("scan", |b| {
         b.iter_custom(|iters| {
             let mut total = Duration::ZERO;

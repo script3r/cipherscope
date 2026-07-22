@@ -61,7 +61,14 @@ fn bench_scan_large(c: &mut Criterion) {
                 Some(parsed)
             }
         })
-        .unwrap_or_else(|| vec![1usize, num_cpus::get()]);
+        .unwrap_or_else(|| {
+            vec![
+                1usize,
+                std::thread::available_parallelism()
+                    .map(usize::from)
+                    .unwrap_or(1),
+            ]
+        });
     for threads in thread_counts {
         group.bench_with_input(
             BenchmarkId::new("fixture", threads),
