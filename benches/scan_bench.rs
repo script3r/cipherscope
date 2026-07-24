@@ -36,7 +36,12 @@ fn bench_scan(c: &mut Criterion) {
     group.sample_size(10);
     group.measurement_time(Duration::from_secs(10));
 
-    let thread_counts = [1usize, num_cpus::get()];
+    let thread_counts = [
+        1usize,
+        std::thread::available_parallelism()
+            .map(usize::from)
+            .unwrap_or(1),
+    ];
     for threads in thread_counts {
         group.bench_with_input(
             BenchmarkId::new("fixtures", threads),

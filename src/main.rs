@@ -4,8 +4,8 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
-use ahash::{AHashMap as HashMap, AHashSet as HashSet};
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, anyhow};
+use cipherscope::{DEFAULT_PATTERNS, Finding, patterns, scan, scan_with_patterns};
 use clap::Parser;
 use crossbeam_channel as channel;
 use ignore::WalkBuilder;
@@ -14,12 +14,6 @@ use ignore::types::TypesBuilder;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use memmap2::Mmap;
 use rayon::prelude::*;
-use serde::Serialize;
-
-mod patterns;
-mod scan;
-
-const DEFAULT_PATTERNS: &str = include_str!("../patterns.toml");
 
 #[derive(Parser, Debug)]
 #[command(
@@ -45,7 +39,7 @@ struct Cli {
     output: String,
 
     /// Max parallelism
-    #[arg(long, default_value_t = num_cpus::get())]
+    #[arg(long, default_value_t = default_thread_count(), value_parser = parse_thread_count)]
     threads: usize,
 
     /// Show progress bars
@@ -53,7 +47,14 @@ struct Cli {
     progress: bool,
 
     /// Respect .gitignore files (enabled by default)
-    #[arg(long, default_value = "true")]
+    #[arg(
+        long,
+        default_value_t = true,
+        action = clap::ArgAction::Set,
+        num_args = 0..=1,
+        default_missing_value = "true",
+        value_name = "BOOL"
+    )]
     gitignore: bool,
 
     /// Skip files larger than this many megabytes
@@ -61,25 +62,20 @@ struct Cli {
     max_file_mb: Option<u64>,
 }
 
-#[derive(Serialize, Clone)]
-struct Evidence {
-    line: usize,
-    column: usize,
+fn default_thread_count() -> usize {
+    std::thread::available_parallelism()
+        .map(usize::from)
+        .unwrap_or(1)
 }
 
-#[derive(Serialize, Clone)]
-struct Finding {
-    #[serde(rename = "assetType")]
-    asset_type: String,
-    identifier: String,
-    path: String,
-    evidence: Evidence,
-    #[serde(skip_serializing_if = "map_is_empty")]
-    metadata: HashMap<String, serde_json::Value>,
-}
-
-fn map_is_empty(m: &HashMap<String, serde_json::Value>) -> bool {
-    m.is_empty()
+fn parse_thread_count(value: &str) -> std::result::Result<usize, String> {
+    let threads = value
+        .parse::<usize>()
+        .map_err(|_| "thread count must be a positive integer".to_string())?;
+    if threads == 0 {
+        return Err("thread count must be at least 1".to_string());
+    }
+    Ok(threads)
 }
 
 /// Main entry point for the scanner.
@@ -98,7 +94,7 @@ fn main() -> Result<()> {
     rayon::ThreadPoolBuilder::new()
         .num_threads(cli.threads)
         .build_global()
-        .ok();
+        .context("configure scanner thread pool")?;
 
     let patterns_text = if let Some(path) = cli.patterns.as_ref() {
         std::fs::read_to_string(path)
@@ -142,20 +138,22 @@ fn main() -> Result<()> {
         pb
     });
 
-    // Use an unbounded channel to avoid deadlocks
-    // We'll rely on the file processing being the bottleneck, not the writer
-    let (tx, rx) = channel::unbounded::<Finding>();
-    let output_path = cli.output.clone();
+    // Bounded queues apply backpressure when discovery or scanning outruns its consumer.
+    let queue_capacity = cli.threads.saturating_mul(4).max(1);
+    let (tx, rx) = channel::bounded::<Finding>(queue_capacity);
+    let (writer, output_scan_path): (Box<dyn Write + Send>, Option<PathBuf>) = if cli.output == "-"
+    {
+        (Box::new(std::io::stdout()), None)
+    } else {
+        let file = File::create(&cli.output).with_context(|| format!("create {}", cli.output))?;
+        let output_scan_path = std::fs::canonicalize(&cli.output)
+            .with_context(|| format!("resolve output path: {}", cli.output))?;
+        (Box::new(BufWriter::new(file)), Some(output_scan_path))
+    };
     let found_count_writer = found_count.clone();
     let scan_bar_writer = scan_bar.clone();
     let writer_handle = std::thread::spawn(move || -> Result<()> {
-        let mut writer: Box<dyn Write> = if output_path == "-" {
-            Box::new(std::io::stdout())
-        } else {
-            let f =
-                File::create(&output_path).with_context(|| format!("create {}", output_path))?;
-            Box::new(BufWriter::new(f))
-        };
+        let mut writer = writer;
         for finding in rx.iter() {
             serde_json::to_writer(&mut writer, &finding)?;
             writer.write_all(b"\n")?;
@@ -171,7 +169,7 @@ fn main() -> Result<()> {
 
     // Streaming architecture: WalkBuilder sends files to channel, rayon workers process immediately
     // This eliminates the mutex contention and synchronous barrier of collect-then-process
-    let (file_tx, file_rx) = channel::unbounded::<PathBuf>();
+    let (file_tx, file_rx) = channel::bounded::<PathBuf>(queue_capacity);
     let patterns_for_discovery = patterns.clone();
     let file_count_discovery = file_count.clone();
     let skipped_oversize_discovery = skipped_oversize_count.clone();
@@ -270,9 +268,19 @@ fn main() -> Result<()> {
             let file_count = file_count_discovery.clone();
             let discovery_bar = discovery_bar.clone();
             let skipped_oversize = skipped_oversize_discovery.clone();
+            let output_scan_path = output_scan_path.clone();
             Box::new(move |entry| {
                 match entry {
                     Ok(e) if e.file_type().map(|t| t.is_file()).unwrap_or(false) => {
+                        // Never scan the output while it is being written, even if it has a
+                        // supported source extension and lives below a requested root.
+                        if output_scan_path.as_ref().is_some_and(|output| {
+                            e.path().file_name() == output.file_name()
+                                && e.path().canonicalize().is_ok_and(|path| path == *output)
+                        }) {
+                            return ignore::WalkState::Continue;
+                        }
+
                         // Skip files larger than the configured limit (if any)
                         if let (Some(limit), Ok(meta)) = (max_bytes, e.metadata())
                             && meta.len() > limit
@@ -325,10 +333,16 @@ fn main() -> Result<()> {
     }
 
     // Wait for all scanning to complete
-    scanner_handle.join().expect("scanner thread panicked");
+    scanner_handle
+        .join()
+        .map_err(|_| anyhow!("scanner thread panicked"))?;
 
     // All files have been processed
     drop(tx);
+
+    writer_handle
+        .join()
+        .map_err(|_| anyhow!("writer thread panicked"))??;
 
     if let Some(pb) = &scan_bar {
         pb.finish_with_message(format!(
@@ -337,8 +351,6 @@ fn main() -> Result<()> {
             found_count.load(Ordering::Relaxed)
         ));
     }
-
-    writer_handle.join().unwrap()?;
 
     if !cli.progress && cli.output != "-" {
         eprintln!(
@@ -369,6 +381,9 @@ fn process_file(
     tx: &channel::Sender<Finding>,
 ) -> Result<()> {
     let file = File::open(path).with_context(|| format!("open {}", path.display()))?;
+    if file.metadata()?.len() == 0 {
+        return Ok(());
+    }
     let mmap = unsafe { Mmap::map(&file)? };
     // Decode file contents safely; fall back to lossy if not valid UTF-8 to avoid UB
     let content_owned;
@@ -380,81 +395,12 @@ fn process_file(
         }
     };
 
-    // Avoid per-file canonicalize overhead; preserve original path for output
-    let absolute_path = path.to_path_buf();
-
     let Some(lang) = scan::language_from_path(path) else {
         return Ok(());
     };
-    if !scan::has_anchor_hint(lang, content, patterns) {
-        return Ok(());
-    }
-
-    let tree = scan::parse(lang, content)?;
-
-    // 1) library anchors
-    let lib_hits = scan::find_library_anchors(lang, content, &tree, patterns);
-    if lib_hits.is_empty() {
-        return Ok(());
-    }
-
-    let mut seen: HashSet<String> = HashSet::new();
-    let mut alg_hits_all = Vec::new();
-
-    for lib in lib_hits {
-        let evidence = Evidence {
-            line: lib.line,
-            column: lib.column,
-        };
-        let finding = Finding {
-            asset_type: "library".to_string(),
-            identifier: lib.library_name.to_string(),
-            path: absolute_path.to_string_lossy().to_string(),
-            evidence,
-            metadata: HashMap::new(),
-        };
-        let key = format!("lib|{}", finding.identifier);
-        if seen.insert(key) {
-            // Use blocking send but log if it takes too long
-            if let Err(e) = tx.send(finding) {
-                eprintln!("error: writer thread has stopped: {}", e);
-                return Ok(());
-            }
-        }
-
-        // 2) algorithms for this library
-        let alg_hits = scan::find_algorithms(lang, content, &tree, patterns, lib.library_name);
-        alg_hits_all.extend(alg_hits);
-    }
-
-    let alg_hits_all = scan::dedupe_more_specific_hits(alg_hits_all);
-    for alg in alg_hits_all {
-        let mut metadata = HashMap::new();
-        for (k, v) in alg.metadata {
-            metadata.insert(k.to_string(), v);
-        }
-        let evidence = Evidence {
-            line: alg.line,
-            column: alg.column,
-        };
-        let finding = Finding {
-            asset_type: "algorithm".to_string(),
-            identifier: alg.algorithm_name.to_string(),
-            path: absolute_path.to_string_lossy().to_string(),
-            evidence,
-            metadata,
-        };
-        let key = format!(
-            "alg|{}|{}:{}",
-            finding.identifier, finding.evidence.line, finding.evidence.column
-        );
-        if seen.insert(key) {
-            // Use blocking send but log if it takes too long
-            if let Err(e) = tx.send(finding) {
-                eprintln!("error: writer thread has stopped: {}", e);
-                return Ok(());
-            }
-        }
+    let source_label = path.to_string_lossy();
+    for finding in scan_with_patterns(content, lang, &source_label, patterns)? {
+        tx.send(finding).context("writer thread stopped")?;
     }
 
     Ok(())

@@ -57,7 +57,9 @@ fn bench_thread_scaling(c: &mut Criterion) {
     let roots = vec![fixture_path.clone()];
 
     // Thread counts to test
-    let max_cpus = num_cpus::get();
+    let max_cpus = std::thread::available_parallelism()
+        .map(usize::from)
+        .unwrap_or(1);
     let thread_counts: Vec<usize> = if is_extended() {
         vec![1, 2, 4, 8, 16, 32, 64]
             .into_iter()

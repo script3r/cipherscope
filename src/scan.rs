@@ -1,18 +1,20 @@
 use ahash::{AHashMap as HashMap, AHashSet as HashSet};
 use anyhow::{Context, Result};
-use tree_sitter::{Language as TsLanguage, Node, Parser, Point, Tree};
+use std::ops::ControlFlow;
+use std::time::{Duration, Instant};
+use tree_sitter::{Language as TsLanguage, Node, ParseOptions, Parser, Point, Tree};
 
 use crate::patterns::{Language, ParameterPattern, PatternSet};
 
 macro_rules! define_ts_lang {
     ($name:ident, $feature:literal, $grammar:expr) => {
         #[cfg(feature = $feature)]
-        fn $name() -> TsLanguage {
-            $grammar.into()
+        fn $name() -> Result<TsLanguage> {
+            Ok($grammar.into())
         }
         #[cfg(not(feature = $feature))]
-        fn $name() -> TsLanguage {
-            unreachable!(concat!($feature, " feature disabled"))
+        fn $name() -> Result<TsLanguage> {
+            anyhow::bail!(concat!($feature, " feature is disabled"))
         }
     };
 }
@@ -57,21 +59,24 @@ pub struct AlgorithmHit<'a> {
 
 pub fn language_from_path(path: &std::path::Path) -> Option<Language> {
     let ext = path.extension()?.to_str()?.to_ascii_lowercase();
-    match ext.as_str() {
-        "c" => Some(Language::C),
-        "h" => Some(Language::Cpp), // Parse .h as C++ since it's backwards compatible with C
-        "cc" | "cpp" | "cxx" | "hpp" | "hh" | "hxx" => Some(Language::Cpp),
-        "java" => Some(Language::Java),
-        "py" => Some(Language::Python),
-        "go" => Some(Language::Go),
-        "swift" => Some(Language::Swift),
-        "php" | "hack" => Some(Language::Php),
-        "m" | "mm" => Some(Language::Objc),
-        "rs" => Some(Language::Rust),
-        "js" | "mjs" | "cjs" | "jsx" => Some(Language::JavaScript),
-        "ts" | "mts" | "cts" | "tsx" => Some(Language::TypeScript),
-        _ => None,
-    }
+    let language = match ext.as_str() {
+        "c" => Language::C,
+        // Prefer the C++ grammar for ambiguous headers, but keep C-only builds useful.
+        "h" if Language::Cpp.is_enabled() => Language::Cpp,
+        "h" => Language::C,
+        "cc" | "cpp" | "cxx" | "hpp" | "hh" | "hxx" => Language::Cpp,
+        "java" => Language::Java,
+        "py" => Language::Python,
+        "go" => Language::Go,
+        "swift" => Language::Swift,
+        "php" | "hack" => Language::Php,
+        "m" | "mm" => Language::Objc,
+        "rs" => Language::Rust,
+        "js" | "mjs" | "cjs" | "jsx" => Language::JavaScript,
+        "ts" | "mts" | "cts" | "tsx" => Language::TypeScript,
+        _ => return None,
+    };
+    language.is_enabled().then_some(language)
 }
 
 /// Parses the given string content into a `tree-sitter` syntax tree.
@@ -82,26 +87,37 @@ pub fn language_from_path(path: &std::path::Path) -> Option<Language> {
 pub fn parse(lang: Language, content: &str) -> Result<Tree> {
     let mut parser = Parser::new();
     let ts_lang = match lang {
-        Language::C => ts_lang_c(),
-        Language::Cpp => ts_lang_cpp(),
-        Language::Java => ts_lang_java(),
-        Language::Python => ts_lang_python(),
-        Language::Go => ts_lang_go(),
-        Language::Swift => ts_lang_swift(),
-        Language::Php => ts_lang_php(),
-        Language::Objc => ts_lang_objc(),
-        Language::Rust => ts_lang_rust(),
-        Language::JavaScript => ts_lang_javascript(),
-        Language::TypeScript => ts_lang_typescript(),
+        Language::C => ts_lang_c()?,
+        Language::Cpp => ts_lang_cpp()?,
+        Language::Java => ts_lang_java()?,
+        Language::Python => ts_lang_python()?,
+        Language::Go => ts_lang_go()?,
+        Language::Swift => ts_lang_swift()?,
+        Language::Php => ts_lang_php()?,
+        Language::Objc => ts_lang_objc()?,
+        Language::Rust => ts_lang_rust()?,
+        Language::JavaScript => ts_lang_javascript()?,
+        Language::TypeScript => ts_lang_typescript()?,
     };
     parser.set_language(&ts_lang).context("set language")?;
 
-    // Allow deprecated method for now - the new API is more complex
-    // and the current method works fine for our needs
-    #[allow(deprecated)]
-    parser.set_timeout_micros(5_000_000); // 5 second timeout
-
-    parser.parse(content, None).context("parse")
+    let deadline = Instant::now() + Duration::from_secs(5);
+    let mut progress = |_state: &tree_sitter::ParseState| {
+        if Instant::now() >= deadline {
+            ControlFlow::Break(())
+        } else {
+            ControlFlow::Continue(())
+        }
+    };
+    let options = ParseOptions::new().progress_callback(&mut progress);
+    let bytes = content.as_bytes();
+    parser
+        .parse_with_options(
+            &mut |offset, _| bytes.get(offset..).unwrap_or_default(),
+            None,
+            Some(options),
+        )
+        .context("parse")
 }
 
 /// Scans the AST to find "library anchors" which are top-level import-like
@@ -628,11 +644,8 @@ fn import_like_nodes<'a>(lang: Language, root: Node<'a>, content: &[u8]) -> Vec<
         if is_import {
             nodes.push(node);
         }
-        for i in 0..node.child_count() {
-            if let Some(child) = node.child(i) {
-                stack.push(child);
-            }
-        }
+        let mut cursor = node.walk();
+        stack.extend(node.children(&mut cursor));
     }
     nodes
 }
@@ -703,11 +716,8 @@ fn code_symbol_nodes<'a>(lang: Language, root: Node<'a>) -> Vec<Node<'a>> {
         if interesting {
             nodes.push(node);
         }
-        for i in 0..node.child_count() {
-            if let Some(child) = node.child(i) {
-                stack.push(child);
-            }
-        }
+        let mut cursor = node.walk();
+        stack.extend(node.children(&mut cursor));
     }
     nodes
 }
@@ -816,9 +826,9 @@ fn is_more_specific(specific: &str, generic: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        AlgorithmHit, dedupe_more_specific_hits, find_library_anchors, has_anchor_hint, parse,
-    };
+    #[cfg(feature = "lang-python")]
+    use super::find_library_anchors;
+    use super::{AlgorithmHit, dedupe_more_specific_hits, has_anchor_hint, parse};
     use crate::patterns::{Language, PatternSet};
     use ahash::AHashMap as HashMap;
     use serde_json::Value;
@@ -1006,6 +1016,19 @@ apis = ["testlib\\.crypto"]
     }
 
     #[test]
+    fn c_headers_use_an_enabled_grammar() {
+        let detected = super::language_from_path(std::path::Path::new("example.h"));
+        if cfg!(feature = "lang-cpp") {
+            assert_eq!(detected, Some(Language::Cpp));
+        } else if cfg!(feature = "lang-c") {
+            assert_eq!(detected, Some(Language::C));
+        } else {
+            assert_eq!(detected, None);
+        }
+    }
+
+    #[cfg(feature = "lang-python")]
+    #[test]
     fn find_library_anchors_uses_import_nodes() {
         let patterns = patterns_from_toml(
             r#"
@@ -1025,6 +1048,7 @@ include = ["testlib"]
         assert_eq!(hits[0].column, 1);
     }
 
+    #[cfg(feature = "lang-python")]
     #[test]
     fn find_library_anchors_falls_back_to_api_regex() {
         let patterns = patterns_from_toml(
@@ -1043,5 +1067,16 @@ apis = ["CryptoLib"]
         assert_eq!(hits[0].library_name, "TestLib");
         assert_eq!(hits[0].line, 1);
         assert_eq!(hits[0].column, 1);
+    }
+
+    #[cfg(not(feature = "lang-python"))]
+    #[test]
+    fn parsing_a_disabled_language_returns_an_error() {
+        let error = parse(Language::Python, "print('hello')").unwrap_err();
+        assert!(
+            error
+                .to_string()
+                .contains("lang-python feature is disabled")
+        );
     }
 }

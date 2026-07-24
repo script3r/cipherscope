@@ -51,7 +51,9 @@ fn bench_file_sizes(c: &mut Criterion) {
     group.sample_size(10);
     group.measurement_time(Duration::from_secs(5));
 
-    let threads = num_cpus::get();
+    let threads = std::thread::available_parallelism()
+        .map(usize::from)
+        .unwrap_or(1);
 
     for size_kb in sizes_kb {
         let config = FixtureConfig {
