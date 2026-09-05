@@ -203,6 +203,7 @@ dependencies = [
  "indicatif",
  "rayon",
  "regex",
+ "regex-syntax",
  "serde",
  "serde_json",
  "tempfile",
