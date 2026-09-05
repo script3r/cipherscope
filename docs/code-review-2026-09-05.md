@@ -40,8 +40,9 @@ The first is classified as a vulnerability; the other two are informational
 unsoundness advisories. Reachability of the affected dependency functions from the
 scanner has not been established. Source inspection found no direct calls to the
 affected `anyhow` or `memmap2` APIs. The patched lockfile passes `cargo audit --deny
-warnings`. PR #14 removes memmap2 entirely; this PR patches it so it can also be
-reviewed and merged independently.
+warnings`. PR #14 has merged and removed memmap2 entirely. This PR retains that
+removal and patches the remaining anyhow and crossbeam-epoch dependencies; the
+combined lockfile contains 135 dependencies.
 
 ## Remaining issues and follow-up acceptance criteria
 
@@ -91,13 +92,12 @@ C-only and TypeScript-only suites. Rust 1.88 all-target/all-feature compilation,
 `actionlint`, and the patched dependency audit pass locally. Expanded CI exercises
 the other platforms and parser combinations on GitHub.
 
-All five PRs target main. Review #14 first for its deliberate output behavior
-change: it requires a writable destination directory, rejects source/symlink
+PRs #14–#17 have merged into main. PR #14 changed output behavior:
+it requires a writable destination directory, rejects source/symlink
 destinations, and preserves previous file output when scanning fails. #17 adds a
 public `Language::Tsx` variant. #16 rejects configuration previously ignored.
 The workflow changes do not publish a release during this review; the live release
 upload and crates.io publication path remains unexecuted.
 
-The I/O and dependency PRs both touch memmap2. When combining them, retain its
-removal and retain the patched anyhow/crossbeam-epoch versions. Other changes are
-intended to remain independently reviewable.
+PR #18 includes the latest main and resolves the dependency conflicts by retaining
+the removal of memmap2 and the patched anyhow/crossbeam-epoch versions.

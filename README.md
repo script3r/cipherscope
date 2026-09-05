@@ -30,8 +30,15 @@
     c.  **Anchoring**: The scanner looks for "library anchors" (e.g., `import` or `#include` statements) that match known cryptographic libraries defined in `patterns.toml`.
     d.  **Algorithm Detection**: If an anchor is found, the scanner performs a deeper search within that file for specific algorithm usage patterns, such as function calls and constants.
 
-All results are streamed as JSONL to the output, allowing for real-time monitoring and processing.
+Findings are streamed as JSONL to stdout for monitoring and processing.
 For a deeper architecture overview, see `DESIGN.md`.
+
+The CLI exits unsuccessfully if discovery, reading, parsing, or writing fails;
+diagnostics go to stderr. Stdout may contain partial findings on failure. With
+`--output`, results are staged beside the destination and replace it only after a
+successful scan, preserving any previous inventory on failure. Output must be a
+regular file, and existing source files or the custom patterns file cannot be
+used as the destination. The destination directory must be writable.
 
 ## Installation
 
@@ -109,6 +116,8 @@ The output is a stream of JSONL objects, where each object represents a single f
 - **Algorithms**: Symbols and function calls associated with specific algorithms (e.g., "AES-GCM") within a library.
 
 You can customize this file to add support for new libraries or improve detection for existing ones.
+See [pattern configuration](docs/pattern-schema.md) for accepted fields, language
+names, and validation behavior.
 
 ## Development
 

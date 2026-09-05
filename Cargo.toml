@@ -14,6 +14,7 @@ include = [
     "benches/**",
     "fixtures/**",
     "tests/**",
+    "docs/**",
     "patterns.toml",
     "Cargo.toml",
     "README.md",
@@ -27,9 +28,10 @@ anyhow = "1.0.103"
 ahash = { version = "0.8", features = ["serde"] }
 clap = { version = "4.5", features = ["derive"] }
 ignore = "0.4"
-memmap2 = "0.9.11"
+tempfile = "3.10"
 rayon = "1.10"
 regex = { version = "1.11", default-features = false, features = ["std", "unicode-perl"] }
+regex-syntax = { version = "0.8", default-features = false, features = ["std", "unicode-perl"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 toml = "1.1"
@@ -64,7 +66,6 @@ lang-typescript = ["tree-sitter-typescript"]
 
 [dev-dependencies]
 assert_cmd = "2.0"
-tempfile = "3.10"
 criterion = "0.8"
 
 [[bench]]
