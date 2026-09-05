@@ -51,7 +51,7 @@ fn should_skip_family(family: &str) -> bool {
         "swift" => !cfg!(feature = "lang-swift"),
         "php" => !cfg!(feature = "lang-php"),
         "objc" | "objective-c" => !cfg!(feature = "lang-objc"),
-        "openssl_c" => !cfg!(feature = "lang-c") || !cfg!(feature = "lang-cpp"),
+        "openssl_c" => !cfg!(feature = "lang-c"),
         "cpp" => !cfg!(feature = "lang-cpp"),
         "rust" => !cfg!(feature = "lang-rust"),
         "javascript" | "js" => !cfg!(feature = "lang-javascript"),
