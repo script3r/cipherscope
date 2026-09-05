@@ -1,10 +1,10 @@
 use std::fs::File;
-use std::io::{BufWriter, Write};
+use std::io::{BufWriter, Read, Write};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
-use anyhow::{Context, Result, anyhow};
+use anyhow::{Context, Result, anyhow, bail};
 use cipherscope::{DEFAULT_PATTERNS, Finding, patterns, scan, scan_with_patterns};
 use clap::Parser;
 use crossbeam_channel as channel;
@@ -12,8 +12,8 @@ use ignore::WalkBuilder;
 use ignore::overrides::OverrideBuilder;
 use ignore::types::TypesBuilder;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
-use memmap2::Mmap;
 use rayon::prelude::*;
+use tempfile::NamedTempFile;
 
 #[derive(Parser, Debug)]
 #[command(
@@ -141,32 +141,6 @@ fn main() -> Result<()> {
     // Bounded queues apply backpressure when discovery or scanning outruns its consumer.
     let queue_capacity = cli.threads.saturating_mul(4).max(1);
     let (tx, rx) = channel::bounded::<Finding>(queue_capacity);
-    let (writer, output_scan_path): (Box<dyn Write + Send>, Option<PathBuf>) = if cli.output == "-"
-    {
-        (Box::new(std::io::stdout()), None)
-    } else {
-        let file = File::create(&cli.output).with_context(|| format!("create {}", cli.output))?;
-        let output_scan_path = std::fs::canonicalize(&cli.output)
-            .with_context(|| format!("resolve output path: {}", cli.output))?;
-        (Box::new(BufWriter::new(file)), Some(output_scan_path))
-    };
-    let found_count_writer = found_count.clone();
-    let scan_bar_writer = scan_bar.clone();
-    let writer_handle = std::thread::spawn(move || -> Result<()> {
-        let mut writer = writer;
-        for finding in rx.iter() {
-            serde_json::to_writer(&mut writer, &finding)?;
-            writer.write_all(b"\n")?;
-            let count = found_count_writer.fetch_add(1, Ordering::Relaxed) + 1;
-            if let Some(pb) = &scan_bar_writer {
-                pb.set_message(format!("Found {} cryptographic items", count));
-            }
-        }
-        // Flush any remaining buffered output
-        writer.flush()?;
-        Ok(())
-    });
-
     // Streaming architecture: WalkBuilder sends files to channel, rayon workers process immediately
     // This eliminates the mutex contention and synchronous barrier of collect-then-process
     let (file_tx, file_rx) = channel::bounded::<PathBuf>(queue_capacity);
@@ -231,18 +205,47 @@ fn main() -> Result<()> {
 
     let max_bytes = cli.max_file_mb.map(|mb| mb.saturating_mul(1024 * 1024));
 
+    // Validate all options before opening output or starting background threads.
+    let (writer, pending_output, output_scan_path) = prepare_output(&cli)?;
+    let error_count = Arc::new(AtomicUsize::new(0));
+    let cancelled = Arc::new(AtomicBool::new(false));
+    let found_count_writer = found_count.clone();
+    let scan_bar_writer = scan_bar.clone();
+    let cancelled_writer = cancelled.clone();
+    let writer_handle = std::thread::spawn(move || {
+        let result = write_findings(writer, rx, &found_count_writer, scan_bar_writer.as_ref());
+        if result.is_err() {
+            cancelled_writer.store(true, Ordering::Relaxed);
+        }
+        result
+    });
+
     // Spawn scanner workers that process files as they're discovered
     let scan_bar_for_workers = scan_bar.clone();
     let scanned_count_for_workers = scanned_count.clone();
     let patterns_for_workers = patterns.clone();
     let tx_for_workers = tx.clone();
+    let errors_for_workers = error_count.clone();
+    let cancelled_workers = cancelled.clone();
+    let skipped_for_workers = skipped_oversize_count.clone();
 
     // Use a thread to run the parallel scanner on the receiving end
     let scanner_handle = std::thread::spawn(move || {
         // Process files as they arrive from the channel
         file_rx.into_iter().par_bridge().for_each(|path| {
-            if let Err(err) = process_file(&path, &patterns_for_workers, &tx_for_workers) {
-                eprintln!("Error processing {}: {err:#}", path.display());
+            if cancelled_workers.load(Ordering::Relaxed) {
+                return;
+            }
+            match process_file(&path, &patterns_for_workers, &tx_for_workers, max_bytes) {
+                Ok(false) => {
+                    skipped_for_workers.fetch_add(1, Ordering::Relaxed);
+                    return;
+                }
+                Ok(true) => {}
+                Err(err) => {
+                    errors_for_workers.fetch_add(1, Ordering::Relaxed);
+                    eprintln!("Error processing {}: {err:#}", path.display());
+                }
             }
 
             scanned_count_for_workers.fetch_add(1, Ordering::Relaxed);
@@ -260,6 +263,7 @@ fn main() -> Result<()> {
         .git_exclude(cli.gitignore)
         .git_global(cli.gitignore)
         .follow_links(false)
+        .skip_stdout(true)
         .threads(cli.threads)
         .build_parallel()
         .run(|| {
@@ -269,7 +273,18 @@ fn main() -> Result<()> {
             let discovery_bar = discovery_bar.clone();
             let skipped_oversize = skipped_oversize_discovery.clone();
             let output_scan_path = output_scan_path.clone();
+            let errors = error_count.clone();
+            let cancelled = cancelled.clone();
             Box::new(move |entry| {
+                if cancelled.load(Ordering::Relaxed) {
+                    return ignore::WalkState::Quit;
+                }
+                if let Ok(entry) = &entry
+                    && let Some(err) = entry.error()
+                {
+                    errors.fetch_add(1, Ordering::Relaxed);
+                    eprintln!("walk error: {err}");
+                }
                 match entry {
                     Ok(e) if e.file_type().map(|t| t.is_file()).unwrap_or(false) => {
                         // Never scan the output while it is being written, even if it has a
@@ -294,7 +309,9 @@ fn main() -> Result<()> {
                             && patterns.supports_language(lang)
                         {
                             // Send to channel instead of pushing to mutex-protected Vec
-                            let _ = file_tx.send(path);
+                            if file_tx.send(path).is_err() {
+                                return ignore::WalkState::Quit;
+                            }
                             let count = file_count.fetch_add(1, Ordering::Relaxed) + 1;
                             // Batch progress updates: only update every 100 files
                             if let Some(pb) = &discovery_bar
@@ -309,7 +326,10 @@ fn main() -> Result<()> {
                         }
                     }
                     Ok(_) => {}
-                    Err(err) => eprintln!("walk error: {err}"),
+                    Err(err) => {
+                        errors.fetch_add(1, Ordering::Relaxed);
+                        eprintln!("walk error: {err}");
+                    }
                 }
                 ignore::WalkState::Continue
             })
@@ -333,16 +353,28 @@ fn main() -> Result<()> {
     }
 
     // Wait for all scanning to complete
-    scanner_handle
+    let scanner_result = scanner_handle
         .join()
-        .map_err(|_| anyhow!("scanner thread panicked"))?;
+        .map_err(|_| anyhow!("scanner thread panicked"));
 
     // All files have been processed
     drop(tx);
 
-    writer_handle
+    let writer_result = writer_handle
         .join()
-        .map_err(|_| anyhow!("writer thread panicked"))??;
+        .map_err(|_| anyhow!("writer thread panicked"));
+    scanner_result?;
+    writer_result??;
+
+    let errors = error_count.load(Ordering::Relaxed);
+    if errors != 0 {
+        bail!("scan incomplete: {errors} error(s); see diagnostics above");
+    }
+    if let Some(output) = pending_output {
+        output
+            .persist(&cli.output)
+            .with_context(|| format!("save output: {}", cli.output))?;
+    }
 
     if let Some(pb) = &scan_bar {
         pb.finish_with_message(format!(
@@ -366,7 +398,7 @@ fn main() -> Result<()> {
 /// Processes a single file to find cryptographic assets.
 ///
 /// This function performs the core analysis for each file:
-/// 1.  **Memory-maps** the file for efficient reading.
+/// 1.  Reads the file into owned memory, enforcing the size limit while reading.
 /// 2.  Decodes the file content to UTF-8, with a fallback to a lossy conversion.
 /// 3.  **Parses** the content into an Abstract Syntax Tree (AST) using `tree-sitter`.
 /// 4.  **Finds library anchors**: Scans the AST for `import` or `include` statements that
@@ -379,29 +411,133 @@ fn process_file(
     path: &Path,
     patterns: &patterns::PatternSet,
     tx: &channel::Sender<Finding>,
-) -> Result<()> {
+    max_bytes: Option<u64>,
+) -> Result<bool> {
     let file = File::open(path).with_context(|| format!("open {}", path.display()))?;
-    if file.metadata()?.len() == 0 {
-        return Ok(());
-    }
-    let mmap = unsafe { Mmap::map(&file)? };
-    // Decode file contents safely; fall back to lossy if not valid UTF-8 to avoid UB
-    let content_owned;
-    let content: &str = match std::str::from_utf8(&mmap) {
-        Ok(s) => s,
-        Err(_) => {
-            content_owned = String::from_utf8_lossy(&mmap).into_owned();
-            &content_owned
-        }
+    let Some(bytes) = read_source(file, max_bytes)? else {
+        return Ok(false);
     };
+    let content = String::from_utf8_lossy(&bytes);
 
     let Some(lang) = scan::language_from_path(path) else {
-        return Ok(());
+        return Ok(true);
     };
     let source_label = path.to_string_lossy();
-    for finding in scan_with_patterns(content, lang, &source_label, patterns)? {
+    for finding in scan_with_patterns(&content, lang, &source_label, patterns)? {
         tx.send(finding).context("writer thread stopped")?;
     }
 
-    Ok(())
+    Ok(true)
+}
+
+// Reading owned bytes avoids the undefined behavior of file-backed mmap when
+// editors or build tools modify/truncate source files during a scan.
+fn read_source(reader: impl Read, max_bytes: Option<u64>) -> Result<Option<Vec<u8>>> {
+    let mut bytes = Vec::new();
+    reader
+        .take(max_bytes.unwrap_or(u64::MAX).saturating_add(1))
+        .read_to_end(&mut bytes)
+        .context("read source")?;
+    if max_bytes.is_some_and(|limit| bytes.len() as u64 > limit) {
+        return Ok(None);
+    }
+    Ok(Some(bytes))
+}
+
+type PreparedOutput = (
+    Box<dyn Write + Send>,
+    Option<NamedTempFile>,
+    Option<PathBuf>,
+);
+
+fn prepare_output(cli: &Cli) -> Result<PreparedOutput> {
+    if cli.output == "-" {
+        return Ok((Box::new(BufWriter::new(std::io::stdout())), None, None));
+    }
+    let destination = Path::new(&cli.output);
+    let existing = match std::fs::symlink_metadata(destination) {
+        Ok(metadata) => {
+            if !metadata.is_file() {
+                bail!("output must be a regular file: {}", destination.display());
+            }
+            let resolved = destination.canonicalize()?;
+            let is_input = scan::language_from_path(destination).is_some()
+                || cli
+                    .roots
+                    .iter()
+                    .chain(cli.patterns.iter())
+                    .any(|path| path.canonicalize().is_ok_and(|path| path == resolved));
+            if is_input {
+                bail!(
+                    "refusing to overwrite scan input: {}",
+                    destination.display()
+                );
+            }
+            Some(resolved)
+        }
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => None,
+        Err(err) => return Err(err).context("inspect output path"),
+    };
+    let parent = destination
+        .parent()
+        .filter(|p| !p.as_os_str().is_empty())
+        .unwrap_or(Path::new("."));
+    let pending = tempfile::Builder::new()
+        .prefix(".cipherscope-")
+        .suffix(".tmp")
+        .tempfile_in(parent)
+        .with_context(|| format!("create output in {}", parent.display()))?;
+    let writer = BufWriter::new(pending.reopen()?);
+    Ok((Box::new(writer), Some(pending), existing))
+}
+
+fn write_findings(
+    mut writer: impl Write,
+    rx: channel::Receiver<Finding>,
+    found_count: &AtomicUsize,
+    progress: Option<&ProgressBar>,
+) -> Result<()> {
+    for finding in rx {
+        serde_json::to_writer(&mut writer, &finding)?;
+        writer.write_all(b"\n")?;
+        let count = found_count.fetch_add(1, Ordering::Relaxed) + 1;
+        if let Some(pb) = progress {
+            pb.set_message(format!("Found {count} cryptographic items"));
+        }
+    }
+    writer.flush().context("flush findings")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn reads_at_most_limit_plus_one_bytes() {
+        let mut reader = std::io::Cursor::new(vec![b'x'; 100]);
+        assert!(read_source(&mut reader, Some(8)).unwrap().is_none());
+        assert_eq!(reader.position(), 9);
+        assert_eq!(
+            read_source(&b"abcd"[..], Some(4)).unwrap().unwrap(),
+            b"abcd"
+        );
+        assert!(read_source(&b""[..], Some(0)).unwrap().unwrap().is_empty());
+    }
+
+    #[test]
+    fn writer_propagates_flush_failure() {
+        struct FailingFlush;
+        impl Write for FailingFlush {
+            fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+                Ok(bytes.len())
+            }
+            fn flush(&mut self) -> std::io::Result<()> {
+                Err(std::io::Error::other("disk full"))
+            }
+        }
+        let (tx, rx) = channel::bounded(1);
+        drop(tx);
+        let error = write_findings(FailingFlush, rx, &AtomicUsize::new(0), None).unwrap_err();
+        assert!(format!("{error:#}").contains("disk full"));
+    }
 }
