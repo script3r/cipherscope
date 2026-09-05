@@ -109,6 +109,8 @@ The output is a stream of JSONL objects, where each object represents a single f
 - **Algorithms**: Symbols and function calls associated with specific algorithms (e.g., "AES-GCM") within a library.
 
 You can customize this file to add support for new libraries or improve detection for existing ones.
+See [pattern configuration](docs/pattern-schema.md) for accepted fields, language
+names, and validation behavior.
 
 ## Development
 

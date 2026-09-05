@@ -54,8 +54,8 @@ impl Language {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct RawPatternSet {
-    #[allow(dead_code)]
     #[serde(default)]
     version: Option<RawVersion>,
     #[serde(default)]
@@ -63,8 +63,8 @@ struct RawPatternSet {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct RawVersion {
-    #[allow(dead_code)]
     #[serde(default)]
     schema: Option<String>,
     #[allow(dead_code)]
@@ -73,6 +73,7 @@ struct RawVersion {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct RawLibrary {
     name: String,
     languages: Vec<String>,
@@ -83,6 +84,7 @@ struct RawLibrary {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct RawLibraryPatterns {
     #[serde(default)]
     include: Vec<String>,
@@ -91,6 +93,7 @@ struct RawLibraryPatterns {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct RawAlgorithm {
     name: String,
     primitive: Option<String>,
@@ -103,6 +106,7 @@ struct RawAlgorithm {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct RawParameterPattern {
     name: String,
     pattern: String,
@@ -165,41 +169,82 @@ pub struct ParameterPattern {
 impl PatternSet {
     pub fn from_toml(text: &str) -> Result<Self> {
         let raw: RawPatternSet = toml::from_str(text).context("parse patterns.toml")?;
+        if let Some(schema) = raw
+            .version
+            .as_ref()
+            .and_then(|version| version.schema.as_deref())
+            && schema != "1"
+        {
+            bail!("unsupported pattern schema {schema:?}; expected \"1\"");
+        }
         let mut libraries = Vec::new();
         let mut library_names = HashSet::new();
         for lib in raw.library {
-            let languages = lib
-                .languages
-                .into_iter()
-                .filter_map(|name| Language::from_pattern_name(&name))
-                .collect::<Vec<_>>();
-            if languages.is_empty() {
-                continue;
+            if lib.name.trim().is_empty() {
+                bail!("library name must not be empty");
             }
             if !library_names.insert(lib.name.clone()) {
                 bail!("duplicate library name {:?}", lib.name);
+            }
+            if lib.languages.is_empty() {
+                bail!("library {:?}: languages must not be empty", lib.name);
+            }
+            let mut languages = Vec::new();
+            for name in &lib.languages {
+                if let Some(language) = Language::from_pattern_name(name) {
+                    if !languages.contains(&language) {
+                        languages.push(language);
+                    }
+                } else if !matches!(name.as_str(), "Kotlin" | "Erlang") {
+                    bail!("library {:?}: unknown language {name:?}", lib.name);
+                }
             }
             let mut include_regexes = Vec::new();
             let mut api_regexes = Vec::new();
             if let Some(p) = lib.patterns {
                 for re in p.include {
-                    include_regexes.push(Regex::new(&re)?);
+                    include_regexes.push(Regex::new(&re).with_context(|| {
+                        format!("library {:?}: invalid include regex {re:?}", lib.name)
+                    })?);
                 }
                 for re in p.apis {
-                    api_regexes.push(Regex::new(&re)?);
+                    api_regexes.push(Regex::new(&re).with_context(|| {
+                        format!("library {:?}: invalid API regex {re:?}", lib.name)
+                    })?);
                 }
             }
             let mut algorithms = Vec::new();
             for a in lib.algorithms {
+                if a.name.trim().is_empty() {
+                    bail!("library {:?}: algorithm name must not be empty", lib.name);
+                }
                 let mut symbol_regexes = Vec::new();
                 for re in a.symbol_patterns {
-                    symbol_regexes.push(Regex::new(&re)?);
+                    symbol_regexes.push(Regex::new(&re).with_context(|| {
+                        format!(
+                            "library {:?}, algorithm {:?}: invalid symbol regex {re:?}",
+                            lib.name, a.name
+                        )
+                    })?);
                 }
                 let mut parameter_patterns = Vec::new();
                 for p in a.parameter_patterns {
+                    if p.name.trim().is_empty() {
+                        bail!(
+                            "library {:?}, algorithm {:?}: parameter name must not be empty",
+                            lib.name,
+                            a.name
+                        );
+                    }
+                    let regex = Regex::new(&p.pattern).with_context(|| {
+                        format!(
+                            "library {:?}, algorithm {:?}, parameter {:?}: invalid regex {:?}",
+                            lib.name, a.name, p.name, p.pattern
+                        )
+                    })?;
                     parameter_patterns.push(ParameterPattern {
                         name: p.name,
-                        regex: Regex::new(&p.pattern)?,
+                        regex,
                         default_value: p.default_value.map(toml_value_to_json),
                     });
                 }
@@ -210,6 +255,11 @@ impl PatternSet {
                     symbol_regexes,
                     parameter_patterns,
                 });
+            }
+            // The catalog reserves Kotlin and Erlang for future parsers. Validate
+            // their definitions too, but do not advertise them as scannable.
+            if languages.is_empty() {
+                continue;
             }
             libraries.push(Library {
                 name: lib.name,
