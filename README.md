@@ -30,7 +30,7 @@
     c.  **Anchoring**: The scanner looks for "library anchors" (e.g., `import` or `#include` statements) that match known cryptographic libraries defined in `patterns.toml`.
     d.  **Algorithm Detection**: If an anchor is found, the scanner performs a deeper search within that file for specific algorithm usage patterns, such as function calls and constants.
 
-All results are streamed as JSONL to the output, allowing for real-time monitoring and processing.
+Findings are streamed as JSONL to stdout for monitoring and processing.
 For a deeper architecture overview, see `DESIGN.md`.
 
 The CLI exits unsuccessfully if discovery, reading, parsing, or writing fails;
