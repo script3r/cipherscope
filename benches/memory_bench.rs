@@ -26,14 +26,17 @@ fn run_scan_with_memory(
     threads: usize,
     patterns_path: &Path,
 ) -> (Duration, Option<u64>) {
-    let output = NamedTempFile::new().expect("create temp output file");
+    // Close the destination handle so Windows can atomically replace the output.
+    let output = NamedTempFile::new()
+        .expect("create temp output file")
+        .into_temp_path();
 
     let start = Instant::now();
     let result = Command::new("/usr/bin/time")
         .arg("-v")
         .arg(assert_cmd::cargo::cargo_bin!("cipherscope"))
         .arg("--output")
-        .arg(output.path())
+        .arg(output.as_os_str())
         .arg("--threads")
         .arg(threads.to_string())
         .arg("--patterns")
@@ -64,12 +67,15 @@ fn run_scan_with_memory(
     threads: usize,
     patterns_path: &Path,
 ) -> (Duration, Option<u64>) {
-    let output = NamedTempFile::new().expect("create temp output file");
+    // Close the destination handle so Windows can atomically replace the output.
+    let output = NamedTempFile::new()
+        .expect("create temp output file")
+        .into_temp_path();
 
     let start = Instant::now();
     let status = Command::new(assert_cmd::cargo::cargo_bin!("cipherscope"))
         .arg("--output")
-        .arg(output.path())
+        .arg(output.as_os_str())
         .arg("--threads")
         .arg(threads.to_string())
         .arg("--patterns")
@@ -85,10 +91,13 @@ fn run_scan_with_memory(
 }
 
 fn run_scan(roots: &[PathBuf], threads: usize, patterns_path: &Path) {
-    let output = NamedTempFile::new().expect("create temp output file");
+    // Close the destination handle so Windows can atomically replace the output.
+    let output = NamedTempFile::new()
+        .expect("create temp output file")
+        .into_temp_path();
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("cipherscope"));
     cmd.arg("--output")
-        .arg(output.path())
+        .arg(output.as_os_str())
         .arg("--threads")
         .arg(threads.to_string())
         .arg("--patterns")

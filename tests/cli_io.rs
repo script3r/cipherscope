@@ -6,6 +6,27 @@ fn scanner() -> Command {
 }
 
 #[test]
+fn successful_scan_replaces_existing_output() {
+    let dir = TempDir::new().unwrap();
+    let output_path = dir.path().join("inventory.jsonl");
+    fs::write(&output_path, "previous inventory\n").unwrap();
+    let output = scanner()
+        .arg("--roots")
+        .arg(dir.path())
+        .arg("--output")
+        .arg(&output_path)
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert!(fs::read(output_path).unwrap().is_empty());
+    assert_eq!(fs::read_dir(dir.path()).unwrap().count(), 1);
+}
+
+#[test]
 fn missing_root_fails_and_preserves_existing_output() {
     let dir = TempDir::new().unwrap();
     let output_path = dir.path().join("inventory.jsonl");

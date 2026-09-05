@@ -92,6 +92,11 @@ C-only and TypeScript-only suites. Rust 1.88 all-target/all-feature compilation,
 `actionlint`, and the patched dependency audit pass locally. Expanded CI exercises
 the other platforms and parser combinations on GitHub.
 
+The combined Windows CI run exposed test and benchmark callers retaining open
+temporary output handles during atomic replacement. They now retain `TempPath`
+cleanup guards while closing the file handles before invoking the scanner. A
+regression test also verifies successful replacement of an existing inventory.
+
 PRs #14–#17 have merged into main. PR #14 changed output behavior:
 it requires a writable destination directory, rejects source/symlink
 destinations, and preserves previous file output when scanning fails. #17 adds a
