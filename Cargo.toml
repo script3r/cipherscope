@@ -1,6 +1,6 @@
 [package]
 name = "cipherscope"
-version = "0.2.5"
+version = "0.3.0"
 edition = "2024"
 rust-version = "1.88"
 description = "A high-performance, language-aware tool for scanning source code to detect cryptographic libraries and algorithms usage."
