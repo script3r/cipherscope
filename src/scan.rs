@@ -38,9 +38,11 @@ define_ts_lang!(
     "lang-typescript",
     tree_sitter_typescript::LANGUAGE_TYPESCRIPT
 );
-// Note: For TSX files, we use the TypeScript grammar which handles most crypto detection needs.
-// The TSX grammar (tree_sitter_typescript::LANGUAGE_TSX) could be used for JSX-specific parsing
-// if needed in the future.
+define_ts_lang!(
+    ts_lang_tsx,
+    "lang-typescript",
+    tree_sitter_typescript::LANGUAGE_TSX
+);
 
 #[derive(Clone, Copy, Debug)]
 pub struct LibraryHit<'a> {
@@ -58,7 +60,12 @@ pub struct AlgorithmHit<'a> {
 }
 
 pub fn language_from_path(path: &std::path::Path) -> Option<Language> {
-    let ext = path.extension()?.to_str()?.to_ascii_lowercase();
+    let extension = path.extension()?.to_str()?;
+    // Uppercase .C conventionally denotes C++, unlike ordinary case variants.
+    if extension == "C" {
+        return Language::Cpp.is_enabled().then_some(Language::Cpp);
+    }
+    let ext = extension.to_ascii_lowercase();
     let language = match ext.as_str() {
         "c" => Language::C,
         // Prefer the C++ grammar for ambiguous headers, but keep C-only builds useful.
@@ -73,7 +80,8 @@ pub fn language_from_path(path: &std::path::Path) -> Option<Language> {
         "m" | "mm" => Language::Objc,
         "rs" => Language::Rust,
         "js" | "mjs" | "cjs" | "jsx" => Language::JavaScript,
-        "ts" | "mts" | "cts" | "tsx" => Language::TypeScript,
+        "ts" | "mts" | "cts" => Language::TypeScript,
+        "tsx" => Language::Tsx,
         _ => return None,
     };
     language.is_enabled().then_some(language)
@@ -98,6 +106,7 @@ pub fn parse(lang: Language, content: &str) -> Result<Tree> {
         Language::Rust => ts_lang_rust()?,
         Language::JavaScript => ts_lang_javascript()?,
         Language::TypeScript => ts_lang_typescript()?,
+        Language::Tsx => ts_lang_tsx()?,
     };
     parser.set_language(&ts_lang).context("set language")?;
 
@@ -140,7 +149,7 @@ pub fn find_library_anchors<'a>(
 
     // Handle libraries without include patterns (fallback to api_regexes)
     for lib in &patterns.libraries {
-        if !lib.languages.contains(&lang) {
+        if !lib.languages.contains(&lang.pattern_language()) {
             continue;
         }
         if lib.include_regexes.is_empty() {
@@ -156,7 +165,10 @@ pub fn find_library_anchors<'a>(
     }
 
     // Use pre-compiled include set with ownership tracking
-    let Some(include_set_with_owners) = patterns.include_sets_with_owners.get(&lang) else {
+    let Some(include_set_with_owners) = patterns
+        .include_sets_with_owners
+        .get(&lang.pattern_language())
+    else {
         return hits;
     };
 
@@ -179,13 +191,13 @@ pub fn find_library_anchors<'a>(
 }
 
 pub fn has_anchor_hint(lang: Language, content: &str, patterns: &PatternSet) -> bool {
-    if let Some(include_set) = patterns.include_sets.get(&lang)
+    if let Some(include_set) = patterns.include_sets.get(&lang.pattern_language())
         && include_set.is_match(content)
     {
         return true;
     }
 
-    if let Some(api_set) = patterns.api_sets.get(&lang)
+    if let Some(api_set) = patterns.api_sets.get(&lang.pattern_language())
         && api_set.is_match(content)
     {
         return true;
@@ -474,7 +486,7 @@ fn collect_constants(
 ) -> HashMap<String, String> {
     let mut constants = HashMap::new();
 
-    let Some(const_patterns) = patterns.constant_patterns.get(&lang) else {
+    let Some(const_patterns) = patterns.constant_patterns.get(&lang.pattern_language()) else {
         return constants;
     };
 
@@ -632,7 +644,7 @@ fn import_like_nodes<'a>(lang: Language, root: Node<'a>, content: &[u8]) -> Vec<
                     }
             }
             // TypeScript: same as JavaScript (import statements, require calls)
-            Language::TypeScript => {
+            Language::TypeScript | Language::Tsx => {
                 kind == "import_statement"
                     || kind == "call_expression" && {
                         node.child(0)
@@ -708,7 +720,7 @@ fn code_symbol_nodes<'a>(lang: Language, root: Node<'a>) -> Vec<Node<'a>> {
                 "call_expression" | "member_expression" | "string" | "template_string"
             ),
             // TypeScript: same as JavaScript
-            Language::TypeScript => matches!(
+            Language::TypeScript | Language::Tsx => matches!(
                 kind,
                 "call_expression" | "member_expression" | "string" | "template_string"
             ),

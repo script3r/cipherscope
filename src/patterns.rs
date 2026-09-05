@@ -16,6 +16,8 @@ pub enum Language {
     Rust,
     JavaScript,
     TypeScript,
+    /// TypeScript with JSX syntax; uses the TypeScript pattern catalog.
+    Tsx,
 }
 
 impl Language {
@@ -31,7 +33,14 @@ impl Language {
             Self::Objc => cfg!(feature = "lang-objc"),
             Self::Rust => cfg!(feature = "lang-rust"),
             Self::JavaScript => cfg!(feature = "lang-javascript"),
-            Self::TypeScript => cfg!(feature = "lang-typescript"),
+            Self::TypeScript | Self::Tsx => cfg!(feature = "lang-typescript"),
+        }
+    }
+
+    pub(crate) const fn pattern_language(self) -> Self {
+        match self {
+            Self::Tsx => Self::TypeScript,
+            language => language,
         }
     }
 
@@ -356,7 +365,11 @@ impl PatternSet {
     }
 
     pub fn supports_language(&self, lang: Language) -> bool {
-        lang.is_enabled() && self.libraries.iter().any(|l| l.languages.contains(&lang))
+        lang.is_enabled()
+            && self
+                .libraries
+                .iter()
+                .any(|l| l.languages.contains(&lang.pattern_language()))
     }
 }
 

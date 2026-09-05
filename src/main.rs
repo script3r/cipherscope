@@ -10,7 +10,6 @@ use clap::Parser;
 use crossbeam_channel as channel;
 use ignore::WalkBuilder;
 use ignore::overrides::OverrideBuilder;
-use ignore::types::TypesBuilder;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use memmap2::Mmap;
 use rayon::prelude::*;
@@ -181,44 +180,8 @@ fn main() -> Result<()> {
         }
     }
 
-    let mut types_builder = TypesBuilder::new();
-    types_builder.add("c", "*.c").unwrap();
-    types_builder.add("c", "*.h").unwrap();
-    types_builder.add("cpp", "*.cc").unwrap();
-    types_builder.add("cpp", "*.cpp").unwrap();
-    types_builder.add("cpp", "*.cxx").unwrap();
-    types_builder.add("cpp", "*.hpp").unwrap();
-    types_builder.add("cpp", "*.hh").unwrap();
-    types_builder.add("cpp", "*.hxx").unwrap();
-    types_builder.add("java", "*.java").unwrap();
-    types_builder.add("python", "*.py").unwrap();
-    types_builder.add("go", "*.go").unwrap();
-    types_builder.add("swift", "*.swift").unwrap();
-    types_builder.add("php", "*.php").unwrap();
-    types_builder.add("php", "*.hack").unwrap();
-    types_builder.add("objc", "*.m").unwrap();
-    types_builder.add("objc", "*.mm").unwrap();
-    types_builder.add("rust", "*.rs").unwrap();
-    types_builder.add("javascript", "*.js").unwrap();
-    types_builder.add("javascript", "*.mjs").unwrap();
-    types_builder.add("javascript", "*.cjs").unwrap();
-    types_builder.add("javascript", "*.jsx").unwrap();
-    types_builder.add("typescript", "*.ts").unwrap();
-    types_builder.add("typescript", "*.mts").unwrap();
-    types_builder.add("typescript", "*.cts").unwrap();
-    types_builder.add("typescript", "*.tsx").unwrap();
-    types_builder.select("c");
-    types_builder.select("cpp");
-    types_builder.select("java");
-    types_builder.select("python");
-    types_builder.select("go");
-    types_builder.select("swift");
-    types_builder.select("php");
-    types_builder.select("objc");
-    types_builder.select("rust");
-    types_builder.select("javascript");
-    types_builder.select("typescript");
-    walk_builder.types(types_builder.build()?);
+    // language_from_path is the single source of truth for supported extensions.
+    // A second, case-sensitive glob allowlist used to silently drop uppercase files.
 
     if !cli.exclude.is_empty() {
         let mut override_builder = OverrideBuilder::new(Path::new("."));
