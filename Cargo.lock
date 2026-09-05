@@ -204,6 +204,7 @@ dependencies = [
  "memmap2",
  "rayon",
  "regex",
+ "regex-syntax",
  "serde",
  "serde_json",
  "tempfile",

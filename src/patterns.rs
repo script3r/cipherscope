@@ -1,5 +1,6 @@
 use anyhow::{Context, Result, bail};
 use regex::{Regex, RegexSet};
+use regex_syntax::hir::{Hir, HirKind};
 use serde::Deserialize;
 use std::collections::{HashMap, HashSet};
 
@@ -127,6 +128,7 @@ pub struct ConstantPatterns {
 #[derive(Debug, Clone)]
 pub struct PatternSet {
     pub libraries: Vec<Library>,
+    /// Conservative whole-file hints; authoritative include regexes live in the owner sets.
     pub include_sets: HashMap<Language, RegexSet>,
     pub api_sets: HashMap<Language, RegexSet>,
     /// Pre-compiled include patterns per language with library ownership for find_library_anchors
@@ -246,7 +248,16 @@ impl PatternSet {
         for (lang, patterns) in include_patterns {
             if !patterns.is_empty() {
                 let regex_set = RegexSet::new(&patterns)?;
-                include_sets.insert(lang, regex_set.clone());
+                let hints = patterns
+                    .iter()
+                    .map(|pattern| {
+                        regex_syntax::Parser::new()
+                            .parse(pattern)
+                            .map(|hir| without_assertions(hir).to_string())
+                            .context("compile include hint")
+                    })
+                    .collect::<std::result::Result<Vec<_>, _>>()?;
+                include_sets.insert(lang, RegexSet::new(hints)?);
                 include_sets_with_owners.insert(
                     lang,
                     IncludeSetWithOwners {
@@ -357,6 +368,29 @@ impl PatternSet {
 
     pub fn supports_language(&self, lang: Language) -> bool {
         lang.is_enabled() && self.libraries.iter().any(|l| l.languages.contains(&lang))
+    }
+}
+
+// Include regexes run on individual AST nodes. Their start/end and boundary
+// assertions do not necessarily hold in the enclosing file. Removing zero-width
+// assertions produces a conservative hint without changing authoritative matching.
+fn without_assertions(hir: Hir) -> Hir {
+    match hir.into_kind() {
+        HirKind::Empty | HirKind::Look(_) => Hir::empty(),
+        HirKind::Literal(literal) => Hir::literal(literal.0),
+        HirKind::Class(class) => Hir::class(class),
+        HirKind::Repetition(mut repetition) => {
+            repetition.sub = Box::new(without_assertions(*repetition.sub));
+            Hir::repetition(repetition)
+        }
+        HirKind::Capture(mut capture) => {
+            capture.sub = Box::new(without_assertions(*capture.sub));
+            Hir::capture(capture)
+        }
+        HirKind::Concat(parts) => Hir::concat(parts.into_iter().map(without_assertions).collect()),
+        HirKind::Alternation(parts) => {
+            Hir::alternation(parts.into_iter().map(without_assertions).collect())
+        }
     }
 }
 

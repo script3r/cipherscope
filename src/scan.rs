@@ -1,5 +1,6 @@
 use ahash::{AHashMap as HashMap, AHashSet as HashSet};
 use anyhow::{Context, Result};
+use std::borrow::Cow;
 use std::ops::ControlFlow;
 use std::time::{Duration, Instant};
 use tree_sitter::{Language as TsLanguage, Node, ParseOptions, Parser, Point, Tree};
@@ -137,6 +138,7 @@ pub fn find_library_anchors<'a>(
     patterns: &'a PatternSet,
 ) -> Vec<LibraryHit<'a>> {
     let mut hits = Vec::new();
+    let code = without_comments(content, tree);
 
     // Handle libraries without include patterns (fallback to api_regexes)
     for lib in &patterns.libraries {
@@ -145,7 +147,7 @@ pub fn find_library_anchors<'a>(
         }
         if lib.include_regexes.is_empty() {
             // Fallback: scan entire content with api_regexes as a coarse anchor (no AST import nodes)
-            if lib.api_regexes.iter().any(|re| re.is_match(content)) {
+            if lib.api_regexes.iter().any(|re| re.is_match(&code)) {
                 hits.push(LibraryHit {
                     library_name: &lib.name,
                     line: 1,
@@ -222,6 +224,8 @@ pub fn find_algorithms<'a>(
             primitive_by_alg.insert(alg.name.clone(), primitive.clone());
         }
     }
+    let code = without_comments(content, tree);
+    let content = code.as_ref();
     let constants = collect_constants(lang, content, patterns);
     // Build line cache for fast line/column lookups (O(n) once, O(log n) per lookup)
     let line_cache = LineCache::new(content);
@@ -605,6 +609,36 @@ fn replace_constants_with_map(
     );
 
     (resolved, map)
+}
+
+// Replace AST comment bytes with spaces while retaining newlines and byte
+// offsets. String contents (including URLs and comment-like text) stay intact.
+fn without_comments<'a>(content: &'a str, tree: &Tree) -> Cow<'a, str> {
+    let mut masked: Option<Vec<u8>> = None;
+    let mut cursor = tree.walk();
+    loop {
+        let node = cursor.node();
+        if node.kind() == "comment" || node.kind().ends_with("_comment") {
+            let bytes = masked.get_or_insert_with(|| content.as_bytes().to_vec());
+            for byte in &mut bytes[node.byte_range()] {
+                if !matches!(*byte, b'\n' | b'\r') {
+                    *byte = b' ';
+                }
+            }
+        } else if cursor.goto_first_child() {
+            continue;
+        }
+        loop {
+            if cursor.goto_next_sibling() {
+                break;
+            }
+            if !cursor.goto_parent() {
+                return masked.map_or(Cow::Borrowed(content), |bytes| {
+                    Cow::Owned(String::from_utf8(bytes).expect("mask preserves UTF-8"))
+                });
+            }
+        }
+    }
 }
 
 fn import_like_nodes<'a>(lang: Language, root: Node<'a>, content: &[u8]) -> Vec<Node<'a>> {
