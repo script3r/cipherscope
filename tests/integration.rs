@@ -3,9 +3,15 @@ use std::{
     path::{Path, PathBuf},
     process::Command,
 };
-use tempfile::NamedTempFile;
 #[cfg(feature = "lang-rust")]
 use tempfile::TempDir;
+use tempfile::{NamedTempFile, TempPath};
+
+// Keep automatic cleanup without holding a destination handle open: Windows
+// cannot atomically replace an output that the parent test still has open.
+fn temporary_output() -> TempPath {
+    NamedTempFile::new().unwrap().into_temp_path()
+}
 
 fn normalize_path_in_value(mut v: serde_json::Value) -> serde_json::Value {
     if let Some(obj) = v.as_object_mut()
@@ -100,8 +106,8 @@ fn fixtures_match_ground_truth() {
         let src_dir = case_dir.join("src");
         let expected_path = case_dir.join("expected.jsonl");
 
-        let tmp_out = NamedTempFile::new().unwrap();
-        let out_path = tmp_out.path().to_path_buf();
+        let tmp_out = temporary_output();
+        let out_path = tmp_out.to_path_buf();
 
         let status = Command::new(env!("CARGO_BIN_EXE_cipherscope"))
             .current_dir(&repo_root)
@@ -142,8 +148,8 @@ fn exclude_works() {
     let repo_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let fixtures_dir = repo_root.join("fixtures");
 
-    let tmp_out = NamedTempFile::new().unwrap();
-    let out_path = tmp_out.path().to_path_buf();
+    let tmp_out = temporary_output();
+    let out_path = tmp_out.to_path_buf();
 
     // We'll scan the whole fixtures/go directory, but exclude the tink_aesgcm subdirectory
     let status = Command::new(env!("CARGO_BIN_EXE_cipherscope"))
@@ -182,8 +188,8 @@ fn multiple_roots_work() {
     let repo_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let fixtures_dir = repo_root.join("fixtures");
 
-    let tmp_out = NamedTempFile::new().unwrap();
-    let out_path = tmp_out.path().to_path_buf();
+    let tmp_out = temporary_output();
+    let out_path = tmp_out.to_path_buf();
 
     // We'll scan two directories and check for combined output
     let status = Command::new(env!("CARGO_BIN_EXE_cipherscope"))
@@ -248,8 +254,8 @@ symbol_patterns = ["test_algo"]
     big_content.push_str(&"a".repeat(1024 * 1024));
     fs::write(&big_path, big_content).unwrap();
 
-    let tmp_out = NamedTempFile::new().unwrap();
-    let out_path = tmp_out.path().to_path_buf();
+    let tmp_out = temporary_output();
+    let out_path = tmp_out.to_path_buf();
 
     let status = Command::new(env!("CARGO_BIN_EXE_cipherscope"))
         .current_dir(&repo_root)
@@ -395,7 +401,7 @@ symbol_patterns = ["test_algo"]
     )
     .unwrap();
 
-    let default_output = NamedTempFile::new().unwrap();
+    let default_output = temporary_output();
     let status = Command::new(env!("CARGO_BIN_EXE_cipherscope"))
         .args([
             "--roots",
@@ -403,14 +409,14 @@ symbol_patterns = ["test_algo"]
             "--patterns",
             patterns_path.to_str().unwrap(),
             "--output",
-            default_output.path().to_str().unwrap(),
+            default_output.to_str().unwrap(),
         ])
         .status()
         .unwrap();
     assert!(status.success());
-    assert!(read_jsonl(default_output.path()).is_empty());
+    assert!(read_jsonl(&default_output).is_empty());
 
-    let unignored_output = NamedTempFile::new().unwrap();
+    let unignored_output = temporary_output();
     let status = Command::new(env!("CARGO_BIN_EXE_cipherscope"))
         .args([
             "--roots",
@@ -418,11 +424,11 @@ symbol_patterns = ["test_algo"]
             "--patterns",
             patterns_path.to_str().unwrap(),
             "--output",
-            unignored_output.path().to_str().unwrap(),
+            unignored_output.to_str().unwrap(),
             "--gitignore=false",
         ])
         .status()
         .unwrap();
     assert!(status.success());
-    assert_eq!(read_jsonl(unignored_output.path()).len(), 2);
+    assert_eq!(read_jsonl(&unignored_output).len(), 2);
 }

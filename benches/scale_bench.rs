@@ -20,10 +20,13 @@ fn is_extended() -> bool {
 }
 
 fn run_scan(roots: &[PathBuf], threads: usize, patterns_path: &Path) {
-    let output = NamedTempFile::new().expect("create temp output file");
+    // Close the destination handle so Windows can atomically replace the output.
+    let output = NamedTempFile::new()
+        .expect("create temp output file")
+        .into_temp_path();
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("cipherscope"));
     cmd.arg("--output")
-        .arg(output.path())
+        .arg(output.as_os_str())
         .arg("--threads")
         .arg(threads.to_string())
         .arg("--patterns")

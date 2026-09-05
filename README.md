@@ -39,6 +39,8 @@ diagnostics go to stderr. Stdout may contain partial findings on failure. With
 successful scan, preserving any previous inventory on failure. Output must be a
 regular file, and existing source files or the custom patterns file cannot be
 used as the destination. The destination directory must be writable.
+On Windows, close open handles to an existing destination before scanning so it
+can be replaced atomically.
 
 ## Installation
 
